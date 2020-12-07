@@ -1,0 +1,5 @@
+uint16 pin
+float64 value
+lebai_msgs/ExecuteMode execute_mode
+---
+industrial_msgs/ServiceReturnCode code

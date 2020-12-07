@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find lebai_lm3_support)/urdf/two_lm3.xacro'" />
+</launch>

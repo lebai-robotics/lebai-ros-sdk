@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>lebai_lm3_support</name>
+  <version>0.0.0</version>
+  <description>The lebai_lm3_support package</description>
+  <maintainer email="liufang_robot@outlook.com">Liu Fang</maintainer>
+  <license>BSD</license>
+  <author email="liufang_robot@outlook.com">Liu Fang</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>lebai_resources</run_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+  </export>
+</package>

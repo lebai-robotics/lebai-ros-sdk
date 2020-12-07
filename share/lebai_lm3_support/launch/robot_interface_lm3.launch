@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  Manipulator specific version of 'robot_interface.launch'.
+
+  Defaults provided for lm3:
+   - 6 joints
+
+  Usage:
+    robot_interface_lm3.launch robot_ip:=<value>
+-->
+<launch>
+  <arg name="robot_ip" doc="IP of controller" />
+
+  <rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_lm3.yaml" />
+
+  <include file="$(find lebai_driver)/launch/robot_interface.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)" />
+  </include>
+</launch>

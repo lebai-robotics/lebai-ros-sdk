@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>lebai_lm3_urdf</name>
+  <version>0.0.0</version>
+  <description>The lebai_lm3_urdf package</description>
+  <maintainer email="liufang_robot@outlook.com">Liu Fang</maintainer>
+  <license>BSD</license>
+  <author email="liufang_robot@outlook.com">Liu Fang</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+  </export>
+</package>
