@@ -1,0 +1,8 @@
+prefix=/home/yonnielu/Documents/ros-sdk/install
+
+Name: lebai_lm3_moveit_config
+Description: Description of lebai_lm3_moveit_config
+Version: 0.3.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

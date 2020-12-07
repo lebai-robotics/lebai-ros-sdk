@@ -1,0 +1,8 @@
+prefix=/home/yonnielu/Documents/ros-sdk/install
+
+Name: lebai_msgs
+Description: Description of lebai_msgs
+Version: 0.0.1
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: industrial_msgs std_msgs trajectory_msgs
