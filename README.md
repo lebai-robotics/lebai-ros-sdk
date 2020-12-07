@@ -80,6 +80,40 @@ roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=<robot_ip>
 ## Ros basic
 As the common usage of ros commands, you can use `rostopic` or `rosservice` to query the states or control the robot.
 
+The following commands and states are support:
+- 
+- I/O
+  - RobotDI
+  - RobotDO
+  - RobotAI
+  - RobotAO
+  - FlangeDO
+  - FlangeDI
+- Motion
+  - MoveJ
+  - MoveL
+  - MoveC
+  - MovePVAT
+- States
+  - Joint states: pose, vel, torque
+  - Robot Status
+- Gripper (current support Lebai gripper only)
+  - Position
+  - Force
+- System Cmds
+  - PowerOn
+  - PowerOff
+  - Enable
+  - Disable
+  - PauseMotion
+  - ResumeMotion
+  - AbortMotion
+  - EntryTeachMode
+  - ExitTeachMode
+  - TurnOff
+  - EmergencyStop
+
+**Notes**: Currently the ros sdk is under development and in preview state, so commands and api maybe change according to our refactor and update, please keep in mind that you know changes will be made in the future updates.
 ## Python support
 Currently only support `python 2`.
 
