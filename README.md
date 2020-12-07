@@ -22,7 +22,7 @@ As a ROS Industrial package, you need firstly install `ROS` && `ROS Industrial`.
 Download deb package from the release section
 
 ```shell
-sudo apt install lebai-ros-sdk-1.0.deb
+sudo apt install lebai-ros-sdk-0.1.deb
 ```
 
 The sdk files will be installed under `/opt/lebai/ros` folder
