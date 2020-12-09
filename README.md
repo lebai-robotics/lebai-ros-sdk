@@ -36,8 +36,8 @@ sudo apt install lebai-ros-sdk-0.2.deb
 The sdk files will be installed under `/opt/lebai/ros` folder
 
 # Configuration
-The configuration is different that depends on what type of shell you use, the following will introduct the common used shells: `bash` and `zsh`.
-For the `Bash` and `ZSH` sections, you should choose the correct shell type.
+The configuration is different that depends on what type of shell you use, the following will introduct the common used shells: `Bash` and `Zsh`.
+For the `Bash` and `Zsh` sections, you should choose the correct shell type.
 
 ## Bash
 
@@ -45,7 +45,7 @@ For the `Bash` and `ZSH` sections, you should choose the correct shell type.
 echo "source /opt/lebai/ros/setup.bash" >> ~/.bashrc
 ```
 
-## ZSH
+## Zsh
 ```bash
 echo "source /opt/lebai/ros/setup.zsh" >> ~/.zshrc
 ```
