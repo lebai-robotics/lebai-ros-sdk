@@ -21,8 +21,16 @@ As a ROS Industrial package, you need firstly install `ROS` && `ROS Industrial`.
 
 Download deb package from the release section
 
-```shell
-sudo apt install lebai-ros-sdk-0.1.deb
+## Clean
+If you have installed `lebai-ros-sdk` before, please uninstall old version first.
+```bash
+sudo apt remove lebai-ros-sdk
+```
+
+## Installation
+
+```bash
+sudo apt install lebai-ros-sdk-0.2.deb
 ```
 
 The sdk files will be installed under `/opt/lebai/ros` folder
@@ -33,16 +41,54 @@ For the `Bash` and `ZSH` sections, you should choose the correct shell type.
 
 ## Bash
 
-```shell
+```bash
 echo "source /opt/lebai/ros/setup.bash" >> ~/.bashrc
 ```
 
 ## ZSH
-```shell
+```bash
 echo "source /opt/lebai/ros/setup.zsh" >> ~/.zshrc
 ```
 
-Then close current terminal and reopen again, then you are ready to go.
+Then close current terminal and reopen again, then you are ready to go. 
+You can use the following command to check whether it installed success or not.
+```bash
+rospack profile
+```
+
+```bash
+Full tree crawl took 0.018217 seconds.
+Directories marked with (*) contain no manifest.  You may
+want to delete these directories.
+To get just of list of directories without manifests,
+re-run the profile with --zombie-only
+-------------------------------------------------------------
+0.016406   /opt/ros/melodic/share
+0.001153 * /opt/ros/melodic/share/doc
+0.001150   /opt/lebai/ros/share
+0.001077 * /opt/ros/melodic/share/doc/eigenpy
+0.000667 * /opt/ros/melodic/share/doc/eigenpy/doxygen-html
+0.000277 * /opt/lebai/ros/share/common-lisp
+0.000247 * /opt/lebai/ros/share/common-lisp/ros
+0.000218 * /opt/lebai/ros/share/common-lisp/ros/lebai_msgs
+0.000217 * /opt/lebai/ros/share/gennodejs
+0.000213 * /opt/lebai/ros/share/roseus
+0.000179 * /opt/lebai/ros/share/gennodejs/ros
+0.000159 * /opt/lebai/ros/share/roseus/ros
+0.000142 * /opt/lebai/ros/share/gennodejs/ros/lebai_msgs
+0.000137 * /opt/ros/melodic/share/doc/eigenpy/doxygen-html/search
+0.000122 * /opt/lebai/ros/share/roseus/ros/lebai_msgs
+0.000042 * /opt/lebai/ros/share/common-lisp/ros/lebai_msgs/srv
+0.000041 * /opt/ros/melodic/share/man
+0.000030 * /opt/lebai/ros/share/common-lisp/ros/lebai_msgs/msg
+0.000024 * /opt/lebai/ros/share/gennodejs/ros/lebai_msgs/srv
+0.000021 * /opt/lebai/ros/share/roseus/ros/lebai_msgs/srv
+```
+
+If the result has the following line that means the installation was success:
+```bash
+0.001150   /opt/lebai/ros/share
+```
 
 # How to run
 
@@ -114,6 +160,7 @@ The following commands and states are support:
   - EmergencyStop
 
 **Notes**: Currently the ros sdk is under development and in preview state, so commands and api maybe change according to our refactor and update, please keep in mind that you know changes will be made in the future updates.
+
 ## Python support
 Currently only support `python 2`.
 
