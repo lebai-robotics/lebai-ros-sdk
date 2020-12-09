@@ -1,4 +1,4 @@
-prefix=/home/yonnielu/Documents/ros-sdk/install
+prefix=/opt/lebai/ros
 
 Name: lebai_lm3_moveit_config
 Description: Description of lebai_lm3_moveit_config

@@ -1,4 +1,4 @@
-prefix=/home/yonnielu/Documents/ros-sdk/install
+prefix=/opt/lebai/ros
 
 Name: lebai_lm3_urdf
 Description: Description of lebai_lm3_urdf

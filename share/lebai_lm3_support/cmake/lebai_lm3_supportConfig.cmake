@@ -74,7 +74,7 @@ if("FALSE" STREQUAL "TRUE")
 else()
   set(lebai_lm3_support_SOURCE_PREFIX "")
   set(lebai_lm3_support_DEVEL_PREFIX "")
-  set(lebai_lm3_support_INSTALL_PREFIX /home/yonnielu/Documents/ros-sdk/install)
+  set(lebai_lm3_support_INSTALL_PREFIX /opt/lebai/ros)
   set(lebai_lm3_support_PREFIX ${lebai_lm3_support_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/yonnielu/Documents/ros-sdk/install/lib;/home/yonnielu/Documents/ros-sdk/install/lib;/home/yonnielu/Documents/ros-sdk/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /opt/lebai/ros/lib;/home/yonnielu/Documents/ros-sdk/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
