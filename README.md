@@ -30,7 +30,7 @@ sudo apt remove lebai-ros-sdk
 ## Installation
 
 ```bash
-sudo apt install lebai-ros-sdk-0.2.deb
+sudo apt install lebai-ros-sdk-<version>.deb
 ```
 
 The sdk files will be installed under `/opt/lebai/ros` folder
