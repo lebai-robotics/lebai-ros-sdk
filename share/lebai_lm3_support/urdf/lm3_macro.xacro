@@ -36,20 +36,27 @@
 <xacro:property name="mass_link6" value="0.584"/>
 
 <!-- Limit of joints-->
-<xacro:property name="joint1_upper_limit" value="4" />
-<xacro:property name="joint2_upper_limit" value="4" />
-<xacro:property name="joint3_upper_limit" value="4" />
-<xacro:property name="joint4_upper_limit" value="4" />
-<xacro:property name="joint5_upper_limit" value="4" />
-<xacro:property name="joint6_upper_limit" value="4" />
+<xacro:property name="joint1_upper_limit" value="6.28" />
+<xacro:property name="joint2_upper_limit" value="6.28" />
+<xacro:property name="joint3_upper_limit" value="6.28" />
+<xacro:property name="joint4_upper_limit" value="6.28" />
+<xacro:property name="joint5_upper_limit" value="6.28" />
+<xacro:property name="joint6_upper_limit" value="6.28" />
 
 
-<xacro:property name="joint1_lower_limit" value="-4" />
-<xacro:property name="joint2_lower_limit" value="-4" />
-<xacro:property name="joint3_lower_limit" value="-4" />
-<xacro:property name="joint4_lower_limit" value="-4" />
-<xacro:property name="joint5_lower_limit" value="-4" />
-<xacro:property name="joint6_lower_limit" value="-4" />
+<xacro:property name="joint1_lower_limit" value="-6.28" />
+<xacro:property name="joint2_lower_limit" value="-6.28" />
+<xacro:property name="joint3_lower_limit" value="-6.28" />
+<xacro:property name="joint4_lower_limit" value="-6.28" />
+<xacro:property name="joint5_lower_limit" value="-6.28" />
+<xacro:property name="joint6_lower_limit" value="-6.28" />
+
+<xacro:property name="joint1_vel_limit" value="3.14" />
+<xacro:property name="joint2_vel_limit" value="3.14" />
+<xacro:property name="joint3_vel_limit" value="3.14" />
+<xacro:property name="joint4_vel_limit" value="3.14" />
+<xacro:property name="joint5_vel_limit" value="3.14" />
+<xacro:property name="joint6_vel_limit" value="3.14" />
 
 <xacro:macro name="lebai_lm3" params="prefix">
 
@@ -218,42 +225,42 @@
 	<child link="${prefix}link_1"/>
 	<origin xyz="0.0 0.0 ${d1}" rpy="0.0 0.0 0.0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint1_lower_limit}" upper="${joint1_upper_limit}" effort="100" velocity="1" />
+	<limit lower="${joint1_lower_limit}" upper="${joint1_upper_limit}" effort="100" velocity="${joint1_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_2" type="revolute">
 	<parent link="${prefix}link_1"/>
 	<child link="${prefix}link_2"/>
         <origin xyz="0.0 0.0 0.0" rpy="${PI_2} 0 0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint2_lower_limit}" upper="${joint2_upper_limit}" effort="100" velocity="1" />
+	<limit lower="${joint2_lower_limit}" upper="${joint2_upper_limit}" effort="100" velocity="${joint2_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_3" type="revolute">
 	<parent link="${prefix}link_2"/>
 	<child link="${prefix}link_3"/>
         <origin xyz="${a2} 0 0" rpy="0 0 0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint3_lower_limit}" upper="${joint3_upper_limit}" effort="100" velocity="1" />
+	<limit lower="${joint3_lower_limit}" upper="${joint3_upper_limit}" effort="100" velocity="${joint3_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_4" type="revolute">
 	<parent link="${prefix}link_3"/>
 	<child link="${prefix}link_4"/>
        <origin xyz="${a3} 0.0 ${d4}" rpy="0 0 0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint4_lower_limit}" upper="${joint4_upper_limit}" effort="100" velocity="1" />
+	<limit lower="${joint4_lower_limit}" upper="${joint4_upper_limit}" effort="100" velocity="${joint4_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_5" type="revolute">
 	<parent link="${prefix}link_4"/>
 	<child link="${prefix}link_5"/>
         <origin xyz="0 -${d5} 0" rpy="${PI_2} 0 0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint5_lower_limit}" upper="${joint5_upper_limit}" effort="5.5" velocity="1" />
+	<limit lower="${joint5_lower_limit}" upper="${joint5_upper_limit}" effort="5.5" velocity="${joint5_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_6" type="revolute">
 	<parent link="${prefix}link_5"/>
 	<child link="${prefix}link_6"/>
         <origin xyz="0  ${d6} 0" rpy="-${PI_2} 0 0"/>
 	<axis xyz="0 0 1" />
-	<limit lower="${joint6_lower_limit}" upper="${joint6_upper_limit}" effort="4.6" velocity="1" />
+	<limit lower="${joint6_lower_limit}" upper="${joint6_upper_limit}" effort="4.6" velocity="${joint6_vel_limit}" />
 </joint>
 <joint name="${prefix}joint_6-tool0" type="fixed">
       <parent link="${prefix}link_6"/>
