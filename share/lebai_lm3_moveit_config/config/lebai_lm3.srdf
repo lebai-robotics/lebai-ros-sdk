@@ -26,23 +26,7 @@
         <joint name="joint_4" value="0" />
         <joint name="joint_5" value="0" />
         <joint name="joint_6" value="0" />
-</group_state>
-	<group_state name="p1" group="manipulator">
-    <joint name="joint_1" value="-1.69467" />
-    <joint name="joint_2" value="-1.0014" />
-    <joint name="joint_3" value="1.87357" />
-    <joint name="joint_4" value="-0.846086" />
-    <joint name="joint_5" value="1.57732" />
-    <joint name="joint_6" value="1.47914" />
-</group_state>
-<group_state name="p2" group="manipulator">
-    <joint name="joint_1" value="-1.70636" />
-    <joint name="joint_2" value="-0.438719" />
-    <joint name="joint_3" value="0.806299" />
-    <joint name="joint_4" value="-0.394904" />
-    <joint name="joint_5" value="1.53638" />
-    <joint name="joint_6" value="1.48288" />
-</group_state>
+    </group_state>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="base_link" link2="link_1" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="link_2" reason="Never" />

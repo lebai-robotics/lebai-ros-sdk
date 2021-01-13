@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- common colours define for lebai robot -->
+  <xacro:property name="color_yellow"   value="0.96 0.76 0.13 1.0" />
+  <xacro:property name="color_white"    value="0.86 0.85 0.81 1.0" />
+  <xacro:property name="color_grey"     value="0.34 0.35 0.36 1.0" />
+
+  <xacro:property name="color_blue"    value="0.0 0.0 1.0 1.0" />
+  <xacro:property name="color_black"    value="0.15 0.15 0.15 1.0" />
+  <xacro:property name="color_greyish"  value="0.75 0.75 0.75 1.0" />
+  <xacro:property name="color_green"    value="${  0/255} ${155/255} ${ 70/255} 1.0" />
+
+</robot>

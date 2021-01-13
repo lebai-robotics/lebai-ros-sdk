@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find lebai_resources)/urdf/common_colours.xacro"/>
+
+  <xacro:macro name="material_yellow" params="name">
+    <material name="${name}">
+      <color rgba="${color_yellow}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_white" params="name">
+    <material name="${name}">
+      <color rgba="${color_white}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_grey" params="name">
+    <material name="${name}">
+      <color rgba="${color_grey}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_blue" params="name">
+    <material name="${name}">
+      <color rgba="${color_blue}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_black" params="name">
+    <material name="${name}">
+      <color rgba="${color_black}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_greyish" params="name">
+    <material name="${name}">
+      <color rgba="${color_greyish}"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="material_green" params="name">
+    <material name="${name}">
+      <color rgba="${color_green}"/>
+    </material>
+  </xacro:macro>
+
+</robot>

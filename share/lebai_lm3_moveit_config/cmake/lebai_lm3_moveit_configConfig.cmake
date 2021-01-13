@@ -67,8 +67,8 @@ set(lebai_lm3_moveit_config_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(lebai_lm3_moveit_config_SOURCE_PREFIX /home/yonnielu/Documents/ros-sdk/src/lebai-ros-sdk/lebai_lm3_moveit_config)
-  set(lebai_lm3_moveit_config_DEVEL_PREFIX /home/yonnielu/Documents/ros-sdk/devel)
+  set(lebai_lm3_moveit_config_SOURCE_PREFIX /home/tjf/catkin_ws/src/lebai-ros-sdk/lebai_lm3_moveit_config)
+  set(lebai_lm3_moveit_config_DEVEL_PREFIX /home/tjf/catkin_ws/devel)
   set(lebai_lm3_moveit_config_INSTALL_PREFIX "")
   set(lebai_lm3_moveit_config_PREFIX ${lebai_lm3_moveit_config_DEVEL_PREFIX})
 else()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /opt/lebai/ros/lib;/home/yonnielu/Documents/ros-sdk/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /opt/lebai/ros/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

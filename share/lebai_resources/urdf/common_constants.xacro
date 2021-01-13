@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Global constants for lebai robot -->
+<xacro:property name="PI" value="3.1415926535897931"/>
+<xacro:property name="PI_2" value="1.570796327"/>
+</robot>

@@ -3,8 +3,5 @@ from ._MoveJoint import *
 from ._MoveLine import *
 from ._SetAMode import *
 from ._SetAO import *
-from ._SetAOut import *
-from ._SetAOutMode import *
 from ._SetDO import *
-from ._SetDOut import *
 from ._SetGripper import *

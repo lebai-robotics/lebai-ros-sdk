@@ -13,8 +13,8 @@ from lebai_msgs.srv import MoveLine
 from lebai_msgs.srv import MoveCircle
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
-from geometry_msgs.msg import Quaternion 
-import math
+from geometry_msgs.msg import Quaternion
+
 
 def SendMoveJoint():
     rospy.wait_for_service("/motion_service/move_joint")
@@ -25,7 +25,7 @@ def SendMoveJoint():
         move_common.vel = 0.2
         move_common.acc = 0.5
         move_common.time = 0.0
-        move_common.until = False
+        move_common.until = True
         move_common.until_info.io_express_logic = UntilInfo.LOGIC_AND
         express_1= IOConditionalExpress()
         express_1.group = 0
@@ -46,7 +46,7 @@ def SendMoveJoint():
         move_joint_execute_mode.data = ExecuteMode.EXECUTE_MODE_BUFFER
 
         # Call  the service
-        result = move_joint_caller(is_joint_pose = True, joint_pose = [0, -math.pi / 4, math.pi/2, - math.pi / 4, math.pi / 2, 0.0], 
+        result = move_joint_caller(is_joint_pose = True, joint_pose = [0.1, 0.2, 0.3, 0.4, 0.0, 0.0], 
         common = move_common, execute_mode = move_joint_execute_mode)
 
         rospy.loginfo("move result %d\n", result.ret)
@@ -104,8 +104,8 @@ def SendMoveCircle():
     
 def Run():
     SendMoveJoint()
-    # SendMoveLine()
-    # SendMoveCircle()
+    SendMoveLine()
+    SendMoveCircle()
     return
 
 if __name__ == '__main__':
