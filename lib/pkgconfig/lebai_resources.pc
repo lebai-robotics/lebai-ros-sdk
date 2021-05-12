@@ -1,8 +1,0 @@
-prefix=/opt/lebai/ros
-
-Name: lebai_resources
-Description: Description of lebai_resources
-Version: 1.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
