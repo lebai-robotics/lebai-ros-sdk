@@ -7,16 +7,16 @@ from tp_stream_trajectory_handler import TPStreamTrajectoryHandler
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-import urdf_helper
+import param_utils
 from urdf_parser_py.urdf import URDF
 
 
 class MotionServiceInterface:
     def __init__(self, ip):
         self.lebai_robot_ = LebaiRobot(ip, False)
-        self.robot_description_param_ = rospy.get_param("/robot_description")
-        self.urdf_robot_ = URDF.from_xml_string(self.robot_description_param_)
-        self.joints_name_ = urdf_helper.find_chain_joints_name(self.urdf_robot_)
+        if not rospy.has_param('controller_joint_names'):
+            rospy.loginfo('controller_joint_names is not assigned')
+        self.joints_name_ = param_utils.get_joint_names("controller_joint_names", "/robot_description")
         self.tp_traj_handler_ = TPTrajectoryHandler(self.lebai_robot_)
         self.tp_stream_traj_handler_ = TPStreamTrajectoryHandler(self.lebai_robot_, self.joints_name_)
         

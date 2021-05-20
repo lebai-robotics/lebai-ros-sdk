@@ -5,19 +5,21 @@ from io_state_handler  import IOStateHandler
 from gripper_state_handler  import GripperStateHandler
 from robot_state_handler  import RobotStateHandler
 import os, sys
+import rospy
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-import urdf_helper
+import param_utils
 from urdf_parser_py.urdf import URDF
 
 
 class RobotStateInterface:
     def __init__(self, ip):
         self.lebai_robot_ = LebaiRobot(ip, False)
-        self.robot_description_param_ = rospy.get_param("/robot_description")
-        self.urdf_robot_ = URDF.from_xml_string(self.robot_description_param_)
-        self.joints_name_ = urdf_helper.find_chain_joints_name(self.urdf_robot_)
+        if not rospy.has_param('controller_joint_names'):
+            rospy.loginfo('controller_joint_names is not assigned')
+        # controller_joint_names = rospy.get_param('controller_joint_names')
+        self.joints_name_ = param_utils.get_joint_names("controller_joint_names", "robot_description")
         self.joint_state_handler_ = JointStateHandler(self.lebai_robot_, self.joints_name_)
         self.io_state_handler_ = IOStateHandler(self.lebai_robot_)
         self.gripper_state_handler_ = GripperStateHandler(self.lebai_robot_)

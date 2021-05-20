@@ -1,22 +1,20 @@
 #!/usr/bin/python3
-# license removed for brevity
 import rospy
 import os, sys
-# from std_msgs.msg import String
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+import robot_state_interface
 
-
-
-def run():
-    
+def run():    
     rate = rospy.Rate(10) # 10hz
     if not rospy.has_param('robot_ip_address'):
         rospy.logerr('robot_ip_address is not assigned')
         return
+    
     robot_ip = rospy.get_param('robot_ip_address')
-    currentdir = os.path.dirname(os.path.realpath(__file__))
-    parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir)
-    import robot_state_interface
+    # rospy.logerr("robot_ip %s"%(robot_ip))
+
     rsi = robot_state_interface.RobotStateInterface(robot_ip)
 
     while not rospy.is_shutdown():

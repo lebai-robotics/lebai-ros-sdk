@@ -21,6 +21,7 @@ class TestAll(unittest.TestCase):
 
     def array_almost_equal(self, array_1, array_2, accuracy = 10**-3):
         for i in range(len(array_1)):
+            # rospy.logerr("data %s %s"%(array_1[i], array_2[i]))
             if not self.almost_equal(array_1[i], array_2[i], accuracy):
                 return False
         return True       
@@ -32,7 +33,7 @@ class TestAll(unittest.TestCase):
         self.assertTrue(self.motion_service_proxy_.move_joint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
         self.assertTrue(self.motion_service_proxy_.move_joint([0, -1.2, math.pi/6, 0, math.pi/4, 0]))
         rate.sleep()
-        self.assertTrue(self.array_almost_equal([0, -1.2, math.pi/6, 0, math.pi/4, 0], self.robot_state_proxy_.joint_states_.position))
+        self.assertTrue(self.array_almost_equal([0, -1.2, math.pi/6, 0, math.pi/4, 0], self.robot_state_proxy_.joint_states_.position, 0.01))
         self.assertTrue(self.motion_service_proxy_.move_line())
         # self.assertTrue(self.motion_service_proxy_.move_joint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
         # self.assertTrue([0.1, 0.2], [0.0999, 0.2001], 3)

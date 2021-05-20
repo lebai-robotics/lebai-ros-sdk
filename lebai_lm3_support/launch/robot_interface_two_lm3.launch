@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="robot1_ns" default="robot1"/>
+	<arg name="robot2_ns" default="robot2"/>
+  <arg name="robot1_ip"/>
+  <arg name="robot2_ip"/>
+	<include file="$(find lebai_lm3_support)/launch/load_two_lm3.launch" />
+	<rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_two_lm3.yaml" />
+
+  <include file="$(find lebai_driver)/launch/two_robot_interface.launch">
+    <arg name="robot1_ns" value="$(arg robot1_ns)" />
+    <arg name="robot2_ns" value="$(arg robot2_ns)" />
+    <arg name="robot1_ip" value="$(arg robot1_ip)" />
+    <arg name="robot2_ip" value="$(arg robot2_ip)" />
+  </include>
+</launch>

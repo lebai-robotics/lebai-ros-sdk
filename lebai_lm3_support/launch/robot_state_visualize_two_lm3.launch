@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="robot1_ip"/>
+  <arg name="robot2_ip"/>
+	<include file="$(find lebai_lm3_support)/launch/load_two_lm3.launch" />
+	<rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_two_lm3.yaml" />
+  <include file="$(find lebai_lm3_support)/launch/load_two_lm3.launch" />
+
+	<include file="$(find lebai_driver)/launch/robot_state.launch">
+		<arg name="robot_ip"   value="$(arg robot1_ip)" />
+		<arg name="robot_ns"   value="robot1" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/robot_state.launch">
+		<arg name="robot_ip"   value="$(arg robot2_ip)" />
+		<arg name="robot_ns"   value="robot2" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    <rosparam param="source_list">["/robot1/joint_states","/robot2/joint_states"]</rosparam>
+	</node>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lebai_lm3_support)/config/robot_state_visualize.rviz" required="true" />
+</launch>
