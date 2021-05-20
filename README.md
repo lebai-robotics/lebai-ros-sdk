@@ -86,4 +86,3 @@ roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=your_robot_ip
 ```
 roslaunch lebai_lm3_support robot_interface_two_lm3.launch robot1_ip:=first_robot_ip robot2_ip:=second_robot_ip
 ```
-
