@@ -38,7 +38,7 @@ checkout out package and run `catkin_make`
 ```bash
 cd ~/catkin_ws/src
 ## TODO replace with github url
-git clone git@code.aliyun.com:lebai/lebai-ros-sdk.git -b noetic-dev
+git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b noetic-dev
 cd ~/catkin_ws
 catkin_make
 ```
@@ -80,3 +80,10 @@ roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=your_robot_ip
 ```
 
 `robot_ip` is the robot's physical IP address.
+
+## Run dual robots
+
+```
+roslaunch lebai_lm3_support robot_interface_two_lm3.launch robot1_ip:=first_robot_ip robot2_ip:=second_robot_ip
+```
+
