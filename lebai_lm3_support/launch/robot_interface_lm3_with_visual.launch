@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+  Manipulator specific version of the state visualizer.
+  Usage:
+    robot_state_visualize_lm3.launch robot_ip:=<value>
+-->
+<launch>
+  <arg name="robot_ip" doc="IP of controller" />
+  <arg name="has_gripper" default="0" />
+  <rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_lm3.yaml" />
+  <rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_gripper.yaml" if="$(arg has_gripper)"/>
+
+  <!-- <include file="$(find lebai_driver)/launch/robot_state.launch">
+    <arg name="robot_ip"   value="$(arg robot_ip)" />
+  </include> -->
+
+  <include file="$(find lebai_driver)/launch/robot_interface.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)" />
+  </include>
+
+  <include file="$(find lebai_lm3_support)/launch/load_lm3.launch" unless="$(arg has_gripper)"/>
+  <include file="$(find lebai_lm3_support)/launch/load_lm3_with_gripper.launch" if="$(arg has_gripper)"/>
+  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" 
+    type="robot_state_publisher" />
+
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lebai_lm3_support)/config/robot_state_visualize.rviz" required="true" />
+</launch>

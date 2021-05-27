@@ -1,0 +1,61 @@
+<launch>
+	
+	<arg name="robot1_ns" default="robot1"/>
+	<arg name="robot2_ns" default="robot2"/>
+	<arg name="$(arg robot1_ns)_ip" />
+	<arg name="$(arg robot2_ns)_ip" />
+
+
+	<include file="$(find lebai_driver)/launch/robot_state.launch">
+		<arg name="robot_ip"   value="$(arg robot1_ip)" />
+		<arg name="robot_ns"   value="$(arg robot1_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/motion_service.launch">
+		<arg name="robot_ip"   value="$(arg robot1_ip)" />
+		<arg name="robot_ns"   value="$(arg robot1_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/io_service.launch">
+		<arg name="robot_ip"   value="$(arg robot1_ip)" />
+		<arg name="robot_ns"   value="$(arg robot1_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/system_service.launch">
+		<arg name="robot_ip"   value="$(arg robot1_ip)" />
+		<arg name="robot_ns"   value="$(arg robot1_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/robot_state.launch">
+		<arg name="robot_ip"   value="$(arg robot2_ip)" />
+		<arg name="robot_ns"   value="$(arg robot2_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/motion_service.launch">
+		<arg name="robot_ip"   value="$(arg robot2_ip)" />
+		<arg name="robot_ns"   value="$(arg robot2_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<include file="$(find lebai_driver)/launch/io_service.launch">
+		<arg name="robot_ip"   value="$(arg robot2_ip)" />
+		<arg name="robot_ns"   value="$(arg robot2_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    	<rosparam param="source_list">["/robot1/joint_states","/robot2/joint_states"]</rosparam>
+	</node>
+
+	<include file="$(find lebai_driver)/launch/system_service.launch">
+		<arg name="robot_ip"   value="$(arg robot2_ip)" />
+		<arg name="robot_ns"   value="$(arg robot2_ns)" />
+		<arg name="use_ns"   value="1" />
+	</include>
+
+</launch>

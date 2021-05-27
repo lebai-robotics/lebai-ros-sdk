@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lebai_lm3">
+  <xacro:include filename="$(find lebai_lm3_support)/urdf/lm3_macro.xacro"/>
+
+  <xacro:lebai_lm3 prefix="robot1_"/>
+  
+  <xacro:lebai_lm3 prefix="robot2_"/>
+
+    <link name="world">
+    </link>
+
+    <joint name="world_to_robot1" type="fixed">
+        <parent link="world"/>
+        <child link="robot1_base_link"/>
+        <origin xyz="0.0 0.5 0.0" />
+    </joint>
+  
+      <joint name="world_to_robot2" type="fixed">
+        <parent link="world"/>
+        <child link="robot2_base_link"/>
+        <origin xyz="0.0 -0.5 0.0" />
+    </joint>
+
+</robot>

@@ -1,8 +1,0 @@
-prefix=/opt/lebai/ros
-
-Name: lebai_lm3_urdf
-Description: Description of lebai_lm3_urdf
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,4 +1,5 @@
-devel/
+.vscode
+\devel/
 logs/
 build/
 bin/
@@ -48,3 +49,5 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+.rosinstall
+.catkin
