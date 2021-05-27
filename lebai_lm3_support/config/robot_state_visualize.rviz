@@ -63,89 +63,85 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        robot1_base:
+        base:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        robot1_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        robot1_link_1:
+        base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_link_2:
+        gripper_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_link_3:
+        gripper_l_link1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_link_4:
+        gripper_l_link2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_link_5:
+        gripper_l_link_finger:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_link_6:
+        gripper_r_link1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot1_tool0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        robot2_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        robot2_base_link:
+        gripper_r_link2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_1:
+        gripper_r_link_finger:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_2:
+        gripper_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_3:
+        link_2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_4:
+        link_3:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_5:
+        link_4:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_link_6:
+        link_5:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        robot2_tool0:
+        link_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        tool0:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -198,7 +194,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.8701589107513428
+      Distance: 1.9231388568878174
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -214,9 +210,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6403971314430237
+      Pitch: 0.36039677262306213
       Target Frame: <Fixed Frame>
-      Yaw: 4.24858283996582
+      Yaw: 4.548574924468994
     Saved: ~
 Window Geometry:
   Displays:

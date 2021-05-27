@@ -20,7 +20,11 @@ class RobotStateInterface:
             rospy.loginfo('controller_joint_names is not assigned')
         # controller_joint_names = rospy.get_param('controller_joint_names')
         self.joints_name_ = param_utils.get_joint_names("controller_joint_names", "robot_description")
-        self.joint_state_handler_ = JointStateHandler(self.lebai_robot_, self.joints_name_)
+        if rospy.has_param("gripper_joint_names"):
+            self.gripper_name = rospy.get_param("gripper_joint_names")
+        else:
+            self.gripper_name = list()
+        self.joint_state_handler_ = JointStateHandler(self.lebai_robot_, self.joints_name_, self.gripper_name)
         self.io_state_handler_ = IOStateHandler(self.lebai_robot_)
         self.gripper_state_handler_ = GripperStateHandler(self.lebai_robot_)
         self.robot_state_handler_ = RobotStateHandler(self.lebai_robot_)

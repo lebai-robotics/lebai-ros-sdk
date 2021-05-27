@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: lebai_lm3_support
+    relative_path: urdf/lm3.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/lebai_lm3.srdf
+  CONFIG:
+    author_name: liufang
+    author_email: liufang_robot@outlook.com
+    generated_timestamp: 1621495269

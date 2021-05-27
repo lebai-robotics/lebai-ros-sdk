@@ -170,31 +170,6 @@ class TPStreamTrajectoryHandler:
                 return False
             return True
          
-
-
-# for (int i=0; i<traj.points.size(); ++i)
-#   {
-#     const trajectory_msgs::JointTrajectoryPoint &pt = traj.points[i];
-
-#     // check for non-empty positions
-#     if (pt.positions.empty())
-#       ROS_ERROR_RETURN(false, "Validation failed: Missing position data for trajectory pt %d", i);
-
-#     // check for joint velocity limits
-#     for (int j=0; j<pt.velocities.size(); ++j)
-#     {
-#       std::map<std::string, double>::iterator max_vel = joint_vel_limits_.find(traj.joint_names[j]);
-#       if (max_vel == joint_vel_limits_.end()) continue;  // no velocity-checking if limit not defined
-
-#       if (std::abs(pt.velocities[j]) > max_vel->second)
-#         ROS_ERROR_RETURN(false, "Validation failed: Max velocity exceeded for trajectory pt %d, joint '%s'", i, traj.joint_names[j].c_str());
-#     }
-
-#     // check for valid timestamp
-#     if ((i > 0) && (pt.time_from_start.toSec() == 0))
-#       ROS_ERROR_RETURN(false, "Validation failed: Missing valid timestamp data for trajectory pt %d", i);
-            
-
     def joint_state_cb(self, data):
         self.joint_state = data
         pass

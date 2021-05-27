@@ -76,13 +76,30 @@ To connect a real lebai robot, you must have a lebai robot controller running wi
 ## Run driver without gui display (lm3 as an example)
 
 ```
-roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=your_robot_ip
+roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=your_robot_ip has_gripper:=0
 ```
 
 `robot_ip` is the robot's physical IP address.
 
-## Run dual robots
+`has_gripper ` depends on whether gripper is mounted on the end.
+
+## Run driver with gui display (lm3 as an example)
 
 ```
-roslaunch lebai_lm3_support robot_interface_two_lm3.launch robot1_ip:=first_robot_ip robot2_ip:=second_robot_ip
+roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:=your_robot_ip has_gripper:=0
 ```
+
+`robot_ip` is the robot's physical IP address.
+
+`has_gripper ` depends on whether gripper is mounted on the end.
+
+
+
+## Connect lm3 with MoveIt
+
+```
+roslaunch lebai_lm3_moveit_config real_robot.launch robot_ip:=your_robot_ip
+```
+
+`robot_ip` is the robot's physical IP address.
+
