@@ -15,7 +15,9 @@ class RobotStateProxy:
        
     
     def robot_status_cb(self, msg):
+        
         self.robot_status_ = msg
+        # rospy.logerr("robot_status_ %s"%{self.robot_status_})
 
     def joint_states_cb(self, msg):
         self.joint_states_ = msg

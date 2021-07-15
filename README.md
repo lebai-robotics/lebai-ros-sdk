@@ -5,11 +5,23 @@
 As a ROS package, you need firstly install `ROS` .
 
 1. Install `ROS` follow official guide(ros-noetic-desktop-full is sugguested).
+   ```
+   sudo apt install -y ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl
+   ```
 
-2. Now the communication to real robot in `lebai-ros-sdk `  is written in python, based on the [`lebai-python-sdk`](https://github.com/lebai-robotics/lebai-python-sdk), So we need install it.
+2. Now the communication to real robot in `lebai-ros-sdk `  is written in python, based on the [`lebai-python-sdk`](https://github.com/lebai-robotics/lebai-python-sdk), So we need install it, and also some other python packages
 
    ```
+   ### lebai sdk
    pip3 install lebai
+
+   ### Other python module
+   pip3 install urdf-parser-py
+   
+   ### If pip3 is not install, install it by apt
+   sudo apt install python3-pip
+  
+
    ```
 
 3. The `lebai-ros-sdk` depends on `ROS Industrial`, Currently `ROS industrial` doesn't have debian package(Due to some dependencies are broken). So we need install it from source code as folow:
@@ -49,7 +61,7 @@ All the python driver code is in package `lebai_driver`, it contains an unit tes
 
 To run this unit test, you need to have a simulation rc-master running.
 
-**You can use a real robot to run this test, but the test will cause the real robot moving, you must guarantee the move do not cause any damage yourself.**
+**You can use a real robot to run this test, but the test will made the real robot moving, you must guarantee the move do not cause any damage yourself.**
 
 Before you run the test, you need to set the robot ip of the simulation rc-master:
 

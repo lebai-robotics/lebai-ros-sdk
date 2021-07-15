@@ -32,7 +32,16 @@ class TestAll(unittest.TestCase):
         rate.sleep()
         self.assertTrue(self.motion_service_proxy_.move_joint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
         self.assertTrue(self.motion_service_proxy_.move_joint([0, -1.2, math.pi/6, 0, math.pi/4, 0]))
-        rate.sleep()
+        while self.robot_state_proxy_.robot_status_.in_motion.val:
+            rate.sleep()
+        
+        rospy.logerr("position %s %s %s %s %s %s"%(self.robot_state_proxy_.joint_states_.position[0],
+        self.robot_state_proxy_.joint_states_.position[1],
+        self.robot_state_proxy_.joint_states_.position[2],
+        self.robot_state_proxy_.joint_states_.position[3],
+        self.robot_state_proxy_.joint_states_.position[4],
+        self.robot_state_proxy_.joint_states_.position[5]))
+        # printf("position %s"%{})
         self.assertTrue(self.array_almost_equal([0, -1.2, math.pi/6, 0, math.pi/4, 0], self.robot_state_proxy_.joint_states_.position, 0.01))
         self.assertTrue(self.motion_service_proxy_.move_line())
         # self.assertTrue(self.motion_service_proxy_.move_joint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
