@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(lebai_driver)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  industrial_msgs
+  industrial_robot_client
   lebai_msgs
   grpc
 )
@@ -12,9 +11,10 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES driver
-  CATKIN_DEPENDS grpc roscpp control_msgs industrial_msgs sensor_msgs std_msgs trajectory_msgs urdf
+  CATKIN_DEPENDS grpc industrial_robot_client
   # LIBRARIES
 #  DEPENDS system_lib
+  LIBRARIES ${ALL_GRPC_LIBS} ${ALL_PROTOBUF_LIBS}
 )
 
 generate_proto(lebai_proto GRPC SRC_BASE "lebai-proto"
