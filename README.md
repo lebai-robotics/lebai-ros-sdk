@@ -1,6 +1,6 @@
 **This document describe `lebai-ros-sdk` on ROS Melodic(Ubuntu 18.04)**
 
-If you use `ROS` noedic, please refer [noedic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/noetic-dev) branch.
+If you use `ROS` noedic, please refer [noetic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/noetic-dev) branch.
 
 # Prerequsite
 
@@ -11,7 +11,7 @@ As a ROS package, you need firstly install `ROS` .
 2. Also we need some extra `ROS` packages:
 
    ```
-   sudo apt install -y ros-melodic-industrial-msgs ros-melodic-grpc
+   sudo apt install -y ros-melodic-industrial-robot-client ros-melodic-grpc
    ```
 
 
