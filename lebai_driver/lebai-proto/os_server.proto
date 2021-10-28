@@ -1,0 +1,56 @@
+syntax = "proto3";
+// compile method:
+// 1. cpp:
+// protoc --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` *.proto
+// protoc --cpp_out=. *.proto
+// 2. python: 
+// protoc --python_out=. *.proto
+//import "google/protobuf/empty.proto";
+// build for web
+// protoc -I=./ *.proto --js_out=import_style=commonjs:./ --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./
+
+package osserver;
+
+service OsServer {
+    rpc getRingData(Req) returns (stream RingData);
+}
+
+message Req {
+    int32 req = 1;
+}
+
+message PR {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+    double rr = 4;
+    double rp = 5;
+    double ry = 6;
+}
+
+message Joint {
+    double targetPose = 1;
+    double targetV = 2;
+    double targetA = 3;
+    double targetTorque = 4;
+    double actualPose = 5;
+    double actualV = 6;
+    double actualA = 7;
+    double actualTorque = 8;
+    double temperature = 9;
+}
+
+message RingData {
+    repeated Joint joints = 1;
+    int32 num = 2;
+    PR targetPose = 3;
+    PR actualPose = 4;
+    CurrentVoltage voltage = 5;
+}
+
+message CurrentVoltage {
+  double power = 1; // 电源电压V/电流mA
+  double flan = 2; // 法兰电压/电流
+  repeated double joint = 3; // 关节电压/电流
+  double io_power = 4; // IO板
+}

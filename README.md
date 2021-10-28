@@ -1,89 +1,34 @@
-**This document describe `lebai-ros-sdk` on ROS Noetic(Ubuntu 20.04)**
+**This document describe `lebai-ros-sdk` on ROS Melodic(Ubuntu 18.04)**
+
+If you use `ROS` noedic, please refer here.
 
 # Prerequsite
 
 As a ROS package, you need firstly install `ROS` .
 
-1. Install `ROS` follow official guide(ros-noetic-desktop-full is sugguested).
-   ```
-   sudo apt install -y ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl
-   ```
-
-2. Now the communication to real robot in `lebai-ros-sdk `  is written in python, based on the [`lebai-python-sdk`](https://github.com/lebai-robotics/lebai-python-sdk), So we need install it, and also some other python packages
-
-   ```
-   ### lebai sdk
-   pip3 install lebai
-
-   ### Other python module
-   pip3 install urdf-parser-py
+1. Install `ROS` follow the official guide(`ros-melodic-desktop-full` is sugguested).
    
-   ### If pip3 is not install, install it by apt
-   sudo apt install python3-pip
-  
+2. Also we need some extra `ROS` packages:
 
    ```
-
-3. The `lebai-ros-sdk` depends on `ROS Industrial`, Currently `ROS industrial` doesn't have debian package(Due to some dependencies are broken). So we need install it from source code as folow:
-
-   ```
-   cd ~/catkin_ws/src
-   git clone https://github.com/ros-industrial/industrial_core.git 
-   cd industrial_core
-   # broken dependencies
-   rm -rf industrial_trajectory_filters
-   # try to run cakint_make to build it. It should success.
-   cd ~/catkin_ws
-   catkin_make
+   sudo apt install -y ros-melodic-industrial-msgs ros-melodic-grpc
    ```
 
-4. If you want to play with `MoveIt`, you need to install `MoveIt` package(optional)
 
-   ```sudo apt install ros-noetic-moveit```
-
-
-
-# Get the `lebai-ros-sdk`
+# Get the `lebai-ros-sdk` from src
 
 checkout out package and run `catkin_make`
 
 ```bash
 cd ~/catkin_ws/src
-## TODO replace with github url
-git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b noetic-dev
+git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b melodic-dev
 cd ~/catkin_ws
 catkin_make
 ```
 
-# Unit Test
-
-All the python driver code is in package `lebai_driver`, it contains an unit test.
-
-To run this unit test, you need to have a simulation rc-master running.
-
-**You can use a real robot to run this test, but the test will made the real robot moving, you must guarantee the move do not cause any damage yourself.**
-
-Before you run the test, you need to set the robot ip of the simulation rc-master:
-
-```
-roscd lebai_driver/test
-### edit the file test_lebai_driver.launch
-### modify the robot_ip according  to real scene.
-###
-### <arg name="robot_ip" value="192.168.1.104" /> ###
-###
-```
-
-Then, you can run the test
-
-```
-cd ~/catkin_ws/
-catkin_make run_tests_lebai_driver
-```
-
 # How to run
 
-To connect a real lebai robot, you must have a lebai robot controller running with network access.
+To connect a real `lebai` robot, you must have a `lebai` `l-master`  running with network access.
 
 ## Run driver without gui display (lm3 as an example)
 
@@ -93,7 +38,7 @@ roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=your_robot_ip h
 
 `robot_ip` is the robot's physical IP address.
 
-`has_gripper ` depends on whether gripper is mounted on the end.
+`has_gripper ` decide whether gripper is mounted on the end.
 
 ## Run driver with gui display (lm3 as an example)
 
@@ -109,9 +54,4 @@ roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:=you
 
 ## Connect lm3 with MoveIt
 
-```
-roslaunch lebai_lm3_moveit_config real_robot.launch robot_ip:=your_robot_ip
-```
-
-`robot_ip` is the robot's physical IP address.
-
+Coming soon...

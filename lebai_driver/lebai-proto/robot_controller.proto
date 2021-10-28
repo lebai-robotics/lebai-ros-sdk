@@ -1,0 +1,713 @@
+/**
+ * Copyright © 2017-2018 Shanghai Lebai Robotic Co., Ltd. All rights reserved.
+ *
+ * FileName: robot_controller.proto
+ *
+ * Author: Yonnie Lu
+ * Email: zhangyong.lu@lebai.ltd
+ * Date: 2018-12-28 17:26
+ * Description:
+ * History:
+ *   <Author>      <Time>    <version>    <desc>
+ *   YonnieLu      2018-12-28 17:26    1.0          Create
+ * 
+ * compile methods:
+ * 1. c++
+ * protoc --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` *.proto
+ * protoc --cpp_out=. *.proto
+ *
+ * 2. golang
+ * protoc *.proto --go_out=plugins=grpc:../
+ *
+ * 3. python
+ */
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "messages.proto";
+
+package robotc;
+
+// Robot controller gRPC & protobuf idl language definition
+service RobotController {
+  // 1. Basic control commands
+  // 关闭电源
+  rpc PowerDown(google.protobuf.Empty) returns (CmdId);
+
+  // implement later
+  rpc Sleep(SleepRequest) returns (CmdId);
+  // implement later
+  rpc Sync(google.protobuf.Empty) returns (CmdId);
+
+  // 2. Config commands
+  // 开启示教模式
+  rpc TeachMode(google.protobuf.Empty) returns (CmdId);
+  // 关闭示教模式
+  rpc EndTeachMode(google.protobuf.Empty) returns (CmdId);
+  // 设置速度因子（0-100）
+  rpc SetVelocityFactor(Factor) returns (CmdId);
+  // 获取速度因子（0-100）
+  rpc GetVelocityFactor(google.protobuf.Empty) returns (Factor);
+
+  rpc SetGravity(Coordinate) returns (CmdId);
+
+  rpc GetGravity(google.protobuf.Empty) returns (Coordinate);
+
+  rpc SetPayload(Payload) returns (CmdId);
+
+  rpc GetPayload(google.protobuf.Empty) returns (Payload);
+
+  rpc SetPayloadMass(PayloadMass) returns (CmdId);
+
+  rpc GetPayloadMass(google.protobuf.Empty) returns (PayloadMass);
+  
+  rpc SetPayloadCog(PayloadCog) returns (CmdId);
+
+  rpc GetPayloadCog(google.protobuf.Empty) returns (PayloadCog);
+  
+  rpc SetTcp(PR) returns (CmdId);
+
+  rpc GetTcp(google.protobuf.Empty) returns (PR);
+  
+  // 设置手爪幅度：0-100 double
+  rpc SetClawAmplitude(Amplitude) returns (CmdId);
+  // 获得手爪幅度：0-100 double
+  rpc GetClawAmplitude(google.protobuf.Empty) returns (Amplitude);
+  // 获得手爪目前是否夹紧物体状态1表示夹紧，0为松开
+  rpc GetClawHoldOn(google.protobuf.Empty) returns (HoldOn);
+  // 设置手爪力度：0-100 double
+  rpc SetClawForce(Force) returns (CmdId);
+  // 获得手爪称重结果
+  rpc GetClawWeight(google.protobuf.Empty) returns (Weight);
+  // implement later
+  //    rpc Force(google.protobuf.Empty) returns (Force);
+  // implement later
+  rpc GetTcpForce(google.protobuf.Empty) returns (ForceTorque);
+  rpc SetClaw(ClawInfo) returns (ClawInfo);
+  rpc GetClaw(google.protobuf.Empty) returns (ClawInfo);
+
+  // 3. Motion control commands
+  rpc SetPos(JPose) returns (CmdId);
+
+  // implement later
+  rpc SpeedJ(SpeedJRequest) returns (CmdId);
+  // implement later
+  rpc SpeedL(SpeedLRequest) returns (CmdId);
+  // implement later
+  rpc StopJ(StopJRequest) returns (CmdId);
+  // implement later
+  rpc StopL(StopLRequest) returns (CmdId);
+
+  // 停止当前移动
+  rpc StopMove(google.protobuf.Empty) returns (CmdId);
+
+  // 圆弧移动
+  rpc MoveC(MoveCRequest) returns (CmdId);
+  // 关节空间线性移动
+  rpc MoveJ(MoveJRequest) returns (CmdId);
+  // 笛卡尔空间线性移动
+  rpc MoveL(MoveLRequest) returns (CmdId);
+  // DEPRECIATED
+  rpc MoveLJ(MoveLRequest) returns (CmdId);
+  // implement later
+  rpc MoveP(MovePRequest) returns (CmdId);
+  // pt move
+  rpc MovePT(PVATRequest) returns (CmdId);
+  rpc MovePTStream(stream PVATRequest) returns (CmdId);
+  // pvt move
+  rpc MovePVT(PVATRequest) returns (CmdId);
+  rpc MovePVTStream(stream PVATRequest) returns (CmdId);
+  // pvat move
+  rpc MovePVAT(PVATRequest) returns (CmdId);
+  rpc MovePVATStream(stream PVATRequest) returns (CmdId);
+
+  // implement later
+  rpc ServoC(ServoCRequest) returns (CmdId);
+  // implement later
+  rpc ServoJ(ServoJRequest) returns (CmdId);
+  
+  // 4. Status and data query commands
+  // 获取机器人所有状态数据
+  rpc GetRobotData(google.protobuf.Empty) returns (RobotData);
+  // 获取机器人概要数据
+  rpc GetRobotBriefData(stream RobotDataCmd) returns (stream RobotBriefData);
+  // 获取机器人的IO数据
+  rpc GetRobotIOData(stream RobotDataCmd) returns (stream IO);
+  // 获取机器人状态
+  rpc GetRobotMode(google.protobuf.Empty) returns (RobotMode);
+  // 获得实际关节位置
+  rpc GetActualJointPositions(google.protobuf.Empty) returns (Joint);
+  // 获得目标关节位置
+  rpc GetTargetJointPositions(google.protobuf.Empty) returns (Joint);
+  // 获得实际关节速度
+  rpc GetActualJointSpeeds(google.protobuf.Empty) returns (Joint);
+  // 获得目标关节速度
+  rpc GetTargetJointSpeeds(google.protobuf.Empty) returns (Joint);
+  // 获得末端在笛卡尔坐标系下的位姿
+  rpc GetActualTcpPose(google.protobuf.Empty) returns (Vector);
+  // 获得末端在笛卡尔坐标系下的目标位姿
+  rpc GetTargetTcpPose(google.protobuf.Empty) returns (Vector);
+  // implement later
+  rpc GetActualTcpSpeed(google.protobuf.Empty) returns (Vector);
+  // implement later
+  rpc GetTargetTcpSpeed(google.protobuf.Empty) returns (Vector);
+  // implement later
+  rpc GetActualFlangePose(google.protobuf.Empty) returns (Vector);
+  // 获取关节扭矩
+  rpc GetJointTorques(google.protobuf.Empty) returns (Joint);
+  // 获取控制器温度
+  rpc GetControllerTemp(google.protobuf.Empty) returns (Temperature);
+  // 获取关节内部温度
+  rpc GetJointTemp(IntRequest) returns (Temperature);
+  // implement later
+  rpc GetToolCurrent(google.protobuf.Empty) returns (Current);
+
+  // 5. IO-related cmds
+  // 设置数字输出端口的值
+  rpc SetDIO(DIO) returns (CmdId);
+  // 获得数字输入端口的值
+  rpc GetDIO(IOPin) returns (DIO);
+  // 设置TCP数字输出端口的值
+  rpc SetTcpDIO(DIO) returns (CmdId);
+  // 获得TCP数字输入端口的值
+  rpc GetTcpDIO(IOPin) returns (DIO);
+  // 设置模拟输出端口的值
+  rpc SetAIO(AIO) returns (CmdId);
+  // 获得模拟输入端口的值
+  rpc GetAIO(IOPin) returns (AIO);
+  // 设置模拟输入端口工作模式：0:电压，1:电流
+  rpc SetAInMode(AIO) returns (CmdId);
+  // 获得模拟输入端口工作模式：0:电压，1:电流
+  rpc GetAInMode(IOPin) returns (AIO);
+  // 设置模拟输出端口工作模式：0:电压，1:电流
+  rpc SetAOutMode(AIO) returns (CmdId);
+  // 获得模拟输出端口工作模式：0:电压，1:电流
+  rpc GetAOutMode(IOPin) returns (AIO);
+
+  // 6. Control commands
+  // 开启/启动系统
+  rpc StartSys(google.protobuf.Empty) returns (CmdId);
+  // 关闭/停止系统
+  rpc StopSys(google.protobuf.Empty) returns (CmdId);
+  // 程序停止
+  rpc Stop(google.protobuf.Empty) returns (CmdId);
+  // 急停
+  rpc EStop(google.protobuf.Empty) returns (CmdId);
+  
+  // 7. Internal commands
+  // 获取kdl参数
+  rpc GetKDL(google.protobuf.Empty) returns (KDParam);
+  // 查询系统里面的日志信息
+  rpc GetLogs(google.protobuf.Empty) returns (Logs);
+  // 获得当前正在执行的命令id，如果没有在执行的命令，则返回-1
+  rpc GetCurrentCmd(google.protobuf.Empty) returns (CmdId); // 命令id
+  // 获得指定命令id的执行结果：-1: 未执行；0: 已执行
+  rpc GetCmdExecStatus(CmdId) returns (CmdStatus);
+  // 开始微调: 如果当前有其他微调再传入新的微调命令会终止当前的微调进行新的微调
+  rpc StartFineTuning(FineTuning) returns (CmdId);
+  // 停止微调
+  rpc StopFineTuning(google.protobuf.Empty) returns (CmdId);
+  // 暂停机器人
+  rpc Pause(google.protobuf.Empty) returns (CmdId);
+  // 恢复机器人
+  rpc Resume(google.protobuf.Empty) returns (CmdId);
+
+  // 机器人正解
+  rpc KinematicsForward(Joint) returns (Vector);
+  // 机器人反解
+  rpc KinematicsInverse(Vector) returns (Joint);
+  // TCP示教添加
+  rpc CalcTcpTranslation(CalcTcpParam) returns (Vector);
+
+  // 8. Test command
+  // 测试命令，以给定的RPY数据执行线性移动
+  rpc MoveLRPY(MoveLRPYRequest) returns (CmdId);
+
+  // 9. 扬声器和LED灯
+  // 设置LED灯状态
+  rpc SetLED(LEDStatus) returns (CmdId);
+  // 设置声音
+  rpc SetVoice(VoiceStatus) returns (CmdId);
+  // 设置风扇
+  rpc SetFan(FanStatus) returns (CmdId);
+  // 获取灯板状态
+  rpc GetLampStatus(google.protobuf.Empty) returns (LampStatus);
+
+  // Lua 状态查询
+  rpc GetLuaState(google.protobuf.Empty) returns (LuaStatus);
+
+  // 外置数字输出
+  rpc SetExternalDO(ExternalDigital) returns (Response);
+  rpc GetExternalDO(ExternalPin) returns (ExternalDigital);
+  // 外置数字输入
+  rpc GetExternalDI(ExternalPin) returns (ExternalDigital);
+  // 外置模拟输出
+  rpc SetExternalAO(ExternalAnalog) returns (Response);
+  rpc GetExternalAO(ExternalPin) returns (ExternalAnalog);
+  // 外置模拟输入
+  rpc GetExternalAI(ExternalPin) returns (ExternalAnalog);
+  // 获取某个外置io的全部io信息
+  rpc GetExternalIOs(ExternalDevice) returns (ExternalIOs);
+
+  // 外置IO的复数版本
+  // 外置数字输出
+  rpc SetExternalDOs(ExternalDigitals) returns (Response);
+  rpc GetExternalDOs(ExternalPins) returns (ExternalDigitals);
+  // 外置数字输入
+  rpc GetExternalDIs(ExternalPins) returns (ExternalDigitals);
+  // 外置模拟输出
+  rpc SetExternalAOs(ExternalAnalogs) returns (Response);
+  rpc GetExternalAOs(ExternalPins) returns (ExternalAnalogs);
+  // 外置模拟输入
+  rpc GetExternalAIs(ExternalPins) returns (ExternalAnalogs);
+
+  // 信号量
+  rpc SetSignal(SignalValue) returns (SignalResult);
+  rpc GetSignal(SignalValue) returns (SignalResult);
+  rpc AddSignal(SignalValue) returns (SignalResult);
+  rpc RegisterSignals(stream SignalList) returns (stream SignalValue);
+}
+
+message SignalValue {
+  int32 index = 1;
+  int32 value = 2;
+}
+
+message SignalResult {
+  int32 index = 1;
+  int32 value = 2;
+  bool ok = 3;
+}
+
+message SignalList {
+  repeated int32 indexes = 1;
+}
+
+// 机器人所有状态数据
+message RobotData {
+  // 机器人模式
+  RobotMode robotMode = 1;
+  // 机器人各个关节模式
+  repeated JointMode jointModes = 2;
+  // 实际关节位置
+  Joint actualJoint = 3;
+  // 实际关节速度
+  Joint actualJointSpeed = 4;
+  // 目标关节位置
+  Joint targetJoint = 5;
+  // 目标关节速度
+  Joint targetJointSpeed = 6;
+  // 实际tcp位置
+  Vector actualTcpPose = 7;
+  // 实际tcp速度
+  Vector actualTcpSpeed = 8;
+  // 目标tcp位置
+  Vector targetTcpPose = 9;
+  // 目标tcp速度
+  Vector targetTcpSpeed = 10;
+  // 当前系统正在执行的命令状态：id + value
+  CmdStatus currentCmd = 11;
+  // 所有的io数据
+  IO io = 12;
+  // 速度因子
+  double velocityFactor = 13;
+  // 爪子信息
+  ClawInfo clawInfo = 14;
+  // 关节温度
+  Joint jointTemps = 15;
+  // 理论力矩
+  Joint targetTorque = 16;
+  // 实际力矩
+  Joint actualTorque = 17;
+}
+
+// 机器人需要获取数据的请求cmd
+message RobotDataCmd {
+  // empty
+}
+
+// 机器人概要状态数据
+message RobotBriefData {
+  // 机器人模式
+  RobotMode robotMode = 1;
+  // 实际关节位置
+  Joint actualJoint = 2;
+  // 目标关节位置
+  Joint targetJoint = 3;
+  // 实际tcp位置
+  Vector actualTcpPose = 4;
+  // 目标tcp位置
+  Vector targetTcpPose = 5;
+  // 速度因子
+  double velocityFactor = 6;
+  // 关节温度
+  Joint jointTemps = 7;
+}
+
+// 机器人状态枚举值
+message RobotMode { int32 mode = 1; }
+
+// dh参数
+message DH {
+  double d = 1;
+  double a = 2;
+  double alpha = 3;
+  double theta = 4;
+}
+
+// 运动学动力学参数
+message KDParam {
+  repeated DH dhParams = 1;
+}
+
+// 关节状态枚举值
+message JointMode { int32 mode = 1; }
+
+message Amplitude { double amplitude = 1; }
+
+message HoldOn { int32 hold_on = 1; }
+
+message Force { double force = 1; }
+
+message Weight { double weight = 1; }
+
+// 爪子信息
+message ClawInfo {
+  double amplitude = 1;
+  double force = 2;
+  double weight = 3;
+  int32 hold_on = 4;
+}
+
+message ForceTorque { repeated double forceTorque = 1; }
+
+message Joint { // it can represent joint angles(rad) or joint speed (rad/s) or
+                // torques (Nm)
+  repeated double joints = 1;
+}
+
+message Vector { // x, y, z, rx, ry, rz
+  repeated double vector = 1;
+}
+
+message Temperature { double degree = 1; }
+
+message Current { double current = 1; }
+
+message Factor { double value = 1; }
+
+message Ret { bool ret = 1; }
+
+message CmdId { int32 id = 1; }
+
+message CmdStatus {
+  // 命令id
+  int32 id = 1;
+  // -1: 未执行；0: 已执行
+  int32 value = 2;
+}
+
+message IntRequest { int32 index = 1; }
+
+message Logs {
+  // 如果没有错误，则返回空
+  repeated Log log = 1;
+}
+
+message Log {
+  // 1 - Fatal: 严重错误，无法正常运行, 2 - Error：错误，系统可能还能继续运行, 3
+  // - Warning： 潜在的警告类错误, 4 - Info, 信息类，5 - Debug：调试类
+  int32 level = 1;
+  int32 code = 2;
+  string msg = 3;
+}
+
+message SleepRequest { int32 time = 1; }
+
+message SpeedJRequest {
+  // 单位：rad/s{base, shoulder, elbow, wrist1, wrist2, wrist3}
+  repeated double joint_speed = 1;
+  // 单位：rad/s^2
+  double acceleration = 2;
+  // 可选参数，单位：秒，设定方法多少秒后返回
+  double time = 3;
+}
+
+message SpeedLRequest {
+  // 单位：m/s {base, shoulder, elbow, wrist1, wrist2, wrist3}
+  repeated double velocity = 1;
+  // 单位：m/s^2，以移动位置长度为衡量标准的加速度
+  double position_acceleration = 2;
+  // 可选参数，单位：秒，设定方法多少秒后返回
+  double time = 3;
+  // 可选参数，单位：rad/s^2，以转动角度为衡量标准的加速度，如果没给到，则使用第二个参数；如果给到，则使用这个参数
+  double acceleration = 4;
+}
+
+message StopJRequest {
+  // deceleration 单位：rad/s^2，减速度
+  double deceleration = 1;
+}
+
+message StopLRequest {
+  // 单位：m/s^2，以移动位置长度为衡量标准的减速度
+  double position_deceleration = 1;
+  // 单位：rad/s^2，可选，以转动角度为衡量标准的减速度，如果设定了该值，则使用该值不使用第一个参数??
+  double deceleration = 2;
+}
+
+message MoveCRequest {
+  // 若 pose_is_joint_angle 为false，则是{x, y, z, rx, ry, rz}；否则为{j0, j1,
+  // j2, j3, j4, j5}每个关节的关节角度，正向运动学会换算成对应的pose
+  repeated double pose_via = 1;
+  // 同上
+  repeated double pose_to = 2;
+  // 设定pose_via和pose_to是用{x, y, z, rx, ry,
+  // rz}描述末端位置和姿态还是用关节角度
+  bool pose_via_is_joint = 3;
+
+  bool pose_to_is_joint = 4;
+  // 单位：m/s^2，工具加速度
+  double acceleration = 5;
+  // 单位：m/s，工具速度
+  double velocity = 6;
+  // 单位：m，下一段的交融半径
+  double blend_radius = 7;
+  // 工作模式：0：无约束模式，Interpolate orientation from current pose to
+  // target pose (pose_to)；1：固定方向模式，使用相对于圆弧切换固定方向的圆弧
+  int32 mode = 8;
+  // 单位：s，运动时间
+  double time = 9;
+  // 相对坐标系，仅pose_is_joint_angle=false时有效。世界坐标系为{0,0,0,0,0,0}
+  PR pose_base = 10;
+  // 弧度 (rad)
+  double rad = 11;
+}
+
+message MoveJRequest {
+  // 如果pose_is_joint_angle 为 false，反向运动学会计算成对应的关节角度；
+  repeated double joint_pose_to = 1;
+  // 设定joint_pose_to是用{x, y, z, rx, ry, rz}描述末端位置和姿态还是用关节角度
+  bool pose_is_joint_angle = 2;
+  // 单位：rad/s^2，主轴的关节加速度
+  double acceleration = 3;
+  // 单位：rad/s，主轴的关节速度
+  double velocity = 4;
+  // 单位：s，运动时间
+  double time = 5;
+  // 单位：m，下一段的交融半径
+  double blend_radius = 6;
+  // 相对坐标系，仅pose_is_joint_angle=false时有效。世界坐标系为{0,0,0,0,0,0}
+  PR pose_base = 7;
+}
+
+message MoveLRequest {
+  // 如果pose_is_joint_angle 为 false，反向运动学会计算成对应的关节角度；
+  repeated double pose_to = 1;
+  // 设定joint_pose_to是用{x, y, z, rx, ry, rz}描述末端位置和姿态还是用关节角度
+  bool pose_is_joint_angle = 2;
+  // 单位：rad/s^2，主轴的关节加速度
+  double acceleration = 3;
+  // 单位：rad/s，主轴的关节速度
+  double velocity = 4;
+  // 单位：s，运动时间
+  double time = 5;
+  // 单位：m，下一段的交融半径
+  double blend_radius = 6;
+  // 相对坐标系，仅pose_is_joint_angle=false时有效。世界坐标系为{0,0,0,0,0,0}
+  PR pose_base = 7;
+}
+
+message MoveLRPYRequest {
+  // 如果pose_is_joint_angle 为 false，反向运动学会计算成对应的关节角度；
+  repeated double pose_to = 1;
+  // 单位：rad/s^2，主轴的关节加速度，如果为-1，则表示未设置值
+  double acceleration = 2;
+  // 单位：rad/s，主轴的关节速度，如果为-1，则表示未设置值
+  double velocity = 3;
+  // 单位：s，运动时间，如果为-1，则表示未设置值
+  double time = 4;
+  // 单位：m，下一段的交融半径，如果为-1，则表示未设置值
+  double blend_radius = 5;
+}
+
+message MovePRequest {
+  repeated double pose_to = 1;
+  // 设定pose_to是用{x, y, z, rx, ry,
+  // rz}描述末端位置和姿态还是用关节角度，如果pose_is_joint_angle是true，正向运动学会计算出对应的{x,
+  // y, z, rx, ry, rz}
+  bool pose_is_joint_angle = 2;
+  // 单位：m/s^2，工具加速度
+  double acceleration = 3;
+  // 单位：m/s，工具速度
+  double velocity = 4;
+  // 单位：m，下一段的交融半径
+  double blend_radius = 5;
+}
+
+message ServoCRequest {
+  repeated double pose_to = 1;
+  // 设定pose_to是用{x, y, z, rx, ry,
+  // rz}描述末端位置和姿态还是用关节角度，如果pose_is_joint_angle是true，正向运动学会计算出对应的{x,
+  // y, z, rx, ry, rz}
+  bool pose_is_joint_angle = 2;
+  // 单位：m/s^2，工具加速度
+  double acceleration = 3;
+  // 单位：m/s，工具速度
+  double velocity = 4;
+  // 单位：m，下一段的交融半径
+  double blend_radius = 5;
+}
+
+message ServoJRequest {
+  // 如果pose_is_joint_angle 为 false，反向运动学会计算成对应的关节角度；
+  repeated double joint_pose_to = 1;
+  // 设定joint_pose_to是用{x, y, z, rx, ry, rz}描述末端位置和姿态还是用关节角度
+  bool pose_is_joint_angle = 2;
+  // 单位：rad/s^2，主轴的关节加速度
+  double acceleration = 3;
+  // 单位：rad/s，主轴的关节速度
+  double velocity = 4;
+  // 单位：s，运动时间
+  double time = 5;
+  // 单位：s，取值范围：0.03 ~ 0.2，使用预向前看的时间来让轨迹平滑
+  double look_ahead_time = 6;
+  // 取值范围：100 ~ 2000，proportinal gain for following target position,
+  int32 gain = 7;
+}
+
+// 微调参数
+message FineTuning {
+  int32 mode = 1; // 1: 坐标系模式；2：关节模式
+  int32 base = 2; // 1: world；2: tcp
+  int32 coordinate = 3; // 1: 直角坐标系；2：圆柱坐标系
+  /* 
+   * 需要微调的目标: 轴/关节：
+   * 1）关节模式下表示关节编号：0-6；
+   * 2）坐标系模式下
+   *     a) 直角坐标系：0: x, 1: y, 2: z, 3: r, 4: p, 5: y
+   *     b) 圆柱坐标系：0: ρ，1: φ，2: z, 3: r, 4: p, 5: y
+   */
+  int32 target = 4; 
+  int32 direction = 5; // 1: +向；-1：负向
+}
+
+message LEDStatus {
+  int32 mode = 1; 
+  // LED_MODE_OFF 1  // 关闭
+  // LED_MODE_CONST 2     // 常亮
+  // LED_MODE_BREATHING 3 // 呼吸
+  // LED_MODE_4_PIES_ROTATE 4 // 四块旋转
+  // LED_MODE_SINGLE_ROTATE 5 // 同色旋转
+  // LED_MODE_FLASHING 6     // 闪烁
+  int32 speed = 2;
+  // LED_SPEED_HIGH 1
+  // LED_SPEED_NORMAL 2
+  // LED_SPEED_SLOW 3
+  repeated int32 color = 3; // 最多包含4个 0 ~ 15 之间的整数
+}
+
+message VoiceStatus {
+  int32 voice = 1; // 声音列表 0~10
+  int32 volume = 2; 
+  // VOLUME_MUTE 0
+  // VOLUME_LOW 1
+  // VOLUME_DEFAULT 2
+  // VOLUME_HIGH 3
+}
+
+message FanStatus {
+  int32 fan = 1; // 1 关闭 2 开启
+}
+
+message CalcTcpParam {
+  repeated Vector poses = 1; // all the sampled frame, usually use flange frame.
+  double tol = 2; // tolerance for standard deviation computing,
+  // * if any deviation exceed tolerance, the function returns error.
+}
+
+message LuaStatus {
+  LuaState state = 1;
+  PR last_pose = 2;
+  JPose last_joints = 3;
+}
+
+message LampStatus {
+  LEDStatus led = 1;
+  VoiceStatus voice = 2;
+  FanStatus fan = 3;
+}
+
+message PVATRequest {
+    double duration = 1;
+    repeated double q = 2;
+    repeated double v = 3;
+    repeated double acc = 4;
+}
+
+message ExternalPin {
+  // 外置设备的id
+  int32 id = 1;
+  // pin索引
+  int32 pin = 2;
+}
+
+message ExternalPins {
+  // 外置设备的id
+  int32 id = 1;
+  // 起始地址
+  int32 pin = 2;
+  // 长度
+  int32 length = 3;
+}
+
+message ExternalDigital {
+  // 外置设备的id
+  int32 id = 1;
+  // pin索引
+  int32 pin = 2;
+  // pin索引对应的值
+  int32 value = 3;
+}
+
+message ExternalDigitals {
+  // 外置设备的id
+  int32 id = 1;
+  // 起始地址
+  int32 pin = 2;
+  // 长度
+  int32 length = 3;
+  // 值数组
+  repeated int32 values = 4;
+}
+
+message ExternalAnalog {
+  // 外置设备的id
+  int32 id = 1;
+  // pin索引
+  int32 pin = 2;
+  // pin索引对应的值
+  double value = 3;
+}
+
+message ExternalAnalogs {
+  // 外置设备的id
+  int32 id = 1;
+  // 起始地址
+  int32 pin = 2;
+  // 长度
+  int32 length = 3;
+  // 值数组
+  repeated double values = 4;
+}
+
+message ExternalDevice {
+  int32 id = 1;
+}
+
+message ExternalIOs {
+  repeated ExternalDigital dis = 1;
+  repeated ExternalDigital dos = 2;
+  repeated ExternalAnalog ais = 3;
+  repeated ExternalAnalog aos = 4;
+}

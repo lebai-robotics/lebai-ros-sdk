@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "messages.proto";
+
+package robotc;
+
+// 仿真-离线编程模拟服务
+service SimulationController {
+  // 设置仿真机器人关节角
+  rpc SetPos(JPose) returns (SimRes);
+  // 硬件急停
+  rpc EStop(google.protobuf.Empty) returns (SimRes);
+  // 释放硬件急停开关
+  rpc EStopRelease(google.protobuf.Empty) returns (SimRes);
+  // 按下按钮
+  rpc Button(ButtonReq) returns (SimRes);
+  // 设置百分表值
+  rpc SetDialgage(DialgageReq) returns (SimRes);
+  // 设置模拟输入
+  rpc SetRobotAI(AIO) returns (SimRes);
+  // 设置数字输入
+  rpc SetRobotDI(DIO) returns (SimRes);
+  // 设置法兰数字输入
+  rpc SetFlangeDI(DIO) returns (SimRes);
+  // 设置仿真机器人运行速度
+  rpc ChangeRobotSpeed(RobotSpeed) returns (SimRes);
+}
+
+message SimRes {
+  int32 ret = 1;
+}
+
+message ButtonReq {
+  int32 id = 1;
+  int32 state = 2; // 1: 按钮空闲；2：长按；3：单击；4: 双击
+}
+
+message DialgageReq {
+  int32 id = 1; // 0, 1, 2
+  double value = 2;
+}
+
+message RobotSpeed {
+  uint32 cycle = 1; // 默认为 9，最小为 3。值越大，速度越慢
+}
