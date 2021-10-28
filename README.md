@@ -1,6 +1,6 @@
 **This document describe `lebai-ros-sdk` on ROS Melodic(Ubuntu 18.04)**
 
-If you use `ROS` noedic, please refer here.
+If you use `ROS` noedic, please refer [noedic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/noetic-dev) branch.
 
 # Prerequsite
 
@@ -30,6 +30,8 @@ catkin_make
 
 To connect a real `lebai` robot, you must have a `lebai` `l-master`  running with network access.
 
+Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for more detailed information.
+
 ## Run driver without gui display (lm3 as an example)
 
 ```
@@ -49,6 +51,10 @@ roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:=you
 `robot_ip` is the robot's physical IP address.
 
 `has_gripper ` depends on whether gripper is mounted on the end.
+
+
+
+
 
 
 
