@@ -82,7 +82,7 @@ add_dependencies(${PROJECT_NAME}_system_service lebai_msgs_generate_messages_cpp
 add_executable(${PROJECT_NAME}_motion_service
   src/motion_service/motion_service_node.cpp
   src/motion_service/joint_trajectory_manager.cpp
-  #  src/motion_service/joint_trajectory_pt_full_streamer.cpp
+  src/motion_service/joint_trajectory_pt_full_streamer.cpp
   src/motion_service/trajectory_move.cpp
 )
 target_link_libraries(${PROJECT_NAME}_motion_service

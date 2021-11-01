@@ -26,6 +26,7 @@
 *  
 */
 
+#include <industrial_utils/param_utils.h>
 #include "lebai_driver/motion_service/joint_trajectory_manager.h"
 
 namespace lebai_driver
@@ -63,11 +64,21 @@ namespace lebai_driver
             return false;
         }
 
+        if (!industrial_utils::param::getJointNames("controller_joint_names", "robot_description", joint_names_))
+        {
+            ROS_ERROR("Failed to initialize joint_names.  Aborting");
+            return false;
+        }        
+
         std::string rcs_target = ip + ":" + std::to_string(rcs_port);
         ROS_DEBUG("rcs_target: %s\n", rcs_target.c_str());
         stubs_.robot_controller_stub_ = robotc::RobotController::NewStub(grpc::CreateChannel(rcs_target, grpc::InsecureChannelCredentials()));
 
         if (!trajectory_move_.init(&stubs_))
+        {
+            return false;
+        }
+        if (!pt_full_streamer_.init(&stubs_, joint_names_))
         {
             return false;
         }

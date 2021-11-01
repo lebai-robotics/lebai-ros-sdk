@@ -36,72 +36,38 @@
 
 namespace lebai_driver
 {
-    class RobotStateInterface
+  class RobotStateInterface
+  {
+
+  public:
+    RobotStateInterface();
+    // Channels & getChannels();
+    Stubs *getStubs();
+    bool init();
+    void run();
+
+    std::vector<std::string> get_joint_names()
     {
+      return this->joint_names_;
+    }
 
-    public:
-        RobotStateInterface();
-        // Channels & getChannels();
-        Stubs * getStubs();
-        bool init();
-        
+    std::vector<std::string> get_gripper_joint_names()
+    {
+      return this->gripper_joint_names_;
+    }
 
+    void add_handler(std::unique_ptr<Handler> &&handler)
+    {
+      handlers_.push_back(std::move(handler));
+    }
 
-        /**
-   * \brief Begin processing messages and publishing topics.
-   */
-        void run();
+  protected:
+    Stubs stubs_;
+    ros::NodeHandle node_;
+    std::vector<std::unique_ptr<Handler>> handlers_;
+    std::vector<std::string> joint_names_ = {"joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"};
+    std::vector<std::string> gripper_joint_names_;
 
-        //   /**
-        //    * \brief get current robot-connection instance.
-        //    *
-        //    * \return current robot connection object
-        //    */
-        //   SmplMsgConnection* get_connection()
-        //   {
-        //     return this->connection_;
-        //   }
-
-        //   /**
-        //    * \brief get active message-manager object
-        //    *
-        //    * \return current message-manager object
-        //    */
-        //   MessageManager* get_manager()
-        //   {
-        //     return &this->manager_;
-        //   }
-
-          std::vector<std::string> get_joint_names()
-          {
-            return this->joint_names_;
-          }
-
-
-          std::vector<std::string> get_gripper_joint_names()
-          {
-            return this->gripper_joint_names_;
-          }
-
-          void add_handler(std::unique_ptr<Handler> && handler)
-          {
-            handlers_.push_back(std::move(handler));
-          }
-
-        protected:
-            Stubs stubs_;
-            ros::NodeHandle node_;
-            std::vector<std::unique_ptr<Handler>> handlers_;
-            std::vector<std::string> joint_names_ = {"joint_1","joint_2","joint_3","joint_4","joint_5","joint_6"};
-            std::vector<std::string> gripper_joint_names_;
-        //   TcpClient default_tcp_connection_;
-        //   JointRelayHandler default_joint_handler_;
-        //   RobotStatusRelayHandler default_robot_status_handler_;
-
-        //   SmplMsgConnection* connection_;
-        //   MessageManager manager_;
-          
-
-    }; //class RobotStateInterface
+  }; //class RobotStateInterface
 
 } //lebai

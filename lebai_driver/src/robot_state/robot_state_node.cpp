@@ -27,7 +27,7 @@
 */
 
 
-#include <lebai_driver/robot_state/robot_state_interface.h>
+#include "lebai_driver/robot_state/robot_state_interface.h"
 #include "lebai_driver/robot_state/joint_feedback_handler.h"
 #include "lebai_driver/robot_state/io_status_handler.h"
 #include "lebai_driver/robot_state/gripper_status_handler.h"
@@ -47,9 +47,10 @@ int main(int argc, char **argv)
         return 0;
     }
 
+
+
     std::unique_ptr<JointFeedbackHandler> joint_feedback_handler;
     joint_feedback_handler.reset(new JointFeedbackHandler());
-    // std::vector<std::string> joint_names = rsi.get_joint_names();
     joint_feedback_handler->init(rsi.getStubs(),rsi.get_joint_names(), rsi.get_gripper_joint_names());
     rsi.add_handler(std::move(joint_feedback_handler));
 

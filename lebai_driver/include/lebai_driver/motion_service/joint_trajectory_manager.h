@@ -28,7 +28,7 @@
 
 #pragma once
 
-// #include "lebai_driver/motion_service/joint_trajectory_pt_full_streamer.h"
+#include "lebai_driver/motion_service/joint_trajectory_pt_full_streamer.h"
 #include "lebai_driver/motion_service/trajectory_move.h"
 #include "lebai_driver/stubs.h"
 
@@ -45,8 +45,10 @@ namespace lebai_driver
 
     protected:
         Stubs stubs_;
-        // industrial_robot_client::joint_trajectory_pt_full_streamer::JointTrajectoryPtFullStreamer pt_full_streamer_;
-        lebai_driver::TrajectoryMove trajectory_move_;
+        JointTrajectoryPtFullStreamer pt_full_streamer_;
+        TrajectoryMove trajectory_move_;
+
+        std::vector<std::string> joint_names_ = {"joint_1","joint_2","joint_3","joint_4","joint_5","joint_6"};
         
     };
 }

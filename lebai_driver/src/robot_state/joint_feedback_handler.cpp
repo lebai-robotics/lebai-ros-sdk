@@ -88,12 +88,16 @@ namespace lebai_driver
       for (size_t i = 0; i < joint_response.joints_size(); ++i)
       {
         all_joint_vel.push_back(joint_response.joints(i));
+        all_joint_effort.push_back(0.0);
       }
     }
     else
     {
       ROS_ERROR("Failed to call `GetActualJointSpeeds`.");
     }
+
+
+    // all_joint_effort.resize(all_joint_vel.size());
 
     //TODO: gRPC not implemented. add this later.
     // grpc::ClientContext torque_context;

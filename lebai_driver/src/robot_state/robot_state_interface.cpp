@@ -26,6 +26,7 @@
 *  
 */
 
+#include <industrial_utils/param_utils.h>
 #include "lebai_driver/robot_state/robot_state_interface.h"
 
 namespace lebai_driver
@@ -65,6 +66,12 @@ namespace lebai_driver
             ROS_ERROR("No valid robot IP rcs port found.  Please set ROS '~rcs_port' param");
             return false;
         }
+
+        if (!industrial_utils::param::getJointNames("controller_joint_names", "robot_description", joint_names_))
+        {
+            ROS_ERROR("Failed to initialize joint_names.  Aborting");
+            return false;
+        }
         
 
         std::vector<std::string> default_gripper_joint_names;
@@ -75,13 +82,6 @@ namespace lebai_driver
         std::string rcs_target = ip+":"+std::to_string(rcs_port);
         ROS_DEBUG("rcs_target: %s\n",rcs_target.c_str());
         stubs_.robot_controller_stub_ = robotc::RobotController::NewStub(grpc::CreateChannel(rcs_target, grpc::InsecureChannelCredentials()));
-        // channels_.rcs_channel = ;
-        // if(!channels_.rcs_channel)
-        // {
-        //     ROS_ERROR("Create connection failed, check the network or robot controller.");
-        //     return false;
-        // }
-        // joint_names_ = std::vector<std::string>()
         return true;
     }
 

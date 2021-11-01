@@ -52,12 +52,23 @@ roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:=you
 
 `has_gripper ` depends on whether gripper is mounted on the end.
 
+## Connect with MoveIt (lm3 as an example)
 
+Install `MoveIt` firstly.
 
+```
+sudo apt install ros-melodic-moveit
+```
 
+Then, run as following:
 
+```
+# simulation mode
+roslaunch lebai_lm3_moveit_config run.launch
+# connection to real robot
+roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=your_robot_ip
+```
 
+`sim` set to true will not connect to real robot. it will only run a simulation
 
-## Connect lm3 with MoveIt
-
-Coming soon...
+`robot_ip` is the robot's physical IP address, if `sim` set to false, `robot_ip` is required.
