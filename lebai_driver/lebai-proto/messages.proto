@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package robotc;
+
+message Response {
+  int32 ret = 1;
+}
+
+message Coordinate {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message Rotation {
+  double r = 1;
+  double p = 2;
+  double y = 3;
+}
+
+message PR {
+  Coordinate position = 1;
+  Rotation rotation = 2;
+}
+
+message JPose {
+  repeated double joints = 1;
+}
+
+message Payload { // 末端负载
+  double mass = 1; // 质量, default: 0
+  Coordinate cog = 2; // 质心，Center of gravity, default: 0
+}
+
+message PayloadMass {
+  double mass = 1;
+}
+
+message PayloadCog {
+  Coordinate cog = 1;
+}
+
+message IOPin { int32 pin = 1; }
+
+message DIO {
+  int32 pin = 1;
+  int32 value = 2;
+}
+
+message AIO {
+  //提供给用户做操作的地址
+  int32 pin = 1;
+  //电流环或电压环
+  int32 mode = 2;
+  double value = 3;
+}
+
+message ModbusExternalIOState {
+    //设备ID
+    int32 id = 1;
+    //0表示断开，1表示连接成功
+    int32 state = 2;
+}
+
+message IO {
+  // 所有数字量的输入值
+  repeated DIO robotDIOIn = 1;
+  // 所有数字量的输出值
+  repeated DIO robotDIOOut = 2;
+  // 所有模拟量输入值
+  repeated AIO robotAIOIn = 3;
+  // 所有模拟量输出值
+  repeated AIO robotAIOOut = 4;
+  // 所有tcp数字量的输入值
+  repeated DIO tcpDIOIn = 5;
+  // 所有tcp数字量的输出值
+  repeated DIO tcpDIOOut = 6;
+  //modbus的状态信息
+  repeated ModbusExternalIOState extIODevices = 7;
+}
+
+message Hardware {
+  string model = 1;
+  string sn = 2;
+  string driver_version = 3; // 作为传入参数时无意义
+}
+
+message RobotInfo {
+  Hardware robot = 1; // 机器人型号在 robot.model 里
+  Hardware flange = 2;
+  Hardware led = 3;
+  repeated Hardware joints = 4;
+  string rcVersion = 5; // 作为传入时无意义
+  string name = 6; // 机器人默认名称
+  Hardware comboard = 7; // 主控板
+  string mac = 8; // 机械臂整机ID号
+  Hardware arm = 9; // 主机箱
+  string appTag = 10; // release cfqmp simulate joint circuit
+  string typeTag = 11; // debug release
+}
+
+message DeviceInfo {
+  Hardware devInfo = 1; // 主控板
+  //2表示通信板、3表示法兰、4表示灯板、5表示关节板
+  int32 dev_type = 2;
+}
+
+enum LuaState {
+  IDLE = 0;
+  RUNNING = 1;
+  PAUSED = 2;
+  ABORTED = 3; // Error 
+  STOPPED = 4; // Stop
+  BEGIN = 5;
+  END = 6;
+};

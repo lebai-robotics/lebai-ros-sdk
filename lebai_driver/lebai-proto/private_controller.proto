@@ -1,0 +1,594 @@
+/**
+ * Copyright © 2017-2018 Shanghai Lebai Robotic Co., Ltd. All rights reserved.
+ *
+ * FileName: robot_controller.proto
+ *
+ * Author: Yonnie Lu
+ * Email: zhangyong.lu@lebai.ltd
+ * Date: 2019-10-31 10:20:01
+ * Description:
+ * History:
+ *   <Author>      <Time>    <version>    <desc>
+ *   YonnieLu      2019-10-31 10:20:01   1.0          Create
+ *
+ * compile methods:
+ * 1. c++
+ * protoc --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` *.proto
+ * protoc --cpp_out=. *.proto
+ *
+ * 2. golang
+ * protoc *.proto --go_out=plugins=grpc:../
+ *
+ * 3. python
+ */
+ syntax = "proto3";
+
+ import "google/protobuf/empty.proto";
+ import "messages.proto";
+
+ package robotc;
+ 
+ service RobotPrivateController {
+   // 初始化配置
+   rpc Init(Configuration) returns (Response);
+   // 获取机器人基础信息
+   rpc GetRobotInfo(google.protobuf.Empty) returns (RobotInfo);
+   // 设置机器人安装方向
+   rpc SetInstallDirection(InstallDirection) returns (Response);
+   // 设置碰撞检测
+   rpc SetCollisionDetector(CollisionDetector) returns (Response);
+   // 设置关节配置
+   rpc SetJointConfig(JointConfigs) returns (Response);
+   // 设置笛卡尔空间的配置
+   rpc SetCartesianConfig(CartesianConfig) returns (Response);
+   // 开启DDS
+   rpc EnableDDS(TrueOrFalse) returns (Response);
+   // 设置碰撞检测力矩差阈值
+   rpc SetCollisionTorqueDiff(CollisionTorqueDiff) returns(Response);
+   // 注册通知事件
+   rpc RegisterNotification(google.protobuf.Empty) returns (stream Notification);
+   rpc RobotDriverInfo(google.protobuf.Empty) returns (DriverInfo);
+   // 机器人OTA单个设备更新接口
+   rpc RobotOTA(OTAData) returns (stream OTAResult);
+   // 通知灯板、法兰、关节切换分区
+   rpc SwitchOtaPartition(OTACmd) returns (Response);
+   // 机器人OTA批量更新接口
+   rpc RobotOTABatch(OTADatas) returns (stream OTAResults);
+   // 重置
+   rpc Reset(google.protobuf.Empty) returns(Response);
+   // 以给定角度置零
+   rpc InitZero(Zero) returns (Response);
+   // 以零位置零
+   rpc SetZero(google.protobuf.Empty) returns (Response);
+   // 获取机器人电压V
+   rpc GetVoltage(google.protobuf.Empty) returns (CurrentVoltage);
+   // 设置单关节伺服参数
+   rpc SetServoParam(JointServoParam) returns (JointServoParams);
+   // 获取当前所有关节伺服参数
+   rpc GetServoParams(google.protobuf.Empty) returns (JointServoParams);
+   // 调试设置
+   rpc SetDebugParams(DebugParams) returns (DebugParams);
+   // 更改DH参数（三轴平行6参数）
+   rpc FixDHParams(FixDHRequest) returns (FixDHResult);
+   // 设置LED样式
+   rpc SetLEDStyle(LEDStyle) returns (LEDStyles);
+   // 获取LED样式
+   rpc GetLEDStyles(google.protobuf.Empty) returns (LEDStyles);
+   // 注册命令状态事件
+   rpc RegisterLuaEvent(google.protobuf.Empty) returns (stream LuaEvent);
+   // 当推送 ALERT/CONFIRM/INPUT/SELECT，用户在前端确定后调用该接口
+   rpc ConfirmCallback(ConfirmInput) returns (Response);
+   // 获取 Lua 上次执行到的机器人位置
+   rpc GetLastPose(google.protobuf.Empty) returns (PoseRes);
+   //配置Modbus外部IO设备
+   rpc SetModbusExternalIO(ModbusExternalIOs) returns (Response);
+   // 修改按钮配置
+   rpc SetButtonConfig(ButtonConfig) returns (Response);
+   // 设置绑定设备开关, true: 不限制设备绑定； false：限制设备绑定逻辑
+   rpc SetBreakACup(TrueOrFalse) returns (Response);
+   // PVAT数据记录接口，用户记录pvat数据
+   rpc RecordPVAT(RecordPVATRequest) returns (stream RecordPVATResponse);
+   rpc StopRecordPVAT(google.protobuf.Empty) returns (Response);
+   // 语音升级
+   rpc UpgradeVoiceFile(VoiceFile) returns (stream VoiceResult);//yvoice
+   // 获取当前 DH 参数
+   rpc GetDHParams(DHRequest) returns (DHParams);
+   // 设置 DH 参数并返回设置后的结果
+   rpc SetDHParams(DHParams) returns (DHParams);
+   // 伺服控制参数
+   rpc WriteExtraServoParam(ExtraServoParam) returns (ExtraServoParam);
+   rpc ReadExtraServoParam(ExtraServoParam) returns (ExtraServoParam);
+   rpc WriteExtraServoParams(ExtraServoParam) returns (ExtraServoParams);
+   rpc ReadExtraServoParams(google.protobuf.Empty) returns (ExtraServoParams);
+   rpc ResetExtraServoParams(google.protobuf.Empty) returns (ExtraServoParams);
+   // “主动消回差”参数
+   rpc WriteJointBacklash(JointBacklash) returns (JointBacklash);
+   rpc ReadJointBacklash(JointBacklash) returns (JointBacklash);
+   rpc WriteJointBacklashes(JointBacklash) returns (JointBacklashes);
+   rpc ReadJointBacklashes(google.protobuf.Empty) returns (JointBacklashes);
+   rpc ResetJointBacklashes(google.protobuf.Empty) returns (JointBacklashes);
+   // 启用主动消回差
+   rpc WriteEnableJointBacklashes(EnableJointBacklash) returns (EnableJointBacklashes);
+   rpc ReadEnableJointBacklashes(google.protobuf.Empty) returns (EnableJointBacklashes);
+   rpc ResetEnableJointBacklashes(google.protobuf.Empty) returns (EnableJointBacklashes);
+   // 关节回差参数
+   rpc WriteJointBacklashParam(JointBacklashParam) returns (JointBacklashParam);
+   rpc ReadJointBacklashParam(JointBacklashParam) returns (JointBacklashParam);
+   rpc WriteJointBacklashParams(JointBacklashParam) returns (JointBacklashParams);
+   rpc ReadJointBacklashParams(google.protobuf.Empty) returns (JointBacklashParams);
+   rpc ResetJointBacklashParams(google.protobuf.Empty) returns (JointBacklashParams);
+   // 关节限位检测
+   rpc EnableJointLimit(TrueOrFalse) returns (Response);
+ }
+
+ message EnableJointBacklash {
+  int32 joint = 1;
+  bool enable = 2;
+ }
+
+ message EnableJointBacklashes {
+  repeated EnableJointBacklash joints = 1;
+ }
+
+ message ExtraServoParam {
+  int32 joint = 1; // 当 Read、Enable/Disable 时仅该值生效, 0 代表关节 1
+
+  double acc_position_kp = 2;
+  double acc_speed_kp = 3;
+  double acc_speed_it = 4;
+  double uni_position_kp = 5;
+  double uni_speed_kp = 6;
+  double uni_speed_it = 7;
+  double dec_position_kp = 8;
+  double dec_speed_kp = 9;
+  double dec_speed_it = 10;
+ }
+
+ message ExtraServoParams {
+  repeated ExtraServoParam joints = 1;
+ }
+
+ message JointBacklash {
+  int32 joint = 1;
+
+  uint32 k = 2;
+  double iq = 3;
+  double iq_final = 4;
+  uint32 iq_count = 5;
+ }
+
+ message JointBacklashes {
+  repeated JointBacklash joints = 1;
+ }
+
+ message JointBacklashParam {
+  int32 joint = 1;
+  
+  int32 encoder_data_offset = 2;
+  uint32 on = 3;
+  uint32 over = 4;
+  uint32 leave = 5;
+  uint32 max = 6;
+ }
+
+ message JointBacklashParams {
+  repeated JointBacklashParam joints = 1;
+ }
+
+ message VoiceFile {//yvoice
+  int32 id = 1;
+  string file = 2;
+  string md5 = 3;
+ }
+
+ message VoiceResult {//yvoice
+  int32 id = 1;
+  int32 step = 2;// 0: not begin, 1: downloading, 2: flashing, 3: done, 4:fail
+  int32 stepProgress = 3;// 0-100, currently only downloading step has progress, other steps need show pending progress
+ }
+
+ //0: all joints    1-7:joint1-7   8:flan  9:claw  10:lamp
+ enum BootloaderId {
+   ALL_JOINTS = 0;
+   JOINT_1 = 1;
+   JOINT_2 = 2;
+   JOINT_3 = 3;
+   JOINT_4 = 4;
+   JOINT_5 = 5;
+   JOINT_6 = 6;
+   JOINT_7 = 7;
+   FLANGE = 8;
+   CLAW = 9;
+   LAMP = 10;
+   COMBOARD = 14;
+ }
+
+ enum BootPartition {
+   A = 0;
+   B = 1;
+   C = 2;
+   PART_UNKNOWN = 3;
+ }
+ 
+ // Message definition
+ message TrueOrFalse {
+   bool val = 1;
+ }
+ 
+ message InstallDirection {
+  int32 direction = 1; // 安装方式: 0: up; 1: down; 2: side, default: UP
+ }
+ 
+ message JointConfig {
+   double maxAngle = 1;
+   double minAngle = 2;
+   double maxV = 3;  // 用户端设定的全局速度拆分到每个关节的maxV上
+   double maxAcc = 4;
+ }
+ 
+ message JointConfigs {
+   repeated JointConfig configs = 1;
+ }
+ 
+ message CartesianConfig {
+     double maxV = 1;
+     double maxAcc = 2;
+ }
+
+ message SafetyPlat { // 安全平面，点为平面四个角的顶点，非示教的三个点
+   repeated Coordinate points = 1;
+ }
+ 
+ message SafetyPlats {
+   repeated SafetyPlat plats = 1; // default: empty
+ }
+ 
+ message CollisionTorqueDiff { // 每个关节碰撞检测的扭矩差值
+   repeated double diffs = 1;
+ }
+ 
+ message CollisionDetector {
+   bool enable = 1;       // 是否启用碰撞检测, default: false
+   int32 action = 2;    // 碰撞检测后动作, 0: estop, 1: pause default: ESTOP
+   int32 pauseTime = 3;           // 碰撞检测暂停时间, default: 0
+   int32 sensitivity = 4;         // 碰撞检测灵敏度, , default: 50
+ }
+
+ message LEDStyle {
+  int32 mode = 3;
+  int32 speed = 4;
+  repeated int32 color = 5;
+  int32 voice = 1;
+  int32 volume = 2;
+  int32 robotMode = 6; // robot-mode
+ }
+
+ message LEDStyles {
+  repeated LEDStyle styles = 16; // 机器人状态对应的LED样式，下标为robot-mode
+ }
+ 
+ message ButtonConfig {
+    bool btn_flan_1 = 1; // 
+    bool btn_flan_2 = 2;
+    bool btn_shoulder_0 = 3;
+}
+
+message Configuration {
+    InstallDirection installDirection = 1;  
+    CollisionDetector collisionDetector = 2;
+    JointConfigs jointConfigs = 3;  // 0-6 关节配置
+    SafetyPlats safetyPlats = 4;    // 安全平面列表
+    PR tcp = 5;                             // tcp配置
+    Payload payload = 6;                    // 负载
+    bool enableDDS = 7;                    // 是否开启内部数据调试服务（Data Debug Service),默认关闭
+    CollisionTorqueDiff collisionTorqueDiff = 8;
+
+    int32 robotDIOInNum = 9;
+    int32 robotDIOOutNum = 10;
+    repeated AIO robotAIOInConfig = 11;
+    repeated AIO robotAIOOutConfig = 12;
+    int32 tcpDIOInNum = 13;
+    int32 tcpDIOOutNum = 14;
+    repeated double zeros = 15; // 关节归零角度 (弃用)
+    repeated LEDStyle styles = 16; // 机器人状态对应的LED样式
+    bool break_a_cup = 17; // true: 不校验启动验证绑定设备hash逻辑; false: 默认值，校验 
+    ButtonConfig button_config = 18;
+    CartesianConfig cartesianConfig = 19;
+}
+
+
+ message Zero {
+   repeated double zeros = 1;
+ }
+ 
+ message Notice {
+   // 通知类型
+   enum NoticeType {
+     NOTICE_STATE = 0;  // 机器人状态变更；机器人状态和急停状态位等
+     NOTICE_ERROR = 1;  // 错误：错误类型
+     NOTICE_BUTTON = 2; // 按钮事件；
+   }
+ 
+   // 按钮类型的nId定义
+   enum NoticeId {
+     NOTICE_ID_STATE_ROBOT_STATE = 0;    // 机器人状态
+     NOTICE_ID_STATE_E_STOP = 1;         // 机器人状态
+     NOTICE_ID_STATE_DATA_UPDATE = 2;    // 机器人数据有更新
+     NOTICE_ID_ERROR = 3;                // 机器人错误
+     NOTICE_ID_BUTTON_SHOULDER = 4;      // 肩部按钮
+     NOTICE_ID_BUTTON_FLANGE_1 = 5;      // 末端按钮1
+     NOTICE_ID_BUTTON_FLANGE_2 = 6;      // 末端按钮1
+   }
+ 
+   NoticeType type = 1; // 通知类型
+   /**
+    * type = 1 按钮事件
+    *    value: 按钮模式：1: 按钮空闲；2：长按；3：单击；4: 双击
+    */
+   NoticeId id = 2;
+   int32 value = 3; // when there ERROR, value represent the LEVEL
+   int32 code = 4;
+   // some fucking boring and important data need return back to front end
+   repeated double lol = 5;
+   int32 count = 6; // 肩部按钮按下时，按该按钮的次数
+ }
+ 
+ message Notification {
+  repeated Notice items = 1;
+ }
+
+ message Driver {
+   // 驱动器基本信息
+   Hardware hardware = 1;
+   // 当前运行分区情况
+   BootPartition curPartition = 2;
+ }
+
+ message DriverInfo {
+  Driver flange = 1;
+  Driver led = 2;
+  repeated Driver joints = 3;
+  Driver comboard = 4;
+ }
+
+ message OTAFile {
+  string file = 1; // 文件完整路径
+  string md5 = 2; // 文件原始md5，前端计算
+  // version string: XX.YY.ZZ.20200608
+  string version = 3;
+ }
+
+ message OTACmd {
+  BootloaderId bootloaderId = 1;
+  // 0: B分区；1: C分区
+  BootPartition targetPartition = 2;
+ }
+ 
+ message OTAData {
+  OTACmd cmd = 1;
+  OTAFile file = 2;
+ }
+
+ message OTAJoints {
+   repeated OTACmd cmds = 1;
+   OTAFile file = 2;
+ }
+
+ message OTADatas {
+  // 所有关节更新描述
+  OTAJoints joints = 1;
+  // 非关节更新描述： 灯板，法兰
+  repeated OTAData notJoints = 2;
+ }
+ 
+ message OTAResult {
+  BootloaderId bootloaderId = 1;
+  int32 step = 2; // 0: not begin, 1: downloading, 2: flashing, 3: done, 4:fail
+  int32 stepProgress = 3;  // 0-100, currently only downloading step has progress, other steps need show pending progress
+  string version = 4;
+  BootPartition partition = 5;
+ }
+
+ message OTAResults {
+   repeated OTAResult results = 1;
+ }
+
+message CurrentVoltage {
+  double power = 1; // 电源电压V/电流mA
+  double flan = 2; // 法兰电压/电流
+  repeated double joint = 3; // 关节电压/电流
+  double io_power = 4; // IO板
+}
+
+message JointServoParam {
+  uint32 index = 1; // 0代表关节一
+  double position_kp = 2;
+  double speed_kp = 3;
+  double speed_it = 4;
+  double torque_cmd_filter = 5;
+}
+
+message JointServoParams {
+  repeated JointServoParam joints = 1;
+}
+
+message DebugParams {
+  repeated double d = 1;
+}
+
+message FixDHRequest {
+  repeated double delta_theta = 1;
+  bool plus_theta = 2; // true则走到theta位再置零，false则走到-theta位再置零
+  repeated double delta_l = 3;
+  bool plus_l = 4; // true则加，false则减
+}
+
+message DHRequest {
+  bool get_theoretical = 1; // 是否获取理论dh参数
+}
+
+message DHt {
+  double d = 1;
+  double a = 2;
+  double alpha = 3;
+  double theta = 4;
+}
+
+message DHParams {
+  repeated DHt params = 1;
+}
+
+message FixDHResult {
+  repeated DHt origin = 1;
+  repeated DHt before = 2;
+  repeated DHt after = 3;
+}
+
+message Option {
+  string value = 1;
+  string label = 2;
+}
+
+message LuaEvent {
+  enum Type {
+    ECHO = 0;
+    LUA = 1;
+    SIGNAL = 2;
+    LOOP = 3;
+    ALERT = 4;
+    CONFIRM = 5;
+    INPUT = 6;
+    SELECT = 7;
+  }
+  enum CmdState {
+      INIT = 0;
+      RUNNING = 1;
+      SUCCESS = 2;
+      FAILED = 3;
+  }
+
+  Type type = 1;
+  // type: ECHO
+  int32 cmd_id = 2;
+  CmdState cmd_state = 3;
+  // echo_key
+  // 当type=Lua时，该字段表示错误消息;
+  // 当type=LOOP 时表示loopid
+  // 当type=ALERT/CONFIRM/INPUT/SELECT时，该字段表示提示语
+  string echo_key = 4;
+  // index
+  // 当type=LOOP时，表示进行到了第几个循环
+  // 当type=LUA时，表示对应的任务ID
+  int32 index = 8;
+  // type: LUA
+  LuaState lua_state = 5;
+  // type: SIGNAL
+  int32 signal_id = 6;
+  double signal_value = 7;
+  // type: SELECT
+  repeated Option options = 9;
+}
+
+message ConfirmInput {
+  string input = 1; // CONFIRM时为"true"|"false", INPUT为用户输入字符串, SELECT为用户选择的value
+}
+
+message PoseRes {
+  PR cart = 1; // 笛卡尔位置
+  JPose joint = 2; // 关节位置
+}
+
+message ModbusDio {
+    int32 pin = 1;
+    //对应modbus内部地址
+    int32 addr = 2;
+}
+
+message ModbusDioGroup {
+    repeated ModbusDio pins = 1;
+    int32 addr = 2;
+}
+
+message ModbusAio {
+    int32 pin = 1;
+    // 0: 电压型 1: 电流型
+    int32 mode = 2;
+    //对应Modbus内部地址 
+    // 一个addr占用2bytes=16bits
+    int32 addr = 3;
+}
+
+message AIORange {
+    double min = 1;
+    double max = 2;
+}
+
+message Range {
+    AIORange V = 1;
+    AIORange A = 2;
+}
+
+message ModbusAioGroup {
+    repeated ModbusAio pins = 1;
+    // modbus base address
+    int32 addr = 2;
+    //大小端
+    int32 isLsb = 3;
+    Range range = 4;
+    // number of 16 bit words for one pin
+    int32 size = 5;
+}
+
+message ModbusExternalIOMapping {
+    // 所有数字量的输入值
+    ModbusDioGroup di = 1;
+    // 所有数字量的输出值
+    ModbusDioGroup do = 2;
+    // 所有模拟量输入值
+    ModbusAioGroup ai = 3;
+    // 所有模拟量输出值
+    ModbusAioGroup ao = 4;
+}
+
+message ModbusExternalIO {
+    int32 id = 1;
+    string ip = 2;
+    int32 port = 3;
+    int32 timeout = 4;
+    int32 slaveId = 5;
+    int32 cmdHoldTime = 6;
+    int32 version = 7;
+    ModbusExternalIOMapping ioMap = 8;
+}
+
+message ModbusExternalIOs {
+    repeated ModbusExternalIO ios= 1;
+}
+
+message RecordPVATRequest {
+    enum PVATType {
+        PT = 0;
+        PVT = 1;
+        PVAT = 2;
+    }
+
+    message VZeroGap {
+        double threshold = 1; // v zero gap threshold should be > 0 and < 0.01
+        bool remove_gap = 2; // whether to remove zero gap during teaching
+    }
+
+    PVATType type = 1;
+    double duration = 2; // duration in microseconds
+    VZeroGap vZeroGap = 3;
+    bool use_duration_ts = 4;
+    bool save_file = 5;
+}
+
+message RecordPVATResponse {
+    repeated double p = 1;
+    repeated double v = 2;
+    repeated double acc = 3;
+    double t = 4;
+    bool end = 5; // is pvat end
+    string f = 6; // data save file path, local
+}

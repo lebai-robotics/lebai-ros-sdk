@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: liufang
     author_email: liufang_robot@outlook.com
-    generated_timestamp: 1621495269
+    generated_timestamp: 1607657269

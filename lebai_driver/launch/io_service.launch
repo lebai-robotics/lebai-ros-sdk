@@ -8,12 +8,14 @@
   <arg name="robot_ns" default=""/>
   <arg name="use_ns" default="0"/>
 
+  <param name="rcs_port" type="int" value="5181"/>
+
   <param name="robot_ip_address" type="str" value="$(arg robot_ip)" unless="$(arg use_ns)"/>
   <param name="$(arg robot_ns)/robot_ip_address" type="str" value="$(arg robot_ip)" if="$(arg use_ns)"/>
 
-  <node name="io_service" pkg="lebai_driver" type="io_service_node.py"  unless="$(arg use_ns)" output="screen">
+  <node name="io_service" pkg="lebai_driver" type="io_service"  unless="$(arg use_ns)" output="screen">
   </node>    
-  <node name="$(arg robot_ns)_io_service" pkg="lebai_driver" type="io_service_node.py"  if="$(arg use_ns)" output="screen">
+  <node name="$(arg robot_ns)_io_service" pkg="lebai_driver" type="io_service"  if="$(arg use_ns)" output="screen">
     <remap from="robot_ip_address" to="$(arg robot_ns)/robot_ip_address"/>
   </node>    
 </launch>

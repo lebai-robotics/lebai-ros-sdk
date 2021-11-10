@@ -1,0 +1,193 @@
+syntax = "proto3";
+import "messages.proto";
+package robotc;
+
+service RobotTest {
+    rpc InitReducerTest(Empty) returns (Result);
+    rpc ReducerTest(ReducerRequest) returns (ReducerResult);
+    rpc InitJointTest(Empty) returns (Result);
+    rpc JointStudy(Empty) returns (JointStudyResult);
+    rpc JointTest(JointRequest) returns (JointResult);
+    rpc TestCommand(CommandRequest) returns (CommandResult);
+    /// 磨合测试，返回每个周期的结果，主动断开即停止
+    rpc RunInTest(RunInRequest) returns(RunInResult);
+    /// 绝对精度测试
+    rpc MoveDetectTest(MoveDetectRequest) returns(MoveDetectResult);
+    /// 百分表读取
+    rpc GetDialIndicator(DeviceIds) returns(DeviceValues);
+    /// 量产测试
+    rpc StartProductTest(ProductTestRequest) returns(ProductTestResult);
+    /// 主机箱测试: 1, 正常；其他异常
+    rpc BoxTest(Empty) returns(Result);
+
+    // 初始化机器人设备信息
+    /**
+    {
+        "robot": {
+            "model": "LM6J",
+            "sn": "C01905010001XX"
+        },
+        "name": "lebai-Yonnie",
+        "mac": "B6LLYLUAQG19",
+        "arm": {
+            "sn": "R01905010001XX"
+        }
+    }
+    */
+    rpc InitRobot(RobotInfo) returns (InitRobotResult);
+    rpc WriteSn(DeviceInfo) returns (WriteSnResult);
+    rpc ReadSn(DeviceTypeRequest) returns (DeviceInfo);
+}
+
+message Empty {}
+
+message Result {
+    int32 ok = 1; // 0 正常 其他异常
+    int32 testError = 2;
+}
+
+message Joints {
+    repeated double pose = 1;
+}
+
+message ReducerRequest {
+    double v = 1; // 转速
+}
+
+message ReducerResult {
+    double voltage = 1; // 电压 V
+    double v = 2; // 转速 rpm
+    double torque = 3; // 扭矩 Nm
+}
+
+message JointStudyResult {
+    uint32 motor_encoder = 1; // 电机编码（磁编位置）
+}
+
+message JointRequest {
+    uint32 joint_type = 1; // 0 大关节 1 小关节
+}
+
+message JointResult {
+    double backlash = 1;  // 空程 °
+    double pos_stable_time = 2; // 位置稳定时间 s
+    double pos_overshot = 3; // 位置超调量 rad
+    double temperature = 4; // 关节内部温度 ℃
+    double current = 5; // 电流 A
+    double voltage = 6; // 电压 V
+    double v = 7; // 转速 rpm
+    double torque = 8; // 电机扭矩 Nm
+    uint32 motor_encoder = 9; // 电机编码（磁编位置）
+    double joint_torque = 10; // 关节扭矩
+    double reducer_eff = 11; // 减速器效率
+    double motor_eff = 12; // 电机效率
+}
+
+message CommandRequest {
+    int32 type = 1; // 类型
+    int32 value_i = 2;
+    double value_f = 3;
+}
+
+message CommandResult {
+    int32 code = 1; // 返回码，默认0即可
+}
+
+message MovePoint {
+    // 如果pose_is_joint_angle 为 false，反向运动学会计算成对应的关节角度；
+    repeated double joint_pose_to = 1;
+    // 设定joint_pose_to是用{x, y, z, rx, ry, rz}描述末端位置和姿态还是用关节角度
+    bool pose_is_joint_angle = 2;
+    // 单位：rad/s^2，主轴的关节加速度
+    double acceleration = 3;
+    // 单位：rad/s，主轴的关节速度
+    double velocity = 4;
+    // 单位：s，运动时间
+    double time = 5;
+    // 单位：m，下一段的交融半径
+    double blend_radius = 6;
+}
+  
+message RunInRequest {
+    repeated MovePoint path = 1; // 单个磨合测试周期轨迹
+    double equivalent_radius = 2; // 等效半径 m
+    double threshold_distance = 3;// 门限距离 m
+    double position_stable_time = 4; // 位置稳定时间(最大) s
+    double position_overshoot = 5; // 位置超调量(最大) m
+    double pose_stable_time = 6; // 姿态稳定时间(最大) s
+    double pose_overshoot = 7; // 姿态超调量(最大) m
+}
+
+message RunInJointInfo {
+    double min_velocity = 1; // 反馈速度 m/s
+    double max_velocity = 2; // 反馈速度
+    double min_voltage = 3; // 电压 V
+    double max_voltage = 4; // 电压
+    double min_temperature = 5; // 温度 ℃
+    double max_temperature = 6; // 温度
+}
+
+message RunInPathResult {
+    repeated RunInJointInfo joints = 1;
+}
+
+message RunInResult {
+    bool ok = 1; // 是否符合标准
+    repeated RunInPathResult path = 2; // 每条轨迹的抖动值
+    double position_stable_time = 4; // 位置稳定时间 s
+    double position_overshoot = 5; // 位置超调量 m
+    double pose_stable_time = 6; // 姿态稳定时间 s
+    double pose_overshoot = 7; // 姿态超调量 m
+    string filename = 8; // csv文件路径
+}
+
+message DeviceIds {
+    repeated uint32 id = 1; // 同类型的第几个设备
+}
+
+message DeviceValues {
+    repeated double value = 1; // 读数结果
+}
+
+message ProductTestRequest {
+    uint32 cmd = 1; // 测试命令
+}
+
+message ProductTestResult {
+    uint32 testRes = 1; // 测试结果
+    uint32 testError = 2;
+}
+
+message InitRobotResult {
+    int32 ret = 1; // 初始化Robort返回结果
+    string cup = 2; // 绑定hash值
+}
+
+message WriteSnResult {
+    int32 writeSnRes = 1; // 写sn结果
+}
+
+message DeviceTypeRequest {
+    int32 devType = 1; // 要读sn的设备类型
+}
+
+message DecimalInput {
+    int32 pin = 1;
+    int32 value = 2; // 1 或者 0。若为 -1 则表示没有结果（没有运行到此处）
+}
+
+message MoveDetectPath {
+    MovePoint path = 1; // 单个轨迹
+    repeated DecimalInput moving = 2; // 移动中的各传感器应有值
+    repeated DecimalInput cross = 3; // 移动完成后（交点）时的各传感器应有值
+}
+
+message MoveDetectRequest {
+    repeated MoveDetectPath req = 1;
+}
+
+message MoveDetectResult {
+    bool ok = 1; // 是否符合标准
+    repeated MoveDetectPath res = 2; // 周期内移动中的传感器值，不保证path是对的
+    string filename = 3; // csv文件路径
+}

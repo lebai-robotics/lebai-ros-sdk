@@ -1,27 +1,28 @@
 <?xml version="1.0"?>
-<package format="2">
+<package>
   <name>lebai_driver</name>
-  <license>lebai</license>
-  <version>0.0.2</version>
+  <version>0.0.1</version>
   <description>The lebai_driver package</description>
+  <license>lebai</license>
   <maintainer email="liufang_robot@outlook.com">Liu Fang</maintainer>
-  <author email="liufang_robot@outlook.com">Liu Fang</author>
+  <author email="liufang_robot@outlook.com">Liu Fang</author> -->
+
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>lebai_msgs</build_depend>
   <build_depend>industrial_robot_client</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>lebai_msgs</exec_depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>industrial_robot_client</exec_depend>
+  <build_depend>lebai_msgs</build_depend>
+  <build_depend>grpc</build_depend>
 
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>industrial_robot_client</run_depend>  
+  <run_depend>lebai_msgs</run_depend>
+  <run_depend>grpc</run_depend>
+  
+  
+
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
