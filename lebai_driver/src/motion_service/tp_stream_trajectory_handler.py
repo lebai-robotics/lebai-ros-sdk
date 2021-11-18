@@ -1,4 +1,4 @@
-from lebai.type import JointPose, JointPose, CartesianPose
+from lebai.type import JointPose, JointPose, CartesianPose, PVAT
 from genpy.rostime import Duration
 import rospy
 from industrial_msgs.msg import RobotStatus, ServiceReturnCode
@@ -81,41 +81,15 @@ class TPStreamTrajectoryHandler:
     
     def generate_data_list(self, traj_msg):        
         for i in range(len(traj_msg.points)-1):
-            data = {
-            't': traj_msg.points[i+1].time_from_start.to_sec() - traj_msg.points[i].time_from_start.to_sec(),
-            'p': traj_msg.points[i+1].positions,
-            'v': traj_msg.points[i+1].velocities,
-            'a': traj_msg.points[i+1].accelerations}
+            data = PVAT(traj_msg.points[i+1].time_from_start.to_sec() - traj_msg.points[i].time_from_start.to_sec(), traj_msg.points[i+1].positions,
+            traj_msg.points[i+1].velocities, traj_msg.points[i+1].accelerations)
             yield data
-            
 
 
     def send_to_robot(self, traj_msg):
         data_gen = self.generate_data_list(traj_msg)
         self.lebai_robot_.move_pvats(data_gen)
 
-        # for i in range(len(traj_msg.points)-1):
-        #     duration =  traj_msg.points[i+1].time_from_start.to_sec() - traj_msg.points[i].time_from_start.to_sec()
-        #     p = traj_msg.points[i+1].positions
-        #     v =  traj_msg.points[i+1].velocities
-        #     a = traj_msg.points[i+1].accelerations
-        #     print("position ")
-        #     for d in traj_msg.points[i+1].positions:
-        #         print(d)
-            # print("duration %s"%(duration))
-            # self.lebai_robot_.move_pvat(p, v, a, duration)
-            
-            # print("p %s"%(p.__str__))
-            # print("v %s"%(v.__str__))
-            # print("a %s"%(a.__str__))
-
-            # print("data")
-            # print(data)
-            # yield data
-        
-
-
-        
 
     def traj_msgs_to_sdk_params(self, traj):
         if self.is_valid_traj(traj) == None:

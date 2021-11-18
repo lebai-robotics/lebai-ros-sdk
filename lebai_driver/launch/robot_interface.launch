@@ -8,14 +8,14 @@
 	<param name="robot_ip_address" type="str" value="$(arg robot_ip)" />
 
 	<!-- robot_state: publishes joint positions and robot-state data
-	     (from socket connection to robot)
+	     (from python-sdk to communicate with robot)
 	-->
 	<include file="$(find lebai_driver)/launch/robot_state.launch">
 		<arg name="robot_ip"   value="$(arg robot_ip)" />
 	</include>
 
 	<!-- motion service: sends robot motion commands by 
-	     send different paths to robot (using socket connection to robot) 
+	     send different paths to robot (using python-sdk to communicate with robot) 
 	-->
 	<include file="$(find lebai_driver)/launch/motion_service.launch">
 		<arg name="robot_ip"   value="$(arg robot_ip)" />
@@ -24,14 +24,14 @@
 
 	
 	<!-- io_service: set digital output
-		(from socket connection to robot) 
+		(from python-sdk to communicate with robot) 
 	-->
 	<include file="$(find lebai_driver)/launch/io_service.launch">
 		<arg name="robot_ip"   value="$(arg robot_ip)" />
 	</include>	
 
 	<!-- system_service: send application command
-		(from socket connection lebai robot) 
+		(from python-sdk lebai to communicate with robot) 
 	-->
 	<include file="$(find lebai_driver)/launch/system_service.launch">
 		<arg name="robot_ip"   value="$(arg robot_ip)" />

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from lebai_msgs.srv import SetAO
@@ -24,7 +24,6 @@ def Run():
     return
 
 if __name__ == '__main__':
-    rospy.logerr("shit")
     try:
         rospy.init_node('io_example', anonymous=True)
         Run()
