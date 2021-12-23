@@ -70,7 +70,7 @@ catkin_make run_tests_lebai_driver
 
 To connect a real `lebai `robot, you must have a `lebai` robot controller running with network access.
 
-Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for more detailed information.
+Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for elaborated information.
 
 ## Run driver without gui display (lm3 as an example)
 
