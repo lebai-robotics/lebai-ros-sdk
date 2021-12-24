@@ -30,7 +30,7 @@ catkin_make
 
 To connect a real `lebai` robot, you must have a `lebai` `l-master`  running with network access. 
 
-If you connect your `ROS` device to the `lebai WIFI`, usually the network gateway(`10.20.17.1`)  address is the robot ip address.
+If you connect your `ROS` device to the `lebai WIFI`, usually the network gateway(`10.20.17.1`)  address is the robot Ip address.
 
 Once the driver started to run, you can get access to the robot controller via `ROS` `pubsub` and `service`. See [lebai_driver](lebai_driver/README.md) for more detailed information.
 
@@ -74,3 +74,17 @@ roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=your_robot_ip
 `sim` set to true will not connect to real robot. it will only run a simulation
 
 `robot_ip` is the robot's physical IP address, if `sim` set to false, `robot_ip` is required.  
+
+**Note**:
+
+Before using `MoveIt` to move the manipulator, make sure the robot is enabled, there are two methods:
+
+in `ROS`:
+
+```
+rosservice call /system_service/enable "{}"
+```
+
+in `l-master` web, click the startup(启动) as show in the following fig:
+
+![](lebai_doc/enable_robot_on_website.png)
