@@ -65,7 +65,7 @@ namespace lebai_driver
 
   public:
     // using JointTrajectoryInterface::init;
-    JointTrajectoryPtFullStreamer(int min_buffer_size = 1) : min_buffer_size_(min_buffer_size){};
+    JointTrajectoryPtFullStreamer(int min_buffer_size = 1) : min_buffer_size_(min_buffer_size), node_("~"){};
     ~JointTrajectoryPtFullStreamer();
     bool init(Stubs *stubs, const std::vector<std::string> &joint_names,
               const std::map<std::string, double> &velocity_limits = std::map<std::string, double>());
