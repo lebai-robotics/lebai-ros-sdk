@@ -29,7 +29,7 @@ As a ROS package, you need firstly install `ROS` .
    
 
 
-# Get the `lebai-ros-sdk`
+# Get `lebai-ros-sdk`
 
 checkout out package and run `catkin_make`
 
@@ -70,7 +70,9 @@ catkin_make run_tests_lebai_driver
 
 To connect a real `lebai `robot, you must have a `lebai` robot controller running with network access.
 
-Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for more detailed information.
+If you connect your `ROS` device to the `lebai WIFI`, usually the network gateway(`10.20.17.1`) address is the robot's physical IP address.
+
+Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for elaborated information.
 
 ## Run driver without gui display (lm3 as an example)
 
@@ -108,7 +110,7 @@ Now, we can only control `lm3` manipulator from `MoveIt`. Gripper control is not
 
 Before using `MoveIt` to move the manipulator, make sure the robot is enabled, there are two methods:
 
-in 'ROS':
+in `ROS`:
 
 ```
 rosservice call /system_service/enable "{}"
