@@ -34,6 +34,7 @@ namespace lebai_driver
 {
 
     TrajectoryMove::TrajectoryMove()
+    :node_("~")
     {
     }
 
