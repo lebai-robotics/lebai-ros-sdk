@@ -11,7 +11,7 @@ As a ROS package, you need firstly install `ROS` .
 2. Also we need some extra `ROS` packages:
 
    ```
-   sudo apt install -y ros-melodic-industrial-robot-client ros-melodic-grpc
+   sudo apt install -y ros-melodic-industrial-robot-client ros-melodic-industrial-robot-simulator ros-melodic-grpc 
    ```
 
 
@@ -28,9 +28,11 @@ catkin_make
 
 # How to run
 
-To connect a real `lebai` robot, you must have a `lebai` `l-master`  running with network access.
+To connect a real `lebai` robot, you must have a `lebai` `l-master`  running with network access. 
 
-Once the driver started to run, you can get access to the robot controller via `ROS` pub\sub and services. See [lebai_driver](lebai_driver/README.md) for more detailed information.
+If you connect your `ROS` device to the `lebai WIFI`, usually the network gateway(`10.20.17.1`)  address is the robot ip address.
+
+Once the driver started to run, you can get access to the robot controller via `ROS` `pubsub` and `service`. See [lebai_driver](lebai_driver/README.md) for more detailed information.
 
 ## Run driver without gui display (lm3 as an example)
 
@@ -57,10 +59,10 @@ roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:=you
 Install `MoveIt` firstly.
 
 ```
-sudo apt install ros-melodic-moveit
+sudo apt install -y ros-melodic-moveit
 ```
 
-Then, run as following:
+Then, run the following:
 
 ```
 # simulation mode
@@ -71,4 +73,4 @@ roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=your_robot_ip
 
 `sim` set to true will not connect to real robot. it will only run a simulation
 
-`robot_ip` is the robot's physical IP address, if `sim` set to false, `robot_ip` is required.
+`robot_ip` is the robot's physical IP address, if `sim` set to false, `robot_ip` is required.  
