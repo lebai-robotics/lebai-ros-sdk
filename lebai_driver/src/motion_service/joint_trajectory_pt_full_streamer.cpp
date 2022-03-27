@@ -33,6 +33,10 @@ namespace lebai_driver
 {
     JointTrajectoryPtFullStreamer::~JointTrajectoryPtFullStreamer()
     {
+        if(streaming_thread_ && streaming_thread_->joinable())
+        {
+            streaming_thread_->join();            
+        }
         delete this->streaming_thread_;
     }
     bool JointTrajectoryPtFullStreamer::init(Stubs *stubs, const std::vector<std::string> &joint_names,
@@ -43,17 +47,16 @@ namespace lebai_driver
         all_joint_names_ = joint_names;
         joint_vel_limits_ = velocity_limits;
 
-        sub_robot_status_ = node_.subscribe("robot_status", 1, &JointTrajectoryPtFullStreamer::robotStatusCB, this);
+        sub_robot_status_ = node_.subscribe("/robot_status", 1, &JointTrajectoryPtFullStreamer::robotStatusCB, this);
 
-        this->sub_cur_pos_ = this->node_.subscribe("joint_states", 1, &JointTrajectoryPtFullStreamer ::jointStateCB, this);
+        this->sub_cur_pos_ = this->node_.subscribe("/joint_states", 1, &JointTrajectoryPtFullStreamer ::jointStateCB, this);
 
         if (joint_vel_limits_.empty() && !industrial_utils::param::getJointVelocityLimits("robot_description", joint_vel_limits_))
             ROS_WARN("Unable to read velocity limits from 'robot_description' param.  Velocity validation disabled.");
 
         this->srv_stop_motion_ = this->node_.advertiseService("stop_motion", &JointTrajectoryPtFullStreamer::stopMotionCB, this);
         // this->srv_joint_trajectory_ = this->node_.advertiseService("joint_path_command", &JointTrajectoryPtFullStreamer::jointTrajectoryCB, this);
-        this->sub_joint_trajectory_ = this->node_.subscribe("joint_path_command", 0, &JointTrajectoryPtFullStreamer::jointTrajectoryCB, this);
-        // std::cout<<"ssssuuubbb\n";
+        this->sub_joint_trajectory_ = this->node_.subscribe("/joint_path_command", 0, &JointTrajectoryPtFullStreamer::jointTrajectoryCB, this);
 
         // rtn &= JointTrajectoryInterface::init(connection, joint_names, velocity_limits);
         //  this->srv_stop_motion_ = this->node_.advertiseService("stop_motion", &JointTrajectoryPtFullStreamer::stopMotionCB, this);
@@ -70,50 +73,12 @@ namespace lebai_driver
 
         return true;
     }
-
-    // JointTrajPtFullMessage JointTrajectoryPtFullStreamer::create_message(int seq, Industrial_JointTrajPtPull &pt_full)
-    // {
-
-    //     JointTrajPtFullMessage msg;
-    //     industrial::joint_data::JointData pos;
-    //     industrial::joint_data::JointData vel;
-    //     industrial::joint_data::JointData acc;
-
-    //     float time = 0.0;
-    //     //  ROS_ASSERT(joint_pos.size() <= (unsigned int)pos.getMaxNumJoints());
-    //     if (!pt_full.getTime(time))
-    //     {
-    //         ROS_ERROR("getTime error");
-    //         return msg;
-    //     }
-    //     if (!pt_full.getPositions(pos))
-    //     {
-    //         ROS_ERROR("getPositions error");
-    //         return msg;
-    //     }
-
-    //     if (!pt_full.getVelocities(vel))
-    //     {
-    //         ROS_ERROR("getVelocities error");
-    //         return msg;
-    //     }
-
-    //     int valid_fields = ValidFieldTypes::TIME | ValidFieldTypes::POSITION | ValidFieldTypes::VELOCITY | ValidFieldTypes::ACCELERATION;
-    //     //TODO
-    //     Industrial_JointTrajPtPull pt_full_data;
-    //     pt_full_data.init(0, seq, valid_fields, time, pos, vel, acc);
-
-    //     msg.init(pt_full_data);
-
-    //     return msg;
-    // }
-
     bool JointTrajectoryPtFullStreamer::select(int seq, const std::vector<std::string> &ros_joint_names, const trajectory_msgs::JointTrajectoryPoint &ros_pt,
                                                const std::vector<std::string> &rbt_joint_names, robotc::PVATRequest &grpc_pt)
     {
         ROS_ASSERT(ros_joint_names.size() == ros_pt.positions.size());
 
-        //    std::cerr << "Vel: ";
+        
         for (size_t rbt_idx = 0; rbt_idx < rbt_joint_names.size(); ++rbt_idx)
         {
             bool is_empty = rbt_joint_names[rbt_idx].empty();
@@ -261,6 +226,7 @@ namespace lebai_driver
         std::vector<robotc::PVATRequest> new_traj_reqs;
         if (!trajectory_to_reqs(msg, &new_traj_reqs))
             return;
+        std::cerr<<"new_traj_reqs "<<new_traj_reqs.size()<<"\n";
 
         // send command messages to robot
         send_to_robot(std::move(new_traj_reqs));
@@ -352,7 +318,7 @@ namespace lebai_driver
         google::protobuf::Empty grpc_req;
         robotc::CmdId grpc_res;
         grpc::Status status;
-        status = stubs_->robot_controller_stub_->Stop(&context, grpc_req, &grpc_res);
+        status = stubs_->robot_controller_stub_->StopMove(&context, grpc_req, &grpc_res);
         if (status.ok())
         {
         }

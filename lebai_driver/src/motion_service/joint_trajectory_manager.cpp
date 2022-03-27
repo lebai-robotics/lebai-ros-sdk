@@ -82,6 +82,7 @@ namespace lebai_driver
         {
             return false;
         }
+        ROS_INFO("JointTrajectoryManager inited.");
         return true;
     }
     void JointTrajectoryManager::run()
