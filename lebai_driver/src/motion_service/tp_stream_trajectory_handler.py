@@ -41,7 +41,7 @@ class TPStreamTrajectoryHandler:
         return res
 
     def stop_motion(self):
-        self.lebai_robot_.stop()
+        self.lebai_robot_.stop_move()
         # self.state_ = TransferState.IDLE
         return
 
@@ -84,7 +84,12 @@ class TPStreamTrajectoryHandler:
             data = PVAT(traj_msg.points[i+1].time_from_start.to_sec() - traj_msg.points[i].time_from_start.to_sec(), traj_msg.points[i+1].positions,
             traj_msg.points[i+1].velocities, traj_msg.points[i+1].accelerations)
             yield data
-
+    
+    def generate_data_list(self, traj_msg):        
+        for i in range(len(traj_msg.points)-1):
+            data = PVAT(traj_msg.points[i+1].time_from_start.to_sec() - traj_msg.points[i].time_from_start.to_sec(), traj_msg.points[i+1].positions,
+            traj_msg.points[i+1].velocities, traj_msg.points[i+1].accelerations)
+            yield data
 
     def send_to_robot(self, traj_msg):
         data_gen = self.generate_data_list(traj_msg)

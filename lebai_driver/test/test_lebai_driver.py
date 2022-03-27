@@ -56,6 +56,8 @@ class TestAll(unittest.TestCase):
         self.assertFalse(self.robot_state_proxy_.robot_status_.drives_powered.val)
         self.assertTrue(self.system_service_proxy_.emergency_stop())
         rate.sleep()
+        rate.sleep()
+        rate.sleep()
         self.assertTrue(self.robot_state_proxy_.robot_status_.e_stopped.val)
         self.assertTrue(self.system_service_proxy_.power_on())
         rate.sleep()
