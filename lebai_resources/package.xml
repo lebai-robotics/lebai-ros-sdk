@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>lebai_resources</name>
-  <version>1.0.0</version>
-  <description>The lebai_resources package</description>
-  <maintainer email="liufang_robot@outlook.com">Liu Fang</maintainer>
-  <license>BSD</license>
-  <author email="liufang_robot@outlook.com">Liu Fang</author>
+  <version>0.0.1</version>
+  <description>Lebai xacro resources package</description>
+  <maintainer email="liufang_robot@outlook.com">ros</maintainer>
+  <license>Apache 2.0</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

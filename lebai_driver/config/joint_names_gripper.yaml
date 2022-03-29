@@ -1,0 +1,9 @@
+/robot_state:
+  ros__parameters:
+    gripper_joint_names:
+      - gripper_l_joint1
+      - gripper_l_joint2
+      - gripper_l_joint_finger
+      - gripper_r_joint1
+      - gripper_r_joint2
+      - gripper_r_joint_finger

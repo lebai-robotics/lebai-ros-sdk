@@ -1,30 +1,15 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(lebai_lm3_support)
 
-find_package(catkin REQUIRED)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES lebai_lm3_support
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+find_package(ament_cmake REQUIRED)
+
+
+install(DIRECTORY launch meshes config rviz urdf DESTINATION 
+    share/${PROJECT_NAME}
 )
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
-)
-
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/lebai_lm3_support.cpp
-# )
-
-install(DIRECTORY config launch urdf  meshes DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
+ament_package()
