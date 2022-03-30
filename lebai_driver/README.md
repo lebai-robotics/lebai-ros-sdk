@@ -1,73 +1,58 @@
 # lebai driver
 
 Driver for robot controller and ros connection.
-Connection services are classified into four types:
+There are  four connection nodes:
 
-- **state** provides all the controller internal states, include io state, robot state, joint state, and gripper state.
-- **io** provides io control interface and gripper control interface.
-- **system** provides some system level interface.(enable, disable, etc.)
+- **robot_state** provides all the controller internal states, include io state, robot state, joint state, and gripper state.
+- **io_service** provides io control interface and gripper control interface.
+- **system_service** provides some system level interface.(enable, disable, etc.)
 - **motion** provides motion control interface
 
-# State
+# robot_state
 
-the node is **robot_state**
+## Published Topics
 
-state send several robot state(joint state, io state, robot state, gripper state) to ROS by publishing.
+* **`robot_status`** (`lebai_interfaces/msg/RobotStatus`)
+* **`joint_states`** (`sensor_msgs/msg/JointState`)
+* **`io_status`** (`lebai_interfaces/msg/IOStatus`)
 
-- `/io_status`, topic type is `lebai_msgs/IOStatus`
-- `/robot_status`, topic type is `lebai_msgs/RobotStatus`
-- `/joint_states`, topic type is `sensor_msgs/JointState`
-- `/gripper_states`, topic type is `lebai_msgs/GripperStatus`
+# io_service
 
-**TODO:**
+## service servers
 
-- `effort` in `joint_states` is not implemented.(gRPC problem)
-- `force` in `gripper_states` is not implemented.(gRPC problem)
-- `hold_on` in `gripper_status` should be documented more explicit.
-- maybe `robot_status` should use some vendor specified dat.(Do not use industrial_msgs's data) 
+- **`/io_service/set_extend_ao`** (`lebai_interfaces/srv/SetAO`)
+- **`/io_service/set_extend_do`** (`lebai_interfaces/srv/SetDO`)
+- **`/io_service/set_flange_do`** (`lebai_interfaces/srv/SetDO`)
+- **`/io_service/set_robot_ai_mode`** (`lebai_interfaces/srv/SetAMode`)
+- **`/io_service/set_robot_ao`** (`lebai_interfaces/srv/SetAO`)
+- **`/io_service/set_robot_ao_mode`** (`lebai_interfaces/srv/SetAMode`)
+- **`/io_service/set_robot_do`** (`lebai_interfaces/srv/SetDO`)
 
-# io
+# system_service
 
-the node is **io_service**
-Currently, io provides following services:
+## service servers
 
-- `/io_service/set_robot_do` type is `lebai_msgs/SetDO`
-- `/io_service/set_robot_ao, service`, type is `lebai_msgs/SetAO`
-- `/io_service/set_robot_ao_mode` type is `lebai_msgs/SetAMode`
-- `/io_service/set_robot_ai_mode` type is `lebai_msgs/SetAMode`
-- `/io_service/set_flange_do` type is `lebai_msgs/SetDO`
-- `/io_service/set_gripper_position` type is `lebai_msgs/SetGripper`
-- `/io_service/set_gripper_force` type is `lebai_msgs/SetGripper`
+- **`/io_service/set_extend_ao`** (`lebai_interfaces/srv/SetAO`)
 
-# system
-
-the node is **system_service**
-Currently, system provides following services:
-
-- `/system_service/emergency_stop`
-- `/system_service/enable`
-- `/system_service/disable`
-- `/system_service/entry_teach_mode`
-- `/system_service/exit_teach_mode`
-- `/system_service/pause_motion`
-- `/system_service/abort_motion`
-- `/system_service/resume_motion`
-- `/system_service/power_off`
-- `/system_service/power_on`
-- `/system_service/turn_off_robot`
-
- all the services are typed `std_srvs/Empty`
+- **`/system_service/abort_motion`** (`std_srvs/srv/Empty`)
+- **`/system_service/emergency_stop`** (`std_srvs/srv/Empty`)
+- **`/system_service/enable`** (`std_srvs/srv/Empty`)
+- **`system_service/entry_teach_mode`** (`std_srvs/srv/Empty`)
+- **`/system_service/exit_teach_mode`**(`std_srvs/srv/Empty`)
+- **`/system_service/pause_motion`**(`std_srvs/srv/Empty`)
+- **`/system_service/power_off`** (`std_srvs/srv/Empty`)
+- **`/system_service/power_on`** (`std_srvs/srv/Empty`)
+- **`/system_service/resume_motion`** (`std_srvs/srv/Empty`)
+- **`/system_service/turn_off_robot`** (`std_srvs/srv/Empty`)
 
 # motion
 
-the node are **motion_service**
-Currently, motion provides following services:
+## service servers
 
-- `/motion_service/move_circle`, service type is `lebai_msgs/MoveCircle`
-- `/motion_service/move_joint`, service type is `lebai_msgs/MoveJoint`
-- `/motion_service/move_circle`, service type is`lebai_msgs/MoveCircle`
+- **`/motion_service/move_joint`** (`lebai_interfaces/srv/MoveJoint`)
+- **`/motion_service/move_line`** (`lebai_interfaces/srv/MoveLine`)
 
- **TODO:**
+## action servers
 
-- `Until` function in all the `MoveXXX` is not working.
+- **`/lebai_trajectory_controller`** (`control_msgs/action/FollowJointTrajectory`)
 

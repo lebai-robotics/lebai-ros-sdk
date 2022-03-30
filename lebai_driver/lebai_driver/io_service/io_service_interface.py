@@ -7,11 +7,10 @@ from lebai_interfaces.srv import SetAMode
 from lebai_interfaces.srv import SetGripper
 
 
-
-
 class IOServiceInterface(Node):
     def __init__(self):
         super().__init__('io_service')
+        
         self.declare_parameter("robot_ip_address", "")
         self.declare_parameter("has_gripper", Parameter.Type.BOOL)        
         if not self.has_parameter('robot_ip_address'):

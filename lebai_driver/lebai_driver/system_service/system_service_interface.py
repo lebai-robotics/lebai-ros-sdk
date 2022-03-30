@@ -19,12 +19,12 @@ class SystemServiceInterface(Node):
         self.srv_power_off_ = self.create_service(Empty,self.get_name()+'/power_off', self.cmd_power_off)
         self.srv_enable_ = self.create_service(Empty, self.get_name()+'/enable', self.cmd_enable)
         self.srv_disable_ = self.create_service(Empty, self.get_name()+'/disable', self.cmd_disable)
-        self.srv_pause_motion_ = self.create_service(Empty, self.get_name()+'/disable', self.cmd_pause_motion)
-        self.srv_resume_motion_ = self.create_service(Empty, self.get_name()+'/resume_motion', self.cmd_resume_motion)
-        self.srv_abort_motion_ = self.create_service(Empty, self.get_name()+'/abort_motion', self.cmd_abort_motion)
         self.srv_entry_teach_mode_ = self.create_service(Empty, self.get_name()+'/entry_teach_mode', self.cmd_entry_teach_mode)
         self.srv_exit_teach_mode_ = self.create_service(Empty, self.get_name()+'/exit_teach_mode', self.cmd_exit_teach_mode)
         self.srv_turn_off_robot_ = self.create_service(Empty, self.get_name()+'/turn_off_robot', self.cmd_turn_off_robot)
+        self.srv_pause_motion_ = self.create_service(Empty, self.get_name()+'/pause_motion', self.cmd_pause_motion)
+        self.srv_resume_motion_ = self.create_service(Empty, self.get_name()+'/resume_motion', self.cmd_resume_motion)
+        self.srv_abort_motion_ = self.create_service(Empty, self.get_name()+'/abort_motion', self.cmd_abort_motion)
 
     def cmd_emergency_stop(self, request : Empty.Request, response: Empty.Response):
         self.lebai_robot_.estop()        
