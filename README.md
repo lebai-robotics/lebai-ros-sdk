@@ -2,6 +2,8 @@
 
 If you use `ROS melodic`, please refer [melodic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/melodic-dev) branch.
 
+If you use `ROS2 galactic`, please refer [galactic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/galactic-dev) branch.
+
 # Prerequsite
 
 As a ROS package, you need firstly install `ROS` .
