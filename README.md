@@ -1,6 +1,8 @@
 **This document describe `lebai-ros-sdk` on ROS Melodic(Ubuntu 18.04)**
 
-If you use `ROS` noetic, please refer [noetic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/noetic-dev) branch.
+If you use `ROS noetic`, please refer [noetic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/noetic-dev) branch.
+
+If you use `ROS2 galactic`, please refer [galactic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/galactic-dev) branch.
 
 # Prerequsite
 
