@@ -160,7 +160,7 @@ target_link_libraries(move_example
 #set_target_properties(move_example
 #  PROPERTIES OUTPUT_NAME move_example
 #  PREFIX "")
-#add_dependencies(move_example lebai_msgs_generate_messages_cpp)
+add_dependencies(move_example lebai_msgs_generate_messages_cpp)
 
 
 #############
