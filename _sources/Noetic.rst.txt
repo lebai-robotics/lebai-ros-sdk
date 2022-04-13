@@ -8,5 +8,6 @@ ROS Noetic
    :numbered:
    :maxdepth: 2
 
-   安装编译说明 <noetic/Install>
+   编译安装 <noetic/Install>
+   运行 <noetic/Execution>
 

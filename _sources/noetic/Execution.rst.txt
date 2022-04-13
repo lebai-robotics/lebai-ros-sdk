@@ -1,0 +1,27 @@
+.. _noetic_execution:
+
+运行
+============
+
+现在你可以开始尝试通过 ``lebai-ros-sdk`` 连接一台乐白机械臂。
+
+.. note::
+
+  请先确保乐白机械臂正常工作并确保机械臂和您的 ``ROS`` 运行系统的网络连接。
+
+在运行程序前，确保您已经正确的编译 ``lebai-ros-sdk``，并且设置了工作空间。
+
+.. code-block:: bash
+
+  # remember to run the source  
+  source ~/lebai_ws/devel/setup.bash
+
+您可以启动不带 ``rviz`` 界面显示的 ``ROS`` 驱动程序如下：
+
+.. code-block:: bash
+
+  roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:=xxx.xxx.xxx.xxx has_gripper:=0
+
+* ``robot_ip`` 是乐白机械臂的 ``IP`` 地址。
+* ``has_gripper`` 是机械臂末端是否有乐白夹爪。有夹爪设置为 ``1``，没有夹爪设置为 ``0``。
+
