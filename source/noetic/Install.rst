@@ -1,0 +1,121 @@
+.. _install:
+
+编译安装说明
+============
+
+.. contents:: 目录
+   :depth: 3
+   :local:
+
+为了编译运行 ``lebai-ros-sdk``，你需要先安装一些依赖。
+
+安装 ``ROS``
+---------------------------------
+
+您可以参考  `ROS官方文档 <https://wiki.ros.org/noetic/Installation/Ubuntu>`_ 安装 ``ROS`` 。
+根据国内的网络环境，这里将给出适配国内网络环境的安装步骤如下：
+
+设置 ``ROS`` 软件包安装源
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   sudo sh -c '. /etc/lsb-release && echo "deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+
+设置 ``ROS`` 秘钥
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   sudo apt install curl # if you haven't already installed curl
+   curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+
+通过 ``apt`` 安装 ``ROS``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+   sudo apt update
+   sudo apt install ros-noetic-desktop-full # use desktop full， this will take some time.
+
+设置 ``ROS`` 环境
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+您需要在 **bash** 终端中运行如下脚本来设置 ``ROS`` 环境。
+
+.. code-block:: bash
+
+   source /opt/ros/noetic/setup.bash
+
+如果您不希望每次打开终端都需要运行上述脚本，你可以通过将上述脚本内容写入对应的 ``rc`` 配置文件中来简化。
+
+**bash**
+
+.. code-block:: bash
+
+   echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+   source ~/.bashrc
+
+如果您使用 ``zsh``，则相应的脚本如下。
+
+**zsh**
+
+.. code-block:: bash
+
+   echo "source /opt/ros/noetic/setup.zsh" >> ~/.zshrc
+   source ~/.zshrc
+
+安装 ``ROS`` 依赖包
+---------------------------------
+运行如下脚本，安装一些 ``lebai-ros-sdk`` 所需要的依赖包。
+
+.. code-block:: bash
+
+   sudo apt install -y ros-noetic-moveit ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl ros-noetic-industrial-core
+
+
+
+安装 ``python`` 依赖包
+---------------------------------
+``lebai-ros-sdk`` 依赖于如下 ``python`` 包:
+   * `lebai-python-sdk <https://pypi.org/project/lebai/>`_
+   * `urdf-parser-py <https://pypi.org/project/urdf-parser-py//>`_
+
+通过 ``pip`` 可以进行安装
+
+.. code-block:: bash
+
+   sudo apt install python3-pip # If pip is not install.
+   pip install -i https://pypi.tuna.tsinghua.edu.cn/simple lebai urdf-parser-py
+
+编译 ``lebai-ros-sdk`` 开发包
+---------------------------------
+
+您现在可以开始从github克隆 ``lebai-ros-sdk`` 的源代码，并且尝试编译。
+
+运行如下脚本：
+
+.. code-block:: bash
+
+   mkdir -p  ~/lebai_ws/src
+   cd  ~/lebai_ws/src
+   # choose one you prefer:
+   # ssh
+   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b noetic-dev
+   # https
+   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b noetic-dev
+   cd ~/lebai_ws
+   catkin_make
+
+你现在已经完成了 ``lebai-ros-sdk`` 的编译。
+
+.. note::
+   记住，当您完成编译后，您需要设置您工作空间的环境以便让 ``ROS`` 发现您的包。
+   
+   .. code-block:: bash
+      
+      # for bash 
+      source ~/lebai_ws/devel/setup.bash
+      # for zsh
+      source ~/lebai_ws/devel/setup.zsh
+   
