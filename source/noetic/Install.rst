@@ -1,6 +1,6 @@
-.. _install:
+.. _noetic_install:
 
-编译安装说明
+编译编译安装
 ============
 
 .. contents:: 目录
@@ -105,9 +105,9 @@
    # https
    git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b noetic-dev
    cd ~/lebai_ws
-   catkin_make
+   catkin_make install
 
-你现在已经完成了 ``lebai-ros-sdk`` 的编译。
+您现在已经完成了 ``lebai-ros-sdk`` 的编译。
 
 .. note::
    记住，当您完成编译后，您需要设置您工作空间的环境以便让 ``ROS`` 发现您的包。
@@ -115,7 +115,7 @@
    .. code-block:: bash
       
       # for bash 
-      source ~/lebai_ws/devel/setup.bash
+      source ~/lebai_ws/install/setup.bash
       # for zsh
-      source ~/lebai_ws/devel/setup.zsh
+      source ~/lebai_ws/install/setup.zsh
    
