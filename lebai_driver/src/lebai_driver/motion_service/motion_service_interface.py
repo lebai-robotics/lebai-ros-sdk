@@ -1,8 +1,8 @@
 from lebai import LebaiRobot
 import rospy
 import os, sys
-from tp_trajectory_handler import TPTrajectoryHandler
-from tp_stream_trajectory_handler import TPStreamTrajectoryHandler
+from lebai_driver.motion_service.tp_trajectory_handler import TPTrajectoryHandler
+from lebai_driver.motion_service.tp_stream_trajectory_handler import TPStreamTrajectoryHandler
 # from urdf_helper import find_chain_joints_name
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
