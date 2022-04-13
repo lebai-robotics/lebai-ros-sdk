@@ -1,9 +1,8 @@
 #!/usr/bin/python3
-# license removed for brevity
 import rospy
-import os, sys
-from system_service_interface import SystemServiceInterface
+from lebai_driver.motion_service.motion_service_interface import MotionServiceInterface
 
+# from std_srvs.srv import Empty, EmptyResponse, EmptyRequest
 
 def run():    
     rate = rospy.Rate(10) # 10hz
@@ -11,14 +10,17 @@ def run():
         rospy.logerr('robot_ip_address is not assigned')
         return
     robot_ip = rospy.get_param('robot_ip_address')
-    ssi = SystemServiceInterface(robot_ip)
+    msi = MotionServiceInterface(robot_ip)
 
     while not rospy.is_shutdown():
         rate.sleep()
 
 
 if __name__ == '__main__':
-    rospy.init_node('system_service', anonymous=True)
+
+    
+    
+    rospy.init_node('motion_service', anonymous=True)
     try:
         run()
     except rospy.ROSInterruptException:
