@@ -33,6 +33,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx_copybutton',
     'sphinx.ext.githubpages',
+    'sphinx_tabs.tabs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
