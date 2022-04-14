@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2. 运行 &mdash; lebai-ros-sdk</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/logo.png"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -18,6 +20,7 @@
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
+        <script src="../_static/tabs.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -59,7 +62,11 @@
 <li class="toctree-l3"><a class="reference internal" href="Install.html#lebai-ros-sdk">1.4. 编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2. 运行</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. 运行</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -91,27 +98,59 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="noetic-execution">
+  <section id="noetic-execution">
 <span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#noetic-execution" title="Permalink to this headline">¶</a></h1>
-<p>现在你可以开始尝试通过 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 连接一台乐白机械臂。</p>
+<p>现在您可以开始尝试通过 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 连接一台乐白机械臂。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>请先确保乐白机械臂正常工作并确保机械臂和您的 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 运行系统的网络连接。</p>
 </div>
 <p>在运行程序前，确保您已经正确的编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，并且设置了工作空间。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># remember to run the source</span>
-<span class="nb">source</span> ~/lebai_ws/devel/setup.bash
+<span class="nb">source</span> ~/lebai_ws/install/setup.bash
 </pre></div>
 </div>
-<p>您可以启动不带 <code class="docutils literal notranslate"><span class="pre">rviz</span></code> 界面显示的 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 驱动程序如下：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="m">0</span>
+<section id="id2">
+<h2><span class="section-number">2.1. </span>基本驱动程序<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>按照如下方式启动基本的驱动程序：</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-5peg55WM6Z2i" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-5peg55WM6Z2i" name="5peg55WM6Z2i" role="tab" tabindex="0">无界面</button><button aria-controls="panel-0-5pyJ55WM6Z2i" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-5pyJ55WM6Z2i" name="5pyJ55WM6Z2i" role="tab" tabindex="-1">有界面</button></div><div aria-labelledby="tab-0-5peg55WM6Z2i" class="sphinx-tabs-panel group-tab" id="panel-0-5peg55WM6Z2i" name="5peg55WM6Z2i" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="m">0</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">has_gripper</span></code> 是机械臂末端是否有乐白夹爪。有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">1</span></code>，没有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">0</span></code>。</p></li>
 </ul>
+</div><div aria-labelledby="tab-0-5pyJ55WM6Z2i" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-5pyJ55WM6Z2i" name="5pyJ55WM6Z2i" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="m">0</span>
+</pre></div>
 </div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_gripper</span></code> 是机械臂末端是否有乐白夹爪。有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">1</span></code>，没有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">0</span></code>。</p></li>
+</ul>
+</div></div>
+<p>运行成功后，您可以打开另一个终端，并通过命令行查看。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosservice list
+rostopic list
+</pre></div>
+</div>
+</section>
+<section id="moveit">
+<h2><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序<a class="headerlink" href="#moveit" title="Permalink to this headline">¶</a></h2>
+<p>按照如下方式启动 <a class="reference external" href="https://moveit.ros.org/">MoveIt</a> 驱动程序：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_moveit_config real_robot.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>在使用 <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 控制机械臂之前，请确保机械臂处于启动状态。</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
+</ul>
+<p>目前， <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 只能用来控制机械臂的关节运动，不能控制夹爪运动。</p>
+</section>
+</section>
 
 
            </div>
