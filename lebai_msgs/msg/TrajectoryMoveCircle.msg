@@ -6,4 +6,4 @@ bool end_point_is_joint_pose
 float64[] end_point_joint_pose
 geometry_msgs/Pose end_point_cartesian_pose
 float64 circle_angle
-lebai_msgs/ExecuteMode execute_mode
+

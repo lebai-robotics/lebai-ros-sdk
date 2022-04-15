@@ -2,7 +2,6 @@
 # license removed for brevity
 import rospy
 from lebai_driver.io_service.io_service_interface import IOServiceInterface
-# from std_srvs.srv import Empty, EmptyResponse, EmptyRequest
 
 def run():    
     rate = rospy.Rate(10) # 10hz

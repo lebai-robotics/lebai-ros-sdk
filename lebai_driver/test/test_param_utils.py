@@ -7,7 +7,7 @@ import rospy
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir+"/src")
-import param_utils
+import lebai_driver.param_utils as param_utils
 
 
 class TestAll(unittest.TestCase):

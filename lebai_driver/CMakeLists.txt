@@ -80,11 +80,9 @@ install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
+
+
 #############
 ## Testing ##
 #############
-if (CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
-  add_rostest(test/test_lebai_driver.launch)
-  add_rostest(test/test_param_utils.launch)
-endif()
+add_subdirectory(test)

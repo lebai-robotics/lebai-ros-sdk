@@ -12,10 +12,10 @@
   <param name="$(arg robot_ns)/robot_ip_address" type="str" value="$(arg robot_ip)" if="$(arg use_ns)"/>
   <!-- load the correct version of the robot state node -->
   
-  <node name="robot_state_node" pkg="lebai_driver" type="robot_state_node.py" unless="$(arg use_ns)" output="screen">
+  <node name="robot_state" pkg="lebai_driver" type="robot_state_node.py" unless="$(arg use_ns)" output="screen">
   </node> 
 
-  <node name="$(arg robot_ns)_state_node" pkg="lebai_driver" type="robot_state_node.py" if="$(arg use_ns)" output="screen">
+  <node name="$(arg robot_ns)_state" pkg="lebai_driver" type="robot_state_node.py" if="$(arg use_ns)" output="screen">
     <remap from="controller_joint_names" to="$(arg robot_ns)/controller_joint_names"/>
     <remap from="feedback_states" to="$(arg robot_ns)/feedback_states"/>
     <remap from="gripper_status" to="$(arg robot_ns)/gripper_status"/>

@@ -2,7 +2,7 @@ from logging import exception
 from urdf_parser_py.urdf import URDF
 from urdf_parser_py.urdf import Joint
 import rospy
-import urdf_helper
+import lebai_driver.urdf_helper as urdf_helper
 
 def get_joint_names(joints_name_param, robot_description_param):
     if rospy.has_param(joints_name_param):

@@ -4,8 +4,8 @@ import rospy
 from sensor_msgs.msg import JointState
 
 
-def callback(data):
-    rospy.loginfo("joint pose %s", data.position)
+def callback(data: JointState):
+    rospy.loginfo("Joint pose: %s", data.position)
     
 def Run():
     rospy.Subscriber("/joint_states", JointState, callback)

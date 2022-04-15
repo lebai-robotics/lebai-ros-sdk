@@ -1,7 +1,7 @@
 from lebai.type import JointPose, JointPose, CartesianPose
 from lebai_msgs.srv import MoveJoint, MoveJointRequest, MoveJointResponse
 from lebai_msgs.srv import MoveLine, MoveLineRequest, MoveLineResponse
-from lebai_msgs.srv import MoveCircle, MoveCircleRequest, MoveCircleResponse
+# from lebai_msgs.srv import MoveCircle, MoveCircleRequest, MoveCircleResponse
 import rospy
 import tf
 
