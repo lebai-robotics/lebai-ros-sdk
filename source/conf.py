@@ -89,7 +89,7 @@ html_sidebars = {
 
 # html_extra_path = ['_extra']
 htmlhelp_basename = 'lebai-ros-sdk-doc'
-
+html_show_sourcelink = False
 
 # latex_elements = {    
 #     'preamble': '\\usepackage[UTF8]{ctex}\n'
