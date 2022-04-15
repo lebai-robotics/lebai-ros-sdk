@@ -4,7 +4,7 @@
 ============
 
 .. contents:: 目录
-   :depth: 3
+   :depth: 2
    :local:
 
 为了编译运行 ``lebai-ros-sdk``，你需要先安装一些依赖。

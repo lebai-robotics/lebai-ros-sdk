@@ -3,6 +3,10 @@
 运行
 ============
 
+.. contents:: 目录
+   :depth: 2
+   :local:
+
 现在您可以开始尝试通过 ``lebai-ros-sdk`` 连接一台乐白机械臂。
 
 .. note::
