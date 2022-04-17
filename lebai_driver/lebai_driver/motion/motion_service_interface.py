@@ -26,5 +26,6 @@ class MotionServiceInterface(Node):
         # self.tp_stream_traj_handler_ = TPStreamTrajectoryHandler(self.lebai_robot_, self.joints_name_)
         
 
-    # def __del__(self):
+    def __del__(self):
+        self.tp_traj_handler_ = None
     #     self.destroy_node()

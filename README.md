@@ -13,7 +13,7 @@ As a `ROS2` package, you need firstly install `ROS2` .
 2. Install some `ROS2` dependency packages.
 
    ```
-   sudo apt install ros-galactic-control-msgs
+   sudo apt install ros-galactic-control-msgs ros-galactic-moveit
    ```
 
 3. Now the communication to real `lebai` robot in `lebai-ros-sdk `  is written in python, based on the [`lebai-python-sdk`](https://github.com/lebai-robotics/lebai-python-sdk), So we need install it.

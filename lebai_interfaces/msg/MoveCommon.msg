@@ -1,10 +1,4 @@
-float64 vel
-float64 acc
-float64 time
-bool is_continous_mode
-# 0: normal move, 1: smooth move
-uint8 continuation_type
-float64 radius
-# until data
-bool until
-lebai_interfaces/UntilInfo until_info
+float64 vel # velocity data.
+float64 acc # acceleration data.
+float64 time # time of run data.
+float64 radius # blend radius data.

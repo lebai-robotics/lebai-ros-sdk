@@ -23,7 +23,6 @@ class TPTrajectoryHandler:
         vel = request.common.vel
         time = request.common.time
         radius = request.common.radius
-        self.node_.get_logger().info("xxxxx")
         
         if pose_is_joint_angle:
             self.lebai_robot_.movej(JointPose(request.joint_pose), acc, vel, time, radius)
@@ -34,7 +33,6 @@ class TPTrajectoryHandler:
             pose = CartesianPose(request.cartesian_pose.position.x, request.cartesian_pose.position.y, request.cartesian_pose.position.z
             ,euler[2],euler[1],euler[0])            
             self.lebai_robot_.movej(pose, acc, vel, time, radius)            
-        self.node_.get_logger().info("yyyyy")
         response.ret = True
         return response
 
@@ -55,11 +53,3 @@ class TPTrajectoryHandler:
             self.lebai_robot_.movel(pose, acc, vel, time, radius)
         response.ret = True
         return response
-
-        # ros2 service call /motion_service/move_line lebai_interfaces/srv/MoveLine "{is_joint_pose: false, cartesian_pose: {position: {x: -0.50, y: -0.2, z: 0.3}, orientation: {x: 0.7003041,  y: 0.0317545, z: -0.1042439, w: 0.7054779}}, common: {vel: 0.1, acc: 0.5}}"
-        # ros2 service call /motion_service/move_line lebai_interfaces/srv/MoveLine "{is_joint_pose: true, joint_pose: [0.0, -0.6, 0.8, -0.3, 0.1, -0.1], common: {vel: 0.1, acc: 0.5}}"
-
-    # def cmd_move_circle(self, req):
-    #     res = MoveCircleResponse()
-    #     res.ret = True
-    #     return res
