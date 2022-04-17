@@ -13,12 +13,14 @@ lebai-ros-sdk文档
 
    
    ROS Noetic <Noetic>
+   ROS 2 Galactic <Galactic>
 
 请按照您需要安装运行的 ``ROS`` 发行版选择对应的章节进行阅读。
 
 目前支持的的 ``ROS`` 发行版如下：
 
-   * :ref:`ROS Noetic发行版文档 <noetic>` 
+   * :ref:`ROS Noetic发行版文档 <noetic>`
+   * :ref:`ROS 2 Galactic发行版文档 <galactic>`
 
 
 单位制
