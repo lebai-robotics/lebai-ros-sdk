@@ -81,22 +81,13 @@
    echo "source /opt/ros/melodic/setup.zsh" >> ~/.zshrc
    source ~/.zshrc
 
-安装 ``python`` 依赖包
----------------------------------
-通过 ``pip`` 可以进行安装
-
-.. code-block:: bash
-
-   sudo apt install python-pip # If pip is not install.
-   pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pyyaml
-
 安装 ``ROS`` 依赖包
 ---------------------------------
 运行如下脚本，安装一些 ``lebai-ros-sdk`` 所需要的依赖包。
 
 .. code-block:: bash
 
-   sudo apt install -y ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-fcl ros-melodic-industrial-robot-client ros-melodic-grpc
+   sudo apt install -y ros-melodic-srdfdom ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-fcl ros-melodic-industrial-robot-client ros-melodic-grpc
 
 编译 ``lebai-ros-sdk`` 开发包
 ---------------------------------

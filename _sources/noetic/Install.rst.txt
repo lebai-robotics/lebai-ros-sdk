@@ -33,7 +33,7 @@
 .. note::   
    如果您在执行 ``curl`` 指令时遇到如下错误：
    
-   ``gpg: 找不到有效的 OpenPGP 数据``
+   ``gpg: 找不到有效的 OpenPGP 数据。``
 
    您可以将出错的指令拆分成两次执行：
 
@@ -86,9 +86,7 @@
 
 .. code-block:: bash
 
-   sudo apt install -y ros-noetic-moveit ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl ros-noetic-industrial-core
-
-
+   sudo apt install -y ros-noetic-srdfdom ros-noetic-moveit ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl ros-noetic-industrial-core
 
 安装 ``python`` 依赖包
 ---------------------------------
