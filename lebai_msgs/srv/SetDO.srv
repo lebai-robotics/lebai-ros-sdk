@@ -1,5 +1,4 @@
 uint16 pin
 bool value
-lebai_msgs/ExecuteMode execute_mode
 ---
 industrial_msgs/ServiceReturnCode code

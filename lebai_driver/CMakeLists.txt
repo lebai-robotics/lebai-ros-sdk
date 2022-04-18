@@ -8,19 +8,19 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES driver
-  CATKIN_DEPENDS grpc industrial_robot_client
-  # LIBRARIES
-#  DEPENDS system_lib
-  LIBRARIES ${ALL_GRPC_LIBS} ${ALL_PROTOBUF_LIBS}
-)
+
 
 generate_proto(lebai_proto GRPC SRC_BASE "lebai-proto"
   FILES lebai-proto/robot_controller.proto lebai-proto/messages.proto
 )
-
+catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES driver
+  CATKIN_DEPENDS grpc industrial_robot_client
+  LIBRARIES lebai_proto
+#  DEPENDS system_lib
+  LIBRARIES ${ALL_GRPC_LIBS} ${ALL_PROTOBUF_LIBS}
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
@@ -94,94 +94,20 @@ target_link_libraries(${PROJECT_NAME}_motion_service
  PREFIX "")
 add_dependencies(${PROJECT_NAME}_motion_service lebai_msgs_generate_messages_cpp)
 
-#
-#
-#
-##############
-### Install ##
-##############
-#
-## all install targets should use catkin DESTINATION variables
-## See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-#
-### Mark executable scripts (Python etc.) for installation
-### in contrast to setup.py, you can choose the destination
-## install(PROGRAMS
-##   scripts/my_python_script
-##   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-## )
-#
-### Mark executables for installation
-### See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-## install(TARGETS ${PROJECT_NAME}_node
-##   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-## )
-#
-### Mark libraries for installation
-### See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-#
-#install(
-#    TARGETS ${PROJECT_NAME}_motion_service
-#  ${PROJECT_NAME}_io_service
-#  ${PROJECT_NAME}_system_service
-#  ${PROJECT_NAME}_robot_state
-#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-#
-### Mark cpp header files for installation
-## install(DIRECTORY include/${PROJECT_NAME}/
-##   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-##   FILES_MATCHING PATTERN "*.h"
-##   PATTERN ".svn" EXCLUDE
-## )
-#
-#
-### Mark other files for installation (e.g. launch and bag files, etc.)
-#install(FILES
-#  README.md
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-#)
-#install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-#
-#
-#
-## catkin_make run_tests
-#find_package(rostest REQUIRED)
-#
-#find_package(rostest REQUIRED)
-#add_rostest_gtest(test_system_service
-#  test/test_system_service.test
-#  test/test_system_service.cpp
-#)
-#target_link_libraries(test_system_service
-#  ${catkin_LIBRARIES}
-#)
-#
-#
-#
-#
-#add_rostest_gtest(test_robot_state
-#  test/test_robot_state.test
-#  test/test_robot_state.cpp
-#)
-#target_link_libraries(test_robot_state
-#  ${catkin_LIBRARIES}
-#)
-#
-#add_rostest_gtest(test_io_service
-#  test/test_io_service.test
-#  test/test_io_service.cpp
-#)
-#target_link_libraries(test_io_service
-#  ${catkin_LIBRARIES}
-#)
-#
-#add_rostest_gtest(test_motion_service
-#  test/test_motion_service.test
-#  test/test_motion_service.cpp
-#)
-#target_link_libraries(test_motion_service
-#  ${catkin_LIBRARIES}
-#)
 
+install(TARGETS lebai_proto
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+      
+install(TARGETS 
+  ${PROJECT_NAME}_robot_state
+  ${PROJECT_NAME}_io_service
+  ${PROJECT_NAME}_motion_service
+  ${PROJECT_NAME}_system_service  
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 

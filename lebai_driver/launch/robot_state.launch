@@ -14,10 +14,10 @@
   <param name="rcs_port" type="int" value="5181"/>
   <!-- load the correct version of the robot state node -->
   
-  <node name="robot_state_node" pkg="lebai_driver" type="robot_state" unless="$(arg use_ns)" output="screen">
+  <node name="robot_state" pkg="lebai_driver" type="robot_state" unless="$(arg use_ns)" output="screen">
   </node> 
 
-  <node name="$(arg robot_ns)_state_node" pkg="lebai_driver" type="robot_state" if="$(arg use_ns)" output="screen">
+  <node name="$(arg robot_ns)_state" pkg="lebai_driver" type="robot_state" if="$(arg use_ns)" output="screen">
     <remap from="controller_joint_names" to="$(arg robot_ns)/controller_joint_names"/>
     <remap from="feedback_states" to="$(arg robot_ns)/feedback_states"/>
     <remap from="gripper_status" to="$(arg robot_ns)/gripper_status"/>
