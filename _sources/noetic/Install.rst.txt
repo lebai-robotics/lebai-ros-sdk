@@ -28,7 +28,22 @@
 .. code-block:: bash
 
    sudo apt install curl # if you haven't already installed curl
-   curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+   curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+
+.. note::   
+   如果您在执行 ``curl`` 指令时遇到如下错误：
+   
+   ``gpg: 找不到有效的 OpenPGP 数据``
+
+   您可以将出错的指令拆分成两次执行：
+
+   .. code-block:: bash
+
+      curl -O https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc
+
+   .. code-block:: bash
+
+      sudo apt-key add ros.asc
 
 通过 ``apt`` 安装 ``ROS``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
