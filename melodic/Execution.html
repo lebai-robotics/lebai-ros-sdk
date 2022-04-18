@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2. 运行 &mdash; lebai-ros-sdk</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. ROS 接口说明" href="Interface.html" />
+    <link rel="prev" title="1. 编译编译安装" href="Install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> lebai-ros-sdk
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">lebai-ros-sdk 文档</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Melodic.html"> ROS Melodic</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Install.html">1. 编译安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Install.html#ros">1.1. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Install.html#id4">1.1.1. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 软件包安装源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Install.html#id5">1.1.2. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 秘钥</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Install.html#apt-ros">1.1.3. 通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="Install.html#id6">1.1.4. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Install.html#id7">1.2. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 依赖包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Install.html#lebai-ros-sdk">1.3. 编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. 运行</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Interface.html">3. ROS接口说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Interface.html#node">3.1. Node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Interface.html#published-topics">3.2. Published Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Interface.html#services">3.3. Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AppDemo.html">4. 应用编程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Noetic.html"> ROS Noetic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../noetic/Install.html">1. 编译安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Install.html#ros">1.1. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../noetic/Install.html#id4">1.1.1. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 软件包安装源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../noetic/Install.html#id5">1.1.2. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 秘钥</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../noetic/Install.html#apt-ros">1.1.3. 通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../noetic/Install.html#id6">1.1.4. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Install.html#id7">1.2. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 依赖包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Install.html#python">1.3. 安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Install.html#lebai-ros-sdk">1.4. 编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../noetic/Execution.html">2. 运行</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../noetic/Interface.html">3. ROS接口说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Interface.html#node">3.1. Node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Interface.html#published-topics">3.2. Published Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Interface.html#services">3.3. Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../noetic/AppDemo.html">4. 应用编程示例</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Galactic.html"> ROS 2 Galactic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../galactic/Install.html">1. 编译安装</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Install.html#ros-2">1.1. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../galactic/Install.html#id4">1.1.1. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code> 软件包安装源</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../galactic/Install.html#apt-ros-2">1.1.2. 通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../galactic/Install.html#id5">1.1.3. 设置 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code> 环境</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Install.html#id6">1.2. 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code> 依赖包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Install.html#python">1.3. 安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Install.html#lebai-ros-sdk">1.4. 编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../galactic/Execution.html">2. 运行</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../galactic/Interface.html">3. ROS接口说明</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Interface.html#node">3.1. Node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Interface.html#published-topics">3.2. Published Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Interface.html#services">3.3. Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../galactic/AppDemo.html">4. 应用编程示例</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/AppDemo.html#ros-2">4.1. 创建 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code> 程序包</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/AppDemo.html#c">4.2. <code class="docutils literal notranslate"><span class="pre">c++</span></code> 部分</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/AppDemo.html#python">4.3. <code class="docutils literal notranslate"><span class="pre">python</span></code> 部分</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../Melodic.html">ROS Melodic</a> &raquo;</li>
+      <li><span class="section-number">2. </span>运行</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
+        <a href="Install.html" class="btn btn-neutral float-left" title="1. 编译编译安装" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Interface.html" class="btn btn-neutral float-right" title="3. ROS 接口说明" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="melodic-execution">
+<span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#melodic-execution" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title">目录</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#id3" id="id5">基本驱动程序</a></p></li>
+<li><p><a class="reference internal" href="#moveit" id="id6"><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></p></li>
+</ul>
+</div>
+<p>现在您可以开始尝试通过 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 连接一台乐白机械臂。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>请先确保乐白机械臂正常工作并确保机械臂和您的 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 运行系统的网络连接。</p>
+</div>
+<p>在运行程序前，确保您已经正确的编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，并且设置了工作空间。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># remember to run the source</span>
+<span class="nb">source</span> ~/lebai_ws/install/setup.bash
+</pre></div>
+</div>
+<section id="id3">
+<h2><a class="toc-backref" href="#id5"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>按照如下方式启动基本的驱动程序：</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-5peg55WM6Z2i" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-5peg55WM6Z2i" name="5peg55WM6Z2i" role="tab" tabindex="0">无界面</button><button aria-controls="panel-0-5pyJ55WM6Z2i" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-5pyJ55WM6Z2i" name="5pyJ55WM6Z2i" role="tab" tabindex="-1">有界面</button></div><div aria-labelledby="tab-0-5peg55WM6Z2i" class="sphinx-tabs-panel group-tab" id="panel-0-5peg55WM6Z2i" name="5peg55WM6Z2i" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_support robot_interface_lm3.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_gripper</span></code> 是机械臂末端是否有乐白夹爪。有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">1</span></code>，没有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">0</span></code>。</p></li>
+</ul>
+</div><div aria-labelledby="tab-0-5pyJ55WM6Z2i" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-5pyJ55WM6Z2i" name="5pyJ55WM6Z2i" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_support robot_interface_lm3_with_visual.launch robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_gripper</span></code> 是机械臂末端是否有乐白夹爪。有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">1</span></code>，没有夹爪设置为 <code class="docutils literal notranslate"><span class="pre">0</span></code>。</p></li>
+</ul>
+</div></div>
+<p>运行成功后，您可以打开另一个终端，并通过命令行查看。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosservice list
+rostopic list
+</pre></div>
+</div>
+</section>
+<section id="moveit">
+<h2><a class="toc-backref" href="#id6"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this headline">¶</a></h2>
+<p>按照如下方式启动 <a class="reference external" href="https://moveit.ros.org/">MoveIt</a> 驱动程序：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch lebai_lm3_moveit_config run.launch sim:<span class="o">=</span><span class="nb">false</span> robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
+
+* <span class="sb">``</span>sim<span class="sb">``</span> 是否虚拟模式，当设置为虚拟模式时，不连接真实机械臂。
+* <span class="sb">``</span>robot_ip<span class="sb">``</span> 是乐白机械臂的 <span class="sb">``</span>IP<span class="sb">``</span> 地址。
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>在使用 <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 控制机械臂之前，请确保机械臂处于启动状态。</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 是乐白机械臂的 <code class="docutils literal notranslate"><span class="pre">IP</span></code> 地址。</p></li>
+</ul>
+<p>目前， <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 只能用来控制机械臂的关节运动，不能控制夹爪运动。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Install.html" class="btn btn-neutral float-left" title="1. 编译编译安装" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Interface.html" class="btn btn-neutral float-right" title="3. ROS 接口说明" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, liufang@Lebai.ltd.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
