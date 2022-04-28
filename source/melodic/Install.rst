@@ -1,4 +1,4 @@
-.. _noetic_install:
+.. _melodic_install:
 
 编译安装
 ============
@@ -12,7 +12,7 @@
 安装 ``ROS``
 ---------------------------------
 
-您可以参考  `ROS官方文档 <https://wiki.ros.org/noetic/Installation/Ubuntu>`_ 安装 ``ROS`` 。
+您可以参考  `ROS官方文档 <https://wiki.ros.org/melodic/Installation/Ubuntu>`_ 安装 ``ROS`` 。
 根据国内的网络环境，这里将给出适配国内网络环境的安装步骤如下：
 
 设置 ``ROS`` 软件包安装源
@@ -28,6 +28,7 @@
 .. code-block:: bash
 
    sudo apt install curl # if you haven't already installed curl
+   # https://ghproxy.com is for chinese network.
    curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
 .. note::   
@@ -51,7 +52,7 @@
 .. code-block:: bash
 
    sudo apt update
-   sudo apt install ros-noetic-desktop-full # use desktop full， this will take some time.
+   sudo apt install ros-melodic-desktop-full # use desktop full， this will take some time.
 
 设置 ``ROS`` 环境
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,7 +61,7 @@
 
 .. code-block:: bash
 
-   source /opt/ros/noetic/setup.bash
+   source /opt/ros/melodic/setup.bash
 
 如果您不希望每次打开终端都需要运行上述脚本，你可以通过将上述脚本内容写入对应的 ``rc`` 配置文件中来简化。
 
@@ -68,7 +69,7 @@
 
 .. code-block:: bash
 
-   echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+   echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
    source ~/.bashrc
 
 如果您使用 ``zsh``，则相应的脚本如下。
@@ -77,7 +78,7 @@
 
 .. code-block:: bash
 
-   echo "source /opt/ros/noetic/setup.zsh" >> ~/.zshrc
+   echo "source /opt/ros/melodic/setup.zsh" >> ~/.zshrc
    source ~/.zshrc
 
 安装 ``ROS`` 依赖包
@@ -86,20 +87,7 @@
 
 .. code-block:: bash
 
-   sudo apt install -y ros-noetic-srdfdom ros-noetic-moveit ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl ros-noetic-industrial-core
-
-安装 ``python`` 依赖包
----------------------------------
-``lebai-ros-sdk`` 依赖于如下 ``python`` 包:
-   * `lebai-python-sdk <https://pypi.org/project/lebai/>`_
-   * `urdf-parser-py <https://pypi.org/project/urdf-parser-py//>`_
-
-通过 ``pip`` 可以进行安装
-
-.. code-block:: bash
-
-   sudo apt install python3-pip # If pip is not install.
-   pip install -i https://pypi.tuna.tsinghua.edu.cn/simple lebai urdf-parser-py
+   sudo apt install -y ros-melodic-srdfdom ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-fcl ros-melodic-industrial-robot-client ros-melodic-grpc
 
 编译 ``lebai-ros-sdk`` 开发包
 ---------------------------------
@@ -114,9 +102,9 @@
    cd  ~/lebai_ws/src
    # choose one you prefer:
    # ssh
-   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b noetic-dev
+   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b melodic-dev
    # https
-   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b noetic-dev
+   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b melodic-dev
    cd ~/lebai_ws
    catkin_make install
 
