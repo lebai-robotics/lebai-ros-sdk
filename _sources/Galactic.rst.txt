@@ -1,7 +1,7 @@
 .. _galactic:
 
-ROS Galactic
-============
+ROS 2 Galactic
+==================
 
 .. toctree::
    :glob:

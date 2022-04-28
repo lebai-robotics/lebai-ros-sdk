@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1. 编译编译安装 &mdash; lebai-ros-sdk</title>
+  <title>1. 编译安装 &mdash; lebai-ros-sdk</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="2. 运行" href="Execution.html" />
-    <link rel="prev" title="ROS Galactic" href="../Galactic.html" /> 
+    <link rel="prev" title="ROS 2 Galactic" href="../Galactic.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -151,12 +151,12 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../Galactic.html">ROS Galactic</a> &raquo;</li>
-      <li><span class="section-number">1. </span>编译编译安装</li>
+          <li><a href="../Galactic.html">ROS 2 Galactic</a> &raquo;</li>
+      <li><span class="section-number">1. </span>编译安装</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
-        <a href="../Galactic.html" class="btn btn-neutral float-left" title="ROS Galactic" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Galactic.html" class="btn btn-neutral float-left" title="ROS 2 Galactic" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Execution.html" class="btn btn-neutral float-right" title="2. 运行" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
   <hr/>
@@ -165,7 +165,7 @@
            <div itemprop="articleBody">
              
   <section id="galactic-install">
-<span id="id1"></span><h1><span class="section-number">1. </span>编译编译安装<a class="headerlink" href="#galactic-install" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">1. </span>编译安装<a class="headerlink" href="#galactic-install" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
@@ -190,7 +190,7 @@
 <h3><a class="toc-backref" href="#id8"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span> <span class="pre">2</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update <span class="o">&amp;&amp;</span> sudo apt install curl gnupg lsb-release
 <span class="c1"># https://ghproxy.com is for chinese network.</span>
-curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+sudo curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 <span class="nb">echo</span> <span class="s2">&quot;deb [arch=</span><span class="k">$(</span>dpkg --print-architecture<span class="k">)</span><span class="s2"> signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu </span><span class="k">$(</span><span class="nb">source</span> /etc/os-release <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nv">$UBUNTU_CODENAME</span><span class="k">)</span><span class="s2"> main&quot;</span> <span class="p">|</span> sudo tee /etc/apt/sources.list.d/ros2.list &gt; /dev/null
 </pre></div>
 </div>
@@ -278,7 +278,7 @@ colcon build
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Galactic.html" class="btn btn-neutral float-left" title="ROS Galactic" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Galactic.html" class="btn btn-neutral float-left" title="ROS 2 Galactic" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Execution.html" class="btn btn-neutral float-right" title="2. 运行" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -1,6 +1,6 @@
 .. _noetic_install:
 
-编译编译安装
+编译安装
 ============
 
 .. contents:: 目录

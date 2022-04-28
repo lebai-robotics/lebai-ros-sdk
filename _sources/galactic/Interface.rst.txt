@@ -1,4 +1,4 @@
-.. _noetic_interface:
+.. _galactic_interface:
 
 
 ``ROS`` 接口说明
