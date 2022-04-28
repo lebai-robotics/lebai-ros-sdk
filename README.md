@@ -11,10 +11,7 @@ https://lebai-robotics.github.io/lebai-ros-sdk/Noetic.html#
 **The following parts are deprecated. Please see the document in the foresaid link.** 
 
 
-
-
-
-**This document describe `lebai-ros-sdk` on `ROS Noetic`(Ubuntu 20.04)**
+This document describe `lebai-ros-sdk` on `ROS Noetic`(Ubuntu 20.04)
 
 If you use `ROS melodic`, please refer [melodic-dev](https://github.com/lebai-robotics/lebai-ros-sdk/tree/melodic-dev) branch.
 
