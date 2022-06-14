@@ -14,7 +14,8 @@ lebai-ros-sdk文档
    
    ROS Melodic <Melodic>
    ROS Noetic <Noetic>
-   ROS 2 Galactic <Galactic>
+   ROS2 Galactic <Galactic>
+   ROS2 Humble <Humble>
    
 
 请按照您需要安装运行的 ``ROS`` 发行版选择对应的章节进行阅读。
@@ -23,7 +24,8 @@ lebai-ros-sdk文档
 
    * :ref:`ROS Melodic发行版文档 <melodic>`
    * :ref:`ROS Noetic发行版文档 <noetic>`
-   * :ref:`ROS 2 Galactic发行版文档 <galactic>`
+   * :ref:`ROS2 Galactic发行版文档 <galactic>`
+   * :ref:`ROS2 Humble <humble>`
 
 
 单位制

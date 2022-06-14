@@ -1,6 +1,6 @@
 .. _galactic:
 
-ROS 2 Galactic
+ROS2 Galactic
 ==================
 
 .. toctree::

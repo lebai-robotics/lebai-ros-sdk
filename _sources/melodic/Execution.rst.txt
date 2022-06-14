@@ -13,6 +13,13 @@
 
   请先确保乐白机械臂正常工作并确保机械臂和您的 ``ROS`` 运行系统的网络连接。
 
+如果您没有乐白机械臂硬件，也可以尝试通过容器（ ``Container`` ）来运行虚拟的乐白机械臂。
+具体的方法您可以参考 `乐白机械臂Docker仿真 <https://help.lebai.ltd/dev/docker.html>`_ 。
+
+.. note::
+
+  记住，您运行 `乐白机械臂Docker仿真 <https://help.lebai.ltd/dev/docker.html>`_ 时需要设置容器的端口映射 ``-p 5181:5181`` 。
+
 在运行程序前，确保您已经正确的编译 ``lebai-ros-sdk``，并且设置了工作空间。
 
 .. code-block:: bash

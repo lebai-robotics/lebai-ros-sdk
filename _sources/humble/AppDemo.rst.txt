@@ -1,4 +1,4 @@
-.. _galactic_app_demo:
+.. _humble_app_demo:
 
 应用编程示例
 ============
@@ -13,7 +13,7 @@
    :depth: 2
    :local:
 
-创建 ``ROS2`` 程序包
+创建 ``ROS 2`` 程序包
 -----------------------------
 .. code-block:: bash
    

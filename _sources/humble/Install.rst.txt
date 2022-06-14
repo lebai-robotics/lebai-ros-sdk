@@ -1,4 +1,4 @@
-.. _galactic_install:
+.. _humble_install:
 
 编译安装
 ============
@@ -7,12 +7,12 @@
    :depth: 2
    :local:
 
-为了编译运行 ``lebai-ros-sdk``，你需要先安装一些依赖。
+为了编译运行 ``lebai-ros-sdk``，您需要先安装一些依赖。
 
-安装 ``ROS2``
+安装 ``ROS2 Humble``
 ---------------------------------
 
-您可以参考  `ROS2官方文档 <https://docs.ros.org/en/galactic/Installation.html>`_ 安装 ``ROS2`` 。
+您可以参考  `ROS2官方文档 <https://docs.ros.org/en/humble/Installation.html>`_ 安装 ``ROS 2`` 。
 在一个标准的 ``Ubuntu`` 桌面系统通过 ``Debian package`` 的安装步骤通常如下：
 
 设置 ``ROS2`` 软件包安装源
@@ -31,16 +31,18 @@
 .. code-block:: bash
 
    sudo apt update
-   sudo apt install ros-galactic-desktop # use desktop full， this will take some time.
+   ## must execute an upgrade before install.
+   sudo apt upgrade
+   sudo apt install ros-humble-desktop # use desktop install, this will take some time.
 
 设置 ``ROS2`` 环境
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-您需要在 **bash** 终端中运行如下脚本来设置 ``ROS2`` 环境。
+您需要在 **bash** 终端中运行如下脚本来设置 ``ROS 2`` 环境。
 
 .. code-block:: bash
 
-   source /opt/ros/galactic/setup.bash
+   source /opt/ros/humble/setup.bash
 
 如果您不希望每次打开终端都需要运行上述脚本，你可以通过将上述脚本内容写入对应的 ``rc`` 配置文件中来简化。
 
@@ -48,7 +50,7 @@
 
 .. code-block:: bash
 
-   echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
+   echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
    source ~/.bashrc
 
 如果您使用 ``zsh``，则相应的脚本如下。
@@ -57,7 +59,7 @@
 
 .. code-block:: bash
 
-   echo "source /opt/ros/galactic/setup.zsh" >> ~/.zshrc
+   echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc
    source ~/.zshrc
 
 注意，如果您的设备装有多个不同的 ``ROS`` 发行版，您可以通过不同的脚本文件来选择使用不同的发行版。
@@ -70,7 +72,14 @@
 
 .. code-block:: bash
 
-   sudo apt install ros-galactic-control-msgs ros-galactic-moveit
+   sudo apt install ros-humble-control-msgs ros-humble-tf-transformations python3-transforms3d
+
+安装 ``MoveIt2``
+---------------------------------
+乐白机械臂支持 ``MoveIt2`` ，但是现在（2022年5月）， ``MoveIt2`` 还无法通过包管理器使用 ``apt`` 安装，您需要手动编译安装。
+
+具体的方法您可以参考 `官方安装指南 <https://moveit.picknik.ai/humble/doc/tutorials/getting_started/getting_started.html#>`_
+
 
 安装 ``python`` 依赖包
 ---------------------------------
@@ -97,16 +106,16 @@
    cd  ~/lebai_ws/src
    # choose one you prefer:
    # ssh
-   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b galactic-dev
+   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b humble-dev
    # https
-   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b galactic-dev
+   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b humble-dev
    cd ~/lebai_ws
    colcon build
 
 您现在已经完成了 ``lebai-ros-sdk`` 的编译。
 
 .. note::
-   记住，当您完成编译后，您需要设置您工作空间的环境以便让 ``ROS2`` 发现您的包。
+   记住，当您完成编译后，您需要设置您工作空间的环境以便让 ``ROS 2`` 发现您的包。
    
 .. code-block:: bash
    
