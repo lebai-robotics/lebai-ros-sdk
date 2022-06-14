@@ -7,6 +7,8 @@
   <maintainer email="liufang_robot@outlook.com">ros</maintainer>
   <license>Apache 2.0</license>
   <exec_depend>rclpy</exec_depend>
+  <exec_depend>urdfdom_py</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>control_msgs</exec_depend>
   <exec_depend>builtin_interfaces</exec_depend>
