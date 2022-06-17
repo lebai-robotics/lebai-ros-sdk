@@ -151,3 +151,4 @@
   catkin_make install
 
 您可以再次运行 ``lebai-ros-sdk`` 的程序，现在坐标位置应该完全一致。
+
