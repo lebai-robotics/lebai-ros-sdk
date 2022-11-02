@@ -72,7 +72,7 @@
 
 .. code-block:: bash
 
-   sudo apt install ros-humble-control-msgs ros-humble-tf-transformations python3-transforms3d
+   sudo apt install python3-colcon-common-extensions ros-humble-control-msgs ros-humble-tf-transformations python3-transforms3d
 
 安装 ``MoveIt2``
 ---------------------------------
@@ -104,10 +104,6 @@
 
    mkdir -p  ~/lebai_ws/src
    cd  ~/lebai_ws/src
-   # choose one you prefer:
-   # ssh
-   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b humble-dev
-   # https
    git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b humble-dev
    cd ~/lebai_ws
    colcon build

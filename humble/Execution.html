@@ -17,6 +17,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -92,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../noetic/Execution.html">2. 运行</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../noetic/Execution.html#id4">2.1. 基本驱动程序</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../noetic/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../noetic/Execution.html#dh">2.3. 修正匹配 <code class="docutils literal notranslate"><span class="pre">DH</span></code> 参数</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../noetic/Interface.html">3. ROS接口说明</a><ul>
@@ -198,7 +200,7 @@
            <div itemprop="articleBody">
              
   <section id="humble-execution">
-<span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#humble-execution" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#humble-execution" title="Permalink to this heading">¶</a></h1>
 <div class="contents local topic" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
@@ -223,7 +225,7 @@
 </pre></div>
 </div>
 <section id="id4">
-<h2><a class="toc-backref" href="#id6"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动基本的驱动程序：</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="nb">false</span> rviz2:<span class="o">=</span><span class="nb">true</span>
@@ -242,7 +244,7 @@ ros2 service list
 </div>
 </section>
 <section id="moveit">
-<h2><a class="toc-backref" href="#id7"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动 <a class="reference external" href="https://moveit.ros.org/">MoveIt</a> 驱动程序：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_moveit_config lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
 </pre></div>

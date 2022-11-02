@@ -70,7 +70,7 @@
 
 .. code-block:: bash
 
-   sudo apt install ros-galactic-control-msgs ros-galactic-moveit
+   sudo apt install python3-colcon-common-extensions ros-galactic-control-msgs ros-galactic-moveit
 
 安装 ``python`` 依赖包
 ---------------------------------
@@ -95,10 +95,6 @@
 
    mkdir -p  ~/lebai_ws/src
    cd  ~/lebai_ws/src
-   # choose one you prefer:
-   # ssh
-   git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b galactic-dev
-   # https
    git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b galactic-dev
    cd ~/lebai_ws
    colcon build

@@ -17,6 +17,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -62,7 +63,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../melodic/Execution.html">2. 运行</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../melodic/Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../melodic/Execution.html#id4">2.1. 基本驱动程序</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../melodic/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
 </ul>
 </li>
@@ -90,8 +91,9 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Execution.html">2. 运行</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Execution.html#id4">2.1. 基本驱动程序</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Execution.html#dh">2.3. 修正匹配 <code class="docutils literal notranslate"><span class="pre">DH</span></code> 参数</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Interface.html">3. ROS接口说明</a><ul>
@@ -117,7 +119,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../galactic/Execution.html">2. 运行</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../galactic/Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../galactic/Execution.html#id4">2.1. 基本驱动程序</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../galactic/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
 </ul>
 </li>
@@ -150,7 +152,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../humble/Execution.html">2. 运行</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../humble/Execution.html#id3">2.1. 基本驱动程序</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../humble/Execution.html#id4">2.1. 基本驱动程序</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../humble/Execution.html#moveit">2.2. <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a></li>
 </ul>
 </li>
@@ -198,7 +200,7 @@
            <div itemprop="articleBody">
              
   <section id="noetic-install">
-<span id="id1"></span><h1><span class="section-number">1. </span>编译安装<a class="headerlink" href="#noetic-install" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">1. </span>编译安装<a class="headerlink" href="#noetic-install" title="Permalink to this heading">¶</a></h1>
 <div class="contents local topic" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
@@ -217,17 +219,17 @@
 </div>
 <p>为了编译运行 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，你需要先安装一些依赖。</p>
 <section id="ros">
-<h2><a class="toc-backref" href="#id8"><span class="section-number">1.1. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><a class="headerlink" href="#ros" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id8"><span class="section-number">1.1. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><a class="headerlink" href="#ros" title="Permalink to this heading">¶</a></h2>
 <p>您可以参考  <a class="reference external" href="https://wiki.ros.org/noetic/Installation/Ubuntu">ROS官方文档</a> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 。
 根据国内的网络环境，这里将给出适配国内网络环境的安装步骤如下：</p>
 <section id="id4">
-<h3><a class="toc-backref" href="#id9"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo sh -c <span class="s1">&#39;. /etc/lsb-release &amp;&amp; echo &quot;deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main&quot; &gt; /etc/apt/sources.list.d/ros-latest.list&#39;</span>
 </pre></div>
 </div>
 </section>
 <section id="id5">
-<h3><a class="toc-backref" href="#id10"><span class="section-number">1.1.2. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 秘钥</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10"><span class="section-number">1.1.2. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 秘钥</a><a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install curl <span class="c1"># if you haven&#39;t already installed curl</span>
 curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc <span class="p">|</span> sudo apt-key add -
 </pre></div>
@@ -246,14 +248,14 @@ curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/mast
 </div>
 </section>
 <section id="apt-ros">
-<h3><a class="toc-backref" href="#id11"><span class="section-number">1.1.3. </span>通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><a class="headerlink" href="#apt-ros" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11"><span class="section-number">1.1.3. </span>通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><a class="headerlink" href="#apt-ros" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update
 sudo apt install ros-noetic-desktop-full <span class="c1"># use desktop full， this will take some time.</span>
 </pre></div>
 </div>
 </section>
 <section id="id6">
-<h3><a class="toc-backref" href="#id12"><span class="section-number">1.1.4. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12"><span class="section-number">1.1.4. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境</a><a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <p>您需要在 <strong>bash</strong> 终端中运行如下脚本来设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> /opt/ros/noetic/setup.bash
 </pre></div>
@@ -273,14 +275,14 @@ sudo apt install ros-noetic-desktop-full <span class="c1"># use desktop full， 
 </section>
 </section>
 <section id="id7">
-<h2><a class="toc-backref" href="#id13"><span class="section-number">1.2. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 依赖包</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13"><span class="section-number">1.2. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 依赖包</a><a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h2>
 <p>运行如下脚本，安装一些 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 所需要的依赖包。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install -y ros-noetic-srdfdom ros-noetic-moveit ros-noetic-urdf ros-noetic-tf ros-noetic-xacro ros-noetic-robot-state-publisher ros-noetic-control-msgs rviz ros-noetic-rviz ros-noetic-fcl ros-noetic-industrial-core
 </pre></div>
 </div>
 </section>
 <section id="python">
-<h2><a class="toc-backref" href="#id14"><span class="section-number">1.3. </span>安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a><a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14"><span class="section-number">1.3. </span>安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a><a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 依赖于如下 <code class="docutils literal notranslate"><span class="pre">python</span></code> 包:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://pypi.org/project/lebai/">lebai-python-sdk</a></p></li>
@@ -295,7 +297,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple lebai urdf-parser-py
 </div>
 </section>
 <section id="lebai-ros-sdk">
-<h2><a class="toc-backref" href="#id15"><span class="section-number">1.4. </span>编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a><a class="headerlink" href="#lebai-ros-sdk" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15"><span class="section-number">1.4. </span>编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a><a class="headerlink" href="#lebai-ros-sdk" title="Permalink to this heading">¶</a></h2>
 <p>您现在可以开始从github克隆 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 的源代码，并且尝试编译。</p>
 <p>运行如下脚本：</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p  ~/lebai_ws/src
