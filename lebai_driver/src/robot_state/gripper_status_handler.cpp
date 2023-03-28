@@ -76,21 +76,6 @@ namespace lebai_driver
       }
     }
 
-    {
-      google::protobuf::Empty req;
-      robotc::Weight res;
-      grpc::ClientContext context;
-      status = stubs_->robot_controller_stub_->GetClawWeight(&context, req, &res);
-      if (status.ok())
-      {
-        gripper_status.weight = res.weight();
-      }
-      else
-      {
-        ROS_ERROR("Failed to call `GetClawWeight`.");
-        return;
-      }
-    }
     this->pub_gripper_status_.publish(gripper_status);
     return;
   }
