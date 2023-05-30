@@ -34,10 +34,11 @@ service RobotController {
   // 关闭电源
   rpc PowerDown(google.protobuf.Empty) returns (CmdId);
 
-  // implement later
+  // 等待，单位毫秒
   rpc Sleep(SleepRequest) returns (CmdId);
-  // implement later
+  // 同步，等待指定命令执行完成，type为0时表示所有（默认）
   rpc Sync(google.protobuf.Empty) returns (CmdId);
+  rpc SyncFor(SyncRequest) returns (CmdId);
 
   // 2. Config commands
   // 开启示教模式
@@ -101,6 +102,8 @@ service RobotController {
   // 停止当前移动
   rpc StopMove(google.protobuf.Empty) returns (CmdId);
 
+  // 跟随移动
+  rpc TowardJ(MoveJRequest) returns (CmdId);
   // 圆弧移动
   rpc MoveC(MoveCRequest) returns (CmdId);
   // 关节空间线性移动
@@ -162,11 +165,16 @@ service RobotController {
   // implement later
   rpc GetToolCurrent(google.protobuf.Empty) returns (Current);
 
+  //xxx
   // 5. IO-related cmds
   // 设置数字输出端口的值
   rpc SetDIO(DIO) returns (CmdId);
+  // 设置扩展数字输出端口的值
+  rpc SetExtraDIO(DIO) returns (CmdId);
   // 获得数字输入端口的值
   rpc GetDIO(IOPin) returns (DIO);
+  // 获得扩展数字数如端口的值
+  rpc GetExtraDIO(IOPin) returns (DIO);
   // 设置TCP数字输出端口的值
   rpc SetTcpDIO(DIO) returns (CmdId);
   // 获得TCP数字输入端口的值
@@ -174,15 +182,27 @@ service RobotController {
   // 设置模拟输出端口的值
   rpc SetAIO(AIO) returns (CmdId);
   // 获得模拟输入端口的值
+  rpc SetExtraAIO(AIO) returns (CmdId);
+  // 获得模拟输入端口的值
   rpc GetAIO(IOPin) returns (AIO);
+  // 获得扩展模拟输入端口的值
+  rpc GetExtraAIO(IOPin) returns (AIO);
   // 设置模拟输入端口工作模式：0:电压，1:电流
   rpc SetAInMode(AIO) returns (CmdId);
+  // 设置扩展模拟输入端口工作模式：0:电压，1:电流
+  rpc SetExtraAInMode(AIO) returns (CmdId);
   // 获得模拟输入端口工作模式：0:电压，1:电流
   rpc GetAInMode(IOPin) returns (AIO);
+  // 获得扩展模拟输入端口工作模式：0:电压，1:电流
+  rpc GetExtraAInMode(IOPin) returns (AIO);
   // 设置模拟输出端口工作模式：0:电压，1:电流
   rpc SetAOutMode(AIO) returns (CmdId);
+  // 设置扩展模拟输出端口工作模式：0:电压，1:电流
+  rpc SetExtraAOutMode(AIO) returns (CmdId); 
   // 获得模拟输出端口工作模式：0:电压，1:电流
   rpc GetAOutMode(IOPin) returns (AIO);
+  // 获得扩展模拟输出端口工作模式：0:电压，1:电流
+  rpc GetExtraAOutMode(IOPin) returns (AIO);
 
   // 6. Control commands
   // 开启/启动系统
@@ -319,6 +339,9 @@ message RobotData {
   Joint targetTorque = 16;
   // 实际力矩
   Joint actualTorque = 17;
+  // 加速度
+  Joint actualJointAcc = 18;
+  Joint targetJointAcc = 19;
 }
 
 // 机器人需要获取数据的请求cmd
@@ -423,6 +446,7 @@ message Log {
 }
 
 message SleepRequest { int32 time = 1; }
+message SyncRequest { int32 type = 1; }
 
 message SpeedJRequest {
   // 单位：rad/s{base, shoulder, elbow, wrist1, wrist2, wrist3}

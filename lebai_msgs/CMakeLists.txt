@@ -37,6 +37,8 @@ add_service_files(
   MoveJoint.srv
   MoveLine.srv
   MoveCircle.srv
+  SpeedJoint.srv
+  SpeedLine.srv
   SetGripper.srv
 )
 

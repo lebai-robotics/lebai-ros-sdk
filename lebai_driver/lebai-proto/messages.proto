@@ -61,7 +61,7 @@ message ModbusExternalIOState {
     //0表示断开，1表示连接成功
     int32 state = 2;
 }
-
+//xxx
 message IO {
   // 所有数字量的输入值
   repeated DIO robotDIOIn = 1;
@@ -77,6 +77,14 @@ message IO {
   repeated DIO tcpDIOOut = 6;
   //modbus的状态信息
   repeated ModbusExternalIOState extIODevices = 7;
+  // 所有扩展数字量的输入值
+  repeated DIO extra_robotDIOIn = 8;
+  // 所有扩展数字量的输出值
+  repeated DIO extra_robotDIOOut = 9;
+  // 所有扩展模拟量输入值
+  repeated AIO extra_robotAIOIn = 10;
+  // 所有扩展模拟量输出值
+  repeated AIO extra_robotAIOOut = 11;
 }
 
 message Hardware {
@@ -97,6 +105,8 @@ message RobotInfo {
   Hardware arm = 9; // 主机箱
   string appTag = 10; // release cfqmp simulate joint circuit
   string typeTag = 11; // debug release
+  bool extra_io = 12;
+  bool simulated = 13; // 仿真模式
 }
 
 message DeviceInfo {

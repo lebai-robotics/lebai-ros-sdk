@@ -32,9 +32,12 @@
 #include <lebai_msgs/MoveJoint.h>
 #include <lebai_msgs/MoveLine.h>
 #include <lebai_msgs/MoveCircle.h>
+#include <lebai_msgs/SpeedJoint.h>
+#include <lebai_msgs/SpeedLine.h>
 #include <lebai_msgs/UntilInfo.h>
 #include "lebai_driver/stubs.h"
 #include <robot_controller.grpc.pb.h>
+#include <motion.pb.h>
 
 namespace lebai_driver
 {
@@ -45,16 +48,18 @@ namespace lebai_driver
     public:
         TrajectoryMove();
         ~TrajectoryMove();
-
         bool init(Stubs * stubs);
-
         bool moveJoint(lebai_msgs::MoveJoint::Request &req, lebai_msgs::MoveJoint::Response &res);
         bool moveLine(lebai_msgs::MoveLine::Request &req, lebai_msgs::MoveLine::Response &res);
         bool moveCircle(lebai_msgs::MoveCircle::Request &req, lebai_msgs::MoveCircle::Response &res);
+        bool speedJoint(lebai_msgs::SpeedJoint::Request &req, lebai_msgs::SpeedJoint::Response &res);
+        bool speedLine(lebai_msgs::SpeedLine::Request &req, lebai_msgs::SpeedLine::Response &res);
 
         bool sendMoveJointToRobot(robotc::MoveJRequest & grpc_req);
         bool sendMoveLineToRobot(robotc::MoveLRequest & grpc_req);
         bool sendMoveCircleToRobot(robotc::MoveCRequest & grpc_req);
+        bool sendSpeedJointToRobot(robotc::SpeedJRequest & grpc_req);
+        bool sendSpeedLineToRobot(robotc::SpeedLRequest & grpc_req);
 
         // void robotStatusCB(const industrial_msgs::RobotStatusConstPtr &msg);
 
@@ -69,6 +74,8 @@ namespace lebai_driver
         ros::ServiceServer move_joint_service_;
         ros::ServiceServer move_line_service_;
         ros::ServiceServer move_circle_service_;
+        ros::ServiceServer speed_joint_service_;
+        ros::ServiceServer speed_line_service_;
     };
 
 } // namespace lebai_driver

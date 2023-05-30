@@ -1,0 +1,5 @@
+float64[] joint_vel
+float64 acc
+float64 time
+---
+bool ret

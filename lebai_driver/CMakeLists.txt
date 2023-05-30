@@ -11,7 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 generate_proto(lebai_proto GRPC SRC_BASE "lebai-proto"
-  FILES lebai-proto/robot_controller.proto lebai-proto/messages.proto
+  FILES 
+  lebai-proto/robot_controller.proto
+  lebai-proto/messages.proto
 )
 catkin_package(
 #  INCLUDE_DIRS include

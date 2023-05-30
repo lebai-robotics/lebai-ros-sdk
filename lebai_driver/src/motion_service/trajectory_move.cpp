@@ -49,6 +49,8 @@ namespace lebai_driver
         move_joint_service_ = node_.advertiseService("move_joint", &TrajectoryMove::moveJoint, this);
         move_line_service_ = node_.advertiseService("move_line", &TrajectoryMove::moveLine, this);
         move_circle_service_ = node_.advertiseService("move_circle", &TrajectoryMove::moveCircle, this);
+        speed_joint_service_ = node_.advertiseService("speed_joint", &TrajectoryMove::speedJoint, this);
+        speed_line_service_ = node_.advertiseService("speed_line", &TrajectoryMove::speedLine, this);
         return true;
     }
     bool TrajectoryMove::sendMoveJointToRobot(robotc::MoveJRequest & grpc_req)
@@ -100,6 +102,34 @@ namespace lebai_driver
         else
         {
             ROS_ERROR("Failed to call `MoveC`.");
+            return false;
+        }
+        return true;
+    }
+
+    bool TrajectoryMove::sendSpeedJointToRobot(robotc::SpeedJRequest & grpc_req)
+    {
+        grpc::ClientContext context;
+        robotc::CmdId grpc_res;
+        grpc::Status status;
+        status = stubs_->robot_controller_stub_->SpeedJ(&context, grpc_req, &grpc_res);
+        if (!status.ok())
+        {
+            ROS_ERROR("Failed to call `SpeedJ`.");
+            return false;
+        }
+        return true;        
+    }
+
+    bool TrajectoryMove::sendSpeedLineToRobot(robotc::SpeedLRequest & grpc_req)
+    {
+        grpc::ClientContext context;
+        robotc::CmdId grpc_res;
+        grpc::Status status;
+        status = stubs_->robot_controller_stub_->SpeedL(&context, grpc_req, &grpc_res);
+        if (!status.ok())
+        {
+            ROS_ERROR("Failed to call `SpeedL`.");
             return false;
         }
         return true;
@@ -203,6 +233,49 @@ namespace lebai_driver
         grpc_req.set_blend_radius(req.common.radius);
 
         if (sendMoveCircleToRobot(grpc_req))
+        {
+            res.ret = true;
+        }
+        else
+        {
+            res.ret = false;
+        }
+        return true;
+    }
+
+    bool TrajectoryMove::speedJoint(lebai_msgs::SpeedJoint::Request &req, lebai_msgs::SpeedJoint::Response &res)
+    {
+        robotc::SpeedJRequest grpc_req;
+        
+        for(size_t i = 0; i < req.joint_vel.size(); ++i)
+        {
+            grpc_req.mutable_joint_speed()->Add(req.joint_vel[i]);
+        }
+        grpc_req.set_acceleration(req.acc);
+        grpc_req.set_time(req.time);
+        if (sendSpeedJointToRobot(grpc_req))
+        {
+            res.ret = true;
+        }
+        else
+        {
+            res.ret = false;
+        }
+        return true;
+    }
+
+    bool TrajectoryMove::speedLine(lebai_msgs::SpeedLine::Request &req, lebai_msgs::SpeedLine::Response &res)
+    {
+        robotc::SpeedLRequest grpc_req;
+        grpc_req.add_velocity(req.vel.linear.x);
+        grpc_req.add_velocity(req.vel.linear.y);
+        grpc_req.add_velocity(req.vel.linear.z);
+        grpc_req.add_velocity(req.vel.angular.x);
+        grpc_req.add_velocity(req.vel.angular.y);
+        grpc_req.add_velocity(req.vel.angular.z);
+        grpc_req.set_position_acceleration(req.acc);
+        grpc_req.set_time(req.time);
+        if (sendSpeedLineToRobot(grpc_req))
         {
             res.ret = true;
         }

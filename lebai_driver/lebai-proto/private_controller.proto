@@ -119,6 +119,9 @@
    rpc ResetJointBacklashParams(google.protobuf.Empty) returns (JointBacklashParams);
    // 关节限位检测
    rpc EnableJointLimit(TrueOrFalse) returns (Response);
+   rpc SwitchSimulate(TrueOrFalse) returns (Response);
+   // 连接/断开 MODBUS 设备
+   rpc ConnectExternalIO(ExternalIOState) returns (Response);
  }
 
  message EnableJointBacklash {
@@ -294,6 +297,10 @@ message Configuration {
     bool break_a_cup = 17; // true: 不校验启动验证绑定设备hash逻辑; false: 默认值，校验 
     ButtonConfig button_config = 18;
     CartesianConfig cartesianConfig = 19;
+    int32 extra_robotDIOInNum = 20;
+    int32 extra_robotDIOOutNum = 21;
+    repeated AIO extra_robotAIOInConfig = 22;
+    repeated AIO extra_robotAIOOutConfig = 23;
 }
 
 
@@ -548,6 +555,11 @@ message ModbusExternalIOMapping {
     ModbusAioGroup ai = 3;
     // 所有模拟量输出值
     ModbusAioGroup ao = 4;
+}
+
+message ExternalIOState {
+    int32 id = 1;
+    bool enable = 2; // true 连接 false 断开
 }
 
 message ModbusExternalIO {
