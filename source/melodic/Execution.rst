@@ -65,9 +65,9 @@
 
 按照如下方式启动 `MoveIt <https://moveit.ros.org/>`_ 驱动程序：
 
-.. code-block:: bash
+  .. code-block:: bash
   
-  roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=xxx.xxx.xxx.xxx
+    roslaunch lebai_lm3_moveit_config run.launch sim:=false robot_ip:=xxx.xxx.xxx.xxx
   
   * ``sim`` 是否虚拟模式，当设置为虚拟模式时，不连接真实机械臂。
   * ``robot_ip`` 是乐白机械臂的 ``IP`` 地址。

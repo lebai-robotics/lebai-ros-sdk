@@ -137,13 +137,38 @@ Services
 
     rosservice call /motion_service/move_joint "{is_joint_pose: 1, joint_pose: [3.1,-1.57,-2.2,-1.03,1.67,1.62], common: {vel: 0.5, acc: 1.0, time: 0.0, radius: 0.0}}"
 
-* **motion_service/move_line** (``lebai_msgs/SetAO``)
+* **motion_service/move_line** (``lebai_msgs/MoveLine``)
 
   机械臂直线移动。该服务仅向机械臂控制器发送移动请求，机械臂缓存该移动请求，该服务返回并不代表机械臂移动到终点位置。
 
   脚本示例::
 
     rosservice call /motion_service/move_line "{is_joint_pose: 0, cartesian_pose: {position: {x: -0.3,y: 0.125,z: 0.4077}, orientation: {x: 0.99669, y: -0.047447,z: 0.043886, w: 0.049333}}, common: {vel: 0.2, acc: 1.0, time: 0.0, radius: 0.0}}"
+
+* **motion_service/speed_joint** (``lebai_msgs/SpeedJoint``)
+
+  机械臂关节指定速度移动。
+
+  脚本示例::
+
+    rosservice call /motion_service/speed_joint "{joint_vel: [-0.1,0.0,0.0,0.0,0.0,0.0], acc: 1.0, time: 0.0}"
+
+* **motion_service/speed_line** (``lebai_msgs/SpeedLine``)
+
+  机械臂坐标指定方向移动。
+
+  脚本示例::
+
+    rosservice call /motion_service/speed_line "{vel: {linear: {x: 0.0, y: 0.0, z: -0.1}, angular: {x: 0.0, y: 0.0, z: 0.0}}, acc: 1.0, time: 0.0}"
+
+* **motion_service/stop_motion** (``std_srvs/Empty``)
+
+  停止移动。
+
+  脚本示例::
+
+    rosservice call /motion_service/stop_motion "{}"
+
 
 * **/io_service/set_robot_do** (``lebai_msgs/SetDO``)
 
