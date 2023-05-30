@@ -72,7 +72,7 @@
 
 .. code-block:: bash
 
-   sudo apt install python3-colcon-common-extensions ros-humble-control-msgs ros-humble-tf-transformations python3-transforms3d
+   sudo apt install python3-colcon-common-extensions ros-humble-control-msgs ros-humble-tf-transformations python3-transforms3d python3-roslib
 
 安装 ``MoveIt2``
 ---------------------------------

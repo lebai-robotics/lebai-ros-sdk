@@ -25,7 +25,7 @@ lebai-ros-sdk文档
    * :ref:`ROS Melodic发行版文档 <melodic>`
    * :ref:`ROS Noetic发行版文档 <noetic>`
    * :ref:`ROS2 Galactic发行版文档 <galactic>`
-   * :ref:`ROS2 Humble <humble>`
+   * :ref:`ROS2 Humble发行版文档 <humble>`
 
 
 单位制

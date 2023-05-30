@@ -19,6 +19,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -33,15 +34,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lebai-ros-sdk
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lebai-ros-sdk
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -185,9 +190,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../Galactic.html">ROS2 Galactic</a> &raquo;</li>
-      <li><span class="section-number">2. </span>运行</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Galactic.html">ROS2 Galactic</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">2. </span>运行</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
@@ -221,14 +226,14 @@
 </div>
 <p>在运行程序前，确保您已经正确的编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，并且设置了工作空间。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># remember to run the source</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.bash
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.bash
 </pre></div>
 </div>
 <section id="id4">
 <h2><a class="toc-backref" href="#id6"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动基本的驱动程序：</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="nb">false</span> rviz2:<span class="o">=</span><span class="nb">true</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_support<span class="w"> </span>robot_interface_lm3.launch.py<span class="w"> </span>robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx<span class="w"> </span>has_gripper:<span class="o">=</span><span class="nb">false</span><span class="w"> </span>rviz2:<span class="o">=</span><span class="nb">true</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -238,15 +243,15 @@
 </ul>
 </div></blockquote>
 <p>运行成功后，您可以打开另一个终端，并通过命令行查看。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 topic list
-ros2 service list
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list
+ros2<span class="w"> </span>service<span class="w"> </span>list
 </pre></div>
 </div>
 </section>
 <section id="moveit">
 <h2><a class="toc-backref" href="#id7"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动 <a class="reference external" href="https://moveit.ros.org/">MoveIt</a> 驱动程序：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_moveit_config lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span>robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
 </pre></div>
 </div>
 <div class="admonition note">

@@ -19,6 +19,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -33,15 +34,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lebai-ros-sdk
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lebai-ros-sdk
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -185,9 +190,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../Melodic.html">ROS Melodic</a> &raquo;</li>
-      <li><span class="section-number">1. </span>编译安装</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Melodic.html">ROS Melodic</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1. </span>编译安装</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
@@ -223,15 +228,15 @@
 根据国内的网络环境，这里将给出适配国内网络环境的安装步骤如下：</p>
 <section id="id4">
 <h3><a class="toc-backref" href="#id9"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo sh -c <span class="s1">&#39;. /etc/lsb-release &amp;&amp; echo &quot;deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main&quot; &gt; /etc/apt/sources.list.d/ros-latest.list&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;. /etc/lsb-release &amp;&amp; echo &quot;deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main&quot; &gt; /etc/apt/sources.list.d/ros-latest.list&#39;</span>
 </pre></div>
 </div>
 </section>
 <section id="id5">
 <h3><a class="toc-backref" href="#id10"><span class="section-number">1.1.2. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 秘钥</a><a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install curl <span class="c1"># if you haven&#39;t already installed curl</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span><span class="c1"># if you haven&#39;t already installed curl</span>
 <span class="c1"># https://ghproxy.com is for chinese network.</span>
-curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc <span class="p">|</span> sudo apt-key add -
+curl<span class="w"> </span>-s<span class="w"> </span>https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
 </pre></div>
 </div>
 <div class="admonition note">
@@ -239,37 +244,37 @@ curl -s https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/mast
 <p>如果您在执行 <code class="docutils literal notranslate"><span class="pre">curl</span></code> 指令时遇到如下错误：</p>
 <p><code class="docutils literal notranslate"><span class="pre">gpg:</span> <span class="pre">找不到有效的</span> <span class="pre">OpenPGP</span> <span class="pre">数据。</span></code></p>
 <p>您可以将出错的指令拆分成两次执行：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl -O https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-O<span class="w"> </span>https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-key add ros.asc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>ros.asc
 </pre></div>
 </div>
 </div>
 </section>
 <section id="apt-ros">
 <h3><a class="toc-backref" href="#id11"><span class="section-number">1.1.3. </span>通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code></a><a class="headerlink" href="#apt-ros" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update
-sudo apt install ros-melodic-desktop-full <span class="c1"># use desktop full， this will take some time.</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-melodic-desktop-full<span class="w"> </span><span class="c1"># use desktop full， this will take some time.</span>
 </pre></div>
 </div>
 </section>
 <section id="id6">
 <h3><a class="toc-backref" href="#id12"><span class="section-number">1.1.4. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境</a><a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <p>您需要在 <strong>bash</strong> 终端中运行如下脚本来设置 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 环境。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> /opt/ros/melodic/setup.bash
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/melodic/setup.bash
 </pre></div>
 </div>
 <p>如果您不希望每次打开终端都需要运行上述脚本，你可以通过将上述脚本内容写入对应的 <code class="docutils literal notranslate"><span class="pre">rc</span></code> 配置文件中来简化。</p>
 <p><strong>bash</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;source /opt/ros/melodic/setup.bash&quot;</span> &gt;&gt; ~/.bashrc
-<span class="nb">source</span> ~/.bashrc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/melodic/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
 </pre></div>
 </div>
 <p>如果您使用 <code class="docutils literal notranslate"><span class="pre">zsh</span></code>，则相应的脚本如下。</p>
 <p><strong>zsh</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;source /opt/ros/melodic/setup.zsh&quot;</span> &gt;&gt; ~/.zshrc
-<span class="nb">source</span> ~/.zshrc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/melodic/setup.zsh&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.zshrc
+<span class="nb">source</span><span class="w"> </span>~/.zshrc
 </pre></div>
 </div>
 </section>
@@ -277,7 +282,7 @@ sudo apt install ros-melodic-desktop-full <span class="c1"># use desktop full，
 <section id="id7">
 <h2><a class="toc-backref" href="#id13"><span class="section-number">1.2. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 依赖包</a><a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h2>
 <p>运行如下脚本，安装一些 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 所需要的依赖包。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install -y ros-melodic-srdfdom ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-fcl ros-melodic-industrial-robot-client ros-melodic-grpc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-melodic-srdfdom<span class="w"> </span>ros-melodic-moveit<span class="w"> </span>ros-melodic-urdf<span class="w"> </span>ros-melodic-tf<span class="w"> </span>ros-melodic-xacro<span class="w"> </span>ros-melodic-robot-state-publisher<span class="w"> </span>ros-melodic-control-msgs<span class="w"> </span>rviz<span class="w"> </span>ros-melodic-rviz<span class="w"> </span>ros-melodic-fcl<span class="w"> </span>ros-melodic-industrial-robot-client<span class="w"> </span>ros-melodic-grpc
 </pre></div>
 </div>
 </section>
@@ -285,15 +290,15 @@ sudo apt install ros-melodic-desktop-full <span class="c1"># use desktop full，
 <h2><a class="toc-backref" href="#id14"><span class="section-number">1.3. </span>编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a><a class="headerlink" href="#lebai-ros-sdk" title="Permalink to this heading">¶</a></h2>
 <p>您现在可以开始从github克隆 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 的源代码，并且尝试编译。</p>
 <p>运行如下脚本：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p  ~/lebai_ws/src
-<span class="nb">cd</span>  ~/lebai_ws/src
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w">  </span>~/lebai_ws/src
+<span class="nb">cd</span><span class="w">  </span>~/lebai_ws/src
 <span class="c1"># choose one you prefer:</span>
 <span class="c1"># ssh</span>
-git clone git@github.com:lebai-robotics/lebai-ros-sdk.git -b melodic-dev
+git<span class="w"> </span>clone<span class="w"> </span>git@github.com:lebai-robotics/lebai-ros-sdk.git<span class="w"> </span>-b<span class="w"> </span>melodic-dev
 <span class="c1"># https</span>
-git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b melodic-dev
-<span class="nb">cd</span> ~/lebai_ws
-catkin_make install
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/lebai-robotics/lebai-ros-sdk.git<span class="w"> </span>-b<span class="w"> </span>melodic-dev
+<span class="nb">cd</span><span class="w"> </span>~/lebai_ws
+catkin_make<span class="w"> </span>install
 </pre></div>
 </div>
 <p>您现在已经完成了 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 的编译。</p>
@@ -301,9 +306,9 @@ catkin_make install
 <p class="admonition-title">Note</p>
 <p>记住，当您完成编译后，您需要设置您工作空间的环境以便让 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 发现您的包。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># for bash</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.bash
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.bash
 <span class="c1"># for zsh</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.zsh
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.zsh
 </pre></div>
 </div>
 </div>
