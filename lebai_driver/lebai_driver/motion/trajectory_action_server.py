@@ -139,7 +139,7 @@ class TrajectoryActionServer(Node):
         self.get_logger().info('Lebai trajectory send to robot start.')
         data_gen = self.generate_data_list(traj_msg)
         self.lebai_robot_.move_pvats(data_gen)
-        self.get_logger().info('Lebai trajectory send to robot finish.')
+        self.get_logger().info('Lebai trajectory send to robot end.')
 
     def loop_send_to_robot(self, goal_handle):
         self.get_logger().info(
@@ -155,6 +155,7 @@ class TrajectoryActionServer(Node):
                 float(traj_msg.points[i+1].time_from_start.nanosec / 1e9)
             t0 = float(traj_msg.points[i].time_from_start.sec) + \
                 float(traj_msg.points[i].time_from_start.nanosec / 1e9)
+            # self.get_logger().info('{0} {1} {2} {3} {4} {5} {6} {7}'.format(t0, t1, traj_msg.points[i+1].velocities[0], traj_msg.points[i+1].velocities[1], traj_msg.points[i+1].velocities[2], traj_msg.points[i+1].velocities[3], traj_msg.points[i+1].velocities[4], traj_msg.points[i+1].velocities[5]))
             self.lebai_robot_.move_pvat(traj_msg.points[i+1].positions,
                                         traj_msg.points[i+1].velocities,
                                         traj_msg.points[i+1].accelerations,
