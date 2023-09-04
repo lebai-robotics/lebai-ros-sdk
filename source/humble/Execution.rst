@@ -24,7 +24,7 @@
 
 .. code-block:: bash
 
-  # remember to run the source  
+  # remember to run the source
   source ~/lebai_ws/install/setup.bash
 
 基本驱动程序
@@ -34,7 +34,10 @@
 
     .. code-block:: bash
 
+      ### For lm3
       ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:=xxx.xxx.xxx.xxx has_gripper:=false rviz2:=true
+      ### For lm3-l1
+      ros2 launch lebai_lm3_support robot_interface_lm3_l1.launch.py robot_ip:=xxx.xxx.xxx.xxx has_gripper:=false rviz2:=true
 
     * ``robot_ip`` 是乐白机械臂的 ``IP`` 地址。
     * ``has_gripper`` 是机械臂末端是否有乐白夹爪。有夹爪设置为 ``true``，没有夹爪设置为 ``false``。
@@ -53,8 +56,11 @@
 按照如下方式启动 `MoveIt <https://moveit.ros.org/>`_ 驱动程序：
 
 .. code-block:: bash
-  
+
+  # For lm3
   ros2 launch lebai_lm3_moveit_config lm3.launch.py robot_ip:=xxx.xxx.xxx.xxx
+  # For lm3-l1
+  ros2 launch lebai_lm3_moveit_config lm3_l1.launch.py robot_ip:=xxx.xxx.xxx.xxx
 
 .. note::
   在使用 ``MoveIt`` 控制机械臂之前，请确保机械臂处于启动状态。
