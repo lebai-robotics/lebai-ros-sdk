@@ -17,9 +17,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -205,7 +203,7 @@
            <div itemprop="articleBody">
              
   <section id="ros">
-<span id="noetic-interface"></span><h1><span class="section-number">3. </span><code class="docutils literal notranslate"><span class="pre">ROS</span></code> 接口说明<a class="headerlink" href="#ros" title="Permalink to this heading">¶</a></h1>
+<span id="noetic-interface"></span><h1><span class="section-number">3. </span><code class="docutils literal notranslate"><span class="pre">ROS</span></code> 接口说明<a class="headerlink" href="#ros" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
@@ -215,7 +213,7 @@
 </ul>
 </div>
 <section id="node">
-<h2><a class="toc-backref" href="#id1"><span class="section-number">3.1. </span>Node</a><a class="headerlink" href="#node" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id1"><span class="section-number">3.1. </span>Node</a><a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">io_service</span></code> <code class="docutils literal notranslate"><span class="pre">IO</span></code> 服务。</p></li>
@@ -227,7 +225,7 @@
 </div></blockquote>
 </section>
 <section id="published-topics">
-<h2><a class="toc-backref" href="#id2"><span class="section-number">3.2. </span>Published Topics</a><a class="headerlink" href="#published-topics" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id2"><span class="section-number">3.2. </span>Published Topics</a><a class="headerlink" href="#published-topics" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>/feedback_states</strong> (<code class="docutils literal notranslate"><span class="pre">control_msgs/FollowJointTrajectoryFeedback</span></code>)</p>
 <p>发布 <code class="docutils literal notranslate"><span class="pre">FollowJointTrajectoryAction</span></code> 反馈信息。</p>
@@ -244,82 +242,82 @@
 </ul>
 </section>
 <section id="services">
-<h2><a class="toc-backref" href="#id3"><span class="section-number">3.3. </span>Services</a><a class="headerlink" href="#services" title="Permalink to this heading">¶</a></h2>
+<h2><a class="toc-backref" href="#id3"><span class="section-number">3.3. </span>Services</a><a class="headerlink" href="#services" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p><strong>/system_service/enable</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂上使能。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">enable</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">enable</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/disable</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂下使能。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">disable</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">disable</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/power_on</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂上电（目前等同于机械臂上使能）。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">power_on</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">power_on</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/power_off</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂上电（目前等同于机械臂下使能）。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">power_off</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">power_off</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/emergency_stop</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂急停。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">emergency_stop</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">emergency_stop</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/turn_off_robot</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂关机。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">turn_off_robot</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">turn_off_robot</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/entry_teach_mode</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂进入拖动示教模式。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">entry_teach_mode</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">entry_teach_mode</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/exit_teach_mode</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂退出拖动示教模式。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">exit_teach_mode</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">exit_teach_mode</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/abort_motion</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂停止正在执行的运动。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">abort_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">abort_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/pause_motion</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂暂停正在执行的运动。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">pause_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">pause_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/system_service/resume_motion</strong> (<code class="docutils literal notranslate"><span class="pre">std_srvs/Empty</span></code>)</p>
 <p>机械臂恢复暂停的运动。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">resume_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">system_service</span><span class="o">/</span><span class="n">resume_motion</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
@@ -327,63 +325,63 @@
 <p>机械臂关节移动。</p>
 <p>该服务仅向机械臂控制器发送移动请求，机械臂缓存该移动请求，该服务返回并不代表机械臂移动到终点位置。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">motion_service</span><span class="o">/</span><span class="n">move_joint</span><span class="w"> </span><span class="s">&quot;{is_joint_pose: 1, joint_pose: [3.1,-1.57,-2.2,-1.03,1.67,1.62], common: {vel: 0.5, acc: 1.0, time: 0.0, radius: 0.0}}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">motion_service</span><span class="o">/</span><span class="n">move_joint</span><span class="w"> </span><span class="s">&quot;{is_joint_pose: 1, joint_pose: [3.1,-1.57,-2.2,-1.03,1.67,1.62], common: {vel: 0.5, acc: 1.0, time: 0.0, radius: 0.0}}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>motion_service/move_line</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetAO</span></code>)</p>
 <p>机械臂直线移动。该服务仅向机械臂控制器发送移动请求，机械臂缓存该移动请求，该服务返回并不代表机械臂移动到终点位置。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">motion_service</span><span class="o">/</span><span class="n">move_line</span><span class="w"> </span><span class="s">&quot;{is_joint_pose: 0, cartesian_pose: {position: {x: -0.3,y: 0.125,z: 0.4077}, orientation: {x: 0.99669, y: -0.047447,z: 0.043886, w: 0.049333}}, common: {vel: 0.2, acc: 1.0, time: 0.0, radius: 0.0}}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">motion_service</span><span class="o">/</span><span class="n">move_line</span><span class="w"> </span><span class="s">&quot;{is_joint_pose: 0, cartesian_pose: {position: {x: -0.3,y: 0.125,z: 0.4077}, orientation: {x: 0.99669, y: -0.047447,z: 0.043886, w: 0.049333}}, common: {vel: 0.2, acc: 1.0, time: 0.0, radius: 0.0}}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_robot_do</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetDO</span></code>)</p>
 <p>设置控制柜模拟量量输出。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_do</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: false}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_do</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: false}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_flange_do</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetDO</span></code>)</p>
 <p>设置法兰数字量输出。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_flange_do</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: false}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_flange_do</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: false}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_robot_ao</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetAO</span></code>)</p>
 <p>设置控制柜模拟量输出。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ao</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: 0.5}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ao</span><span class="w"> </span><span class="s">&quot;{pin: 0,value: 0.5}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_robot_ao_mode</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetAMode</span></code>)</p>
 <p>设置控制柜模拟量输出模式。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ao_mode</span><span class="w"> </span><span class="s">&quot;{pin: 0, mode: 0}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ao_mode</span><span class="w"> </span><span class="s">&quot;{pin: 0, mode: 0}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_robot_ai_mode</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetAMode</span></code>)</p>
 <p>设置控制柜模拟量输入模式。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ai_mode</span><span class="w"> </span><span class="s">&quot;{pin: 0, mode: 0}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_robot_ai_mode</span><span class="w"> </span><span class="s">&quot;{pin: 0, mode: 0}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_gripper_force</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetGripper</span></code>)</p>
 <p>设置夹爪力。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_gripper_force</span><span class="w"> </span><span class="s">&quot;{val: 0.2}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_gripper_force</span><span class="w"> </span><span class="s">&quot;{val: 0.2}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>/io_service/set_gripper_position</strong> (<code class="docutils literal notranslate"><span class="pre">lebai_msgs/SetGripper</span></code>)</p>
 <p>设置夹爪位置。</p>
 <p>脚本示例:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_gripper_position</span><span class="w"> </span><span class="s">&quot;{val: 0.2}&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rosservice</span><span class="w"> </span><span class="n">call</span><span class="w"> </span><span class="o">/</span><span class="n">io_service</span><span class="o">/</span><span class="n">set_gripper_position</span><span class="w"> </span><span class="s">&quot;{val: 0.2}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </li>
