@@ -37,7 +37,7 @@
 #include <lebai_msgs/UntilInfo.h>
 #include "lebai_driver/stubs.h"
 #include <robot_controller.grpc.pb.h>
-#include <motion.pb.h>
+// #include <motion.pb.h>
 
 namespace lebai_driver
 {
