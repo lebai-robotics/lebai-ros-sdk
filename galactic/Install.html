@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1. 编译安装 &mdash; lebai-ros-sdk</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+
+  
     <link rel="shortcut icon" href="../_static/logo.png"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -17,7 +19,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -203,7 +207,7 @@
            <div itemprop="articleBody">
              
   <section id="galactic-install">
-<span id="id1"></span><h1><span class="section-number">1. </span>编译安装<a class="headerlink" href="#galactic-install" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">1. </span>编译安装<a class="headerlink" href="#galactic-install" title="Permalink to this heading">¶</a></h1>
 <div class="contents local topic" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
@@ -221,41 +225,41 @@
 </div>
 <p>为了编译运行 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，你需要先安装一些依赖。</p>
 <section id="ros2">
-<h2><a class="toc-backref" href="#id7"><span class="section-number">1.1. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code></a><a class="headerlink" href="#ros2" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7"><span class="section-number">1.1. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code></a><a class="headerlink" href="#ros2" title="Permalink to this heading">¶</a></h2>
 <p>您可以参考  <a class="reference external" href="https://docs.ros.org/en/galactic/Installation.html">ROS2官方文档</a> 安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 。
 在一个标准的 <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code> 桌面系统通过 <code class="docutils literal notranslate"><span class="pre">Debian</span> <span class="pre">package</span></code> 的安装步骤通常如下：</p>
 <section id="id4">
-<h3><a class="toc-backref" href="#id8"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update <span class="o">&amp;&amp;</span> sudo apt install curl gnupg lsb-release
+<h3><a class="toc-backref" href="#id8"><span class="section-number">1.1.1. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 软件包安装源</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>gnupg<span class="w"> </span>lsb-release
 <span class="c1"># https://ghproxy.com is for chinese network.</span>
-sudo curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-<span class="nb">echo</span> <span class="s2">&quot;deb [arch=</span><span class="k">$(</span>dpkg --print-architecture<span class="k">)</span><span class="s2"> signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu </span><span class="k">$(</span><span class="nb">source</span> /etc/os-release <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nv">$UBUNTU_CODENAME</span><span class="k">)</span><span class="s2"> main&quot;</span> <span class="p">|</span> sudo tee /etc/apt/sources.list.d/ros2.list &gt; /dev/null
+sudo<span class="w"> </span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://ghproxy.com/https://raw.githubusercontent.com/ros/rosdistro/master/ros.key<span class="w"> </span>-o<span class="w"> </span>/usr/share/keyrings/ros-archive-keyring.gpg
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb [arch=</span><span class="k">$(</span>dpkg<span class="w"> </span>--print-architecture<span class="k">)</span><span class="s2"> signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu </span><span class="k">$(</span><span class="nb">source</span><span class="w"> </span>/etc/os-release<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$UBUNTU_CODENAME</span><span class="k">)</span><span class="s2"> main&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/ros2.list<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 </pre></div>
 </div>
 </section>
 <section id="apt-ros2">
-<h3><a class="toc-backref" href="#id9"><span class="section-number">1.1.2. </span>通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code></a><a class="headerlink" href="#apt-ros2" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update
-sudo apt install ros-galactic-desktop <span class="c1"># use desktop full， this will take some time.</span>
+<h3><a class="toc-backref" href="#id9"><span class="section-number">1.1.2. </span>通过 <code class="docutils literal notranslate"><span class="pre">apt</span></code> 安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code></a><a class="headerlink" href="#apt-ros2" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-galactic-desktop<span class="w"> </span><span class="c1"># use desktop full， this will take some time.</span>
 </pre></div>
 </div>
 </section>
 <section id="id5">
-<h3><a class="toc-backref" href="#id10"><span class="section-number">1.1.3. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 环境</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10"><span class="section-number">1.1.3. </span>设置 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 环境</a><a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <p>您需要在 <strong>bash</strong> 终端中运行如下脚本来设置 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 环境。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> /opt/ros/galactic/setup.bash
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/galactic/setup.bash
 </pre></div>
 </div>
 <p>如果您不希望每次打开终端都需要运行上述脚本，你可以通过将上述脚本内容写入对应的 <code class="docutils literal notranslate"><span class="pre">rc</span></code> 配置文件中来简化。</p>
 <p><strong>bash</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;source /opt/ros/galactic/setup.bash&quot;</span> &gt;&gt; ~/.bashrc
-<span class="nb">source</span> ~/.bashrc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/galactic/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
 </pre></div>
 </div>
 <p>如果您使用 <code class="docutils literal notranslate"><span class="pre">zsh</span></code>，则相应的脚本如下。</p>
 <p><strong>zsh</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;source /opt/ros/galactic/setup.zsh&quot;</span> &gt;&gt; ~/.zshrc
-<span class="nb">source</span> ~/.zshrc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/galactic/setup.zsh&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.zshrc
+<span class="nb">source</span><span class="w"> </span>~/.zshrc
 </pre></div>
 </div>
 <p>注意，如果您的设备装有多个不同的 <code class="docutils literal notranslate"><span class="pre">ROS</span></code> 发行版，您可以通过不同的脚本文件来选择使用不同的发行版。
@@ -263,14 +267,14 @@ sudo apt install ros-galactic-desktop <span class="c1"># use desktop full， thi
 </section>
 </section>
 <section id="id6">
-<h2><a class="toc-backref" href="#id11"><span class="section-number">1.2. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 依赖包</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11"><span class="section-number">1.2. </span>安装 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 依赖包</a><a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
 <p>运行如下脚本，安装一些 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 所需要的依赖包。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install python3-colcon-common-extensions ros-galactic-control-msgs ros-galactic-moveit
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-colcon-common-extensions<span class="w"> </span>ros-galactic-control-msgs<span class="w"> </span>ros-galactic-moveit
 </pre></div>
 </div>
 </section>
 <section id="python">
-<h2><a class="toc-backref" href="#id12"><span class="section-number">1.3. </span>安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a><a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id12"><span class="section-number">1.3. </span>安装 <code class="docutils literal notranslate"><span class="pre">python</span></code> 依赖包</a><a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 依赖于如下 <code class="docutils literal notranslate"><span class="pre">python</span></code> 包:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://pypi.org/project/lebai/">lebai-python-sdk</a></p></li>
@@ -278,20 +282,20 @@ sudo apt install ros-galactic-desktop <span class="c1"># use desktop full， thi
 </dd>
 </dl>
 <p>通过 <code class="docutils literal notranslate"><span class="pre">pip</span></code> 可以进行安装</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install python3-pip <span class="c1"># If pip is not install.</span>
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple lebai
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-pip<span class="w"> </span><span class="c1"># If pip is not install.</span>
+pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://pypi.tuna.tsinghua.edu.cn/simple<span class="w"> </span>lebai
 </pre></div>
 </div>
 </section>
 <section id="lebai-ros-sdk">
-<h2><a class="toc-backref" href="#id13"><span class="section-number">1.4. </span>编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a><a class="headerlink" href="#lebai-ros-sdk" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13"><span class="section-number">1.4. </span>编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 开发包</a><a class="headerlink" href="#lebai-ros-sdk" title="Permalink to this heading">¶</a></h2>
 <p>您现在可以开始从github克隆 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 的源代码，并且尝试编译。</p>
 <p>运行如下脚本：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p  ~/lebai_ws/src
-<span class="nb">cd</span>  ~/lebai_ws/src
-git clone https://github.com/lebai-robotics/lebai-ros-sdk.git -b galactic-dev
-<span class="nb">cd</span> ~/lebai_ws
-colcon build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w">  </span>~/lebai_ws/src
+<span class="nb">cd</span><span class="w">  </span>~/lebai_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/lebai-robotics/lebai-ros-sdk.git<span class="w"> </span>-b<span class="w"> </span>galactic-dev
+<span class="nb">cd</span><span class="w"> </span>~/lebai_ws
+colcon<span class="w"> </span>build
 </pre></div>
 </div>
 <p>您现在已经完成了 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code> 的编译。</p>
@@ -300,9 +304,9 @@ colcon build
 <p>记住，当您完成编译后，您需要设置您工作空间的环境以便让 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 发现您的包。</p>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># for bash</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.bash
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.bash
 <span class="c1"># for zsh</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.zsh
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.zsh
 </pre></div>
 </div>
 </section>

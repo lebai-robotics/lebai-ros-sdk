@@ -87,7 +87,7 @@
 
 .. code-block:: bash
 
-   sudo apt install -y ros-melodic-srdfdom ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-fcl ros-melodic-industrial-robot-client ros-melodic-grpc
+   sudo apt install -y ros-melodic-srdfdom ros-melodic-moveit ros-melodic-urdf ros-melodic-tf ros-melodic-xacro ros-melodic-robot-state-publisher ros-melodic-control-msgs rviz ros-melodic-rviz ros-melodic-industrial-robot-client ros-melodic-grpc
 
 编译 ``lebai-ros-sdk`` 开发包
 ---------------------------------

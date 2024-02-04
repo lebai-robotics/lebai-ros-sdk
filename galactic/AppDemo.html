@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4. 应用编程示例 &mdash; lebai-ros-sdk</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+
+  
     <link rel="shortcut icon" href="../_static/logo.png"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -17,7 +19,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -203,7 +207,7 @@
            <div itemprop="articleBody">
              
   <section id="galactic-app-demo">
-<span id="id1"></span><h1><span class="section-number">4. </span>应用编程示例<a class="headerlink" href="#galactic-app-demo" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">4. </span>应用编程示例<a class="headerlink" href="#galactic-app-demo" title="Permalink to this heading">¶</a></h1>
 <p>以下给出构建一个简单应用的基本步骤。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -218,75 +222,75 @@
 </ul>
 </div>
 <section id="ros2">
-<h2><a class="toc-backref" href="#id3"><span class="section-number">4.1. </span>创建 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 程序包</a><a class="headerlink" href="#ros2" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 pkg create lebai_tutorials --build-type ament_cmake --dependencies rclpy rclcpp lebai_interfaces
+<h2><a class="toc-backref" href="#id3"><span class="section-number">4.1. </span>创建 <code class="docutils literal notranslate"><span class="pre">ROS2</span></code> 程序包</a><a class="headerlink" href="#ros2" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>pkg<span class="w"> </span>create<span class="w"> </span>lebai_tutorials<span class="w"> </span>--build-type<span class="w"> </span>ament_cmake<span class="w"> </span>--dependencies<span class="w"> </span>rclpy<span class="w"> </span>rclcpp<span class="w"> </span>lebai_interfaces
 </pre></div>
 </div>
 <p>在 <code class="docutils literal notranslate"><span class="pre">package.xml</span></code> 文件中自行设置 <code class="docutils literal notranslate"><span class="pre">description</span></code>， <code class="docutils literal notranslate"><span class="pre">maintainer</span></code>， <code class="docutils literal notranslate"><span class="pre">license</span></code> 等内容。</p>
 </section>
 <section id="c">
-<h2><a class="toc-backref" href="#id4"><span class="section-number">4.2. </span><code class="docutils literal notranslate"><span class="pre">c++</span></code> 部分</a><a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4"><span class="section-number">4.2. </span><code class="docutils literal notranslate"><span class="pre">c++</span></code> 部分</a><a class="headerlink" href="#c" title="Permalink to this heading">¶</a></h2>
 <p>在 <code class="docutils literal notranslate"><span class="pre">src</span></code> 目录下，添加 <code class="docutils literal notranslate"><span class="pre">move_example.cc</span></code> 文件。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>touch src/move_example.cc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>touch<span class="w"> </span>src/move_example.cc
 </pre></div>
 </div>
 <p>复制如下内容到 <code class="docutils literal notranslate"><span class="pre">move_example.cc</span></code> 文件中:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rclcpp/rclcpp.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;lebai_interfaces/srv/move_joint.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;lebai_interfaces/srv/move_line.hpp&gt;</span><span class="cp"></span>
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"></span>
-<span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span><span class="o">&gt;</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span><span class="o">::</span><span class="n">make_shared</span><span class="p">(</span><span class="s">&quot;move_example&quot;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rclcpp/rclcpp.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;lebai_interfaces/srv/move_joint.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;lebai_interfaces/srv/move_line.hpp&gt;</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span><span class="o">&gt;</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span><span class="o">::</span><span class="n">make_shared</span><span class="p">(</span><span class="s">&quot;move_example&quot;</span><span class="p">);</span>
 <span class="w">  </span><span class="c1">// Create move joint service client.</span>
-<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">move_joint_client</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
-<span class="w">      </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">create_client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;/motion_service/move_joint&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">move_joint_client</span><span class="w"> </span><span class="o">=</span>
+<span class="w">      </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">create_client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;/motion_service/move_joint&quot;</span><span class="p">);</span>
 <span class="w">  </span><span class="c1">// Wait for service.</span>
-<span class="w">  </span><span class="n">move_joint_client</span><span class="o">-&gt;</span><span class="n">wait_for_service</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Move joint service exist.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">move_joint_client</span><span class="o">-&gt;</span><span class="n">wait_for_service</span><span class="p">();</span>
+<span class="w">  </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Move joint service exist.&quot;</span><span class="p">);</span>
 <span class="w">  </span><span class="c1">// generate a move joint srv data.</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_joint_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">::</span><span class="n">Request</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-0.515705166127304</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.383938292070577</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9317015810420413</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.0843326694366626</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8334309368181174</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.7919175817459623</span><span class="p">};</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">is_joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">vel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_joint_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveJoint</span><span class="o">::</span><span class="n">Request</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-0.515705166127304</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.383938292070577</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9317015810420413</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.0843326694366626</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8334309368181174</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.7919175817459623</span><span class="p">};</span>
+<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">is_joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">vel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="w">  </span><span class="n">move_joint_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 <span class="w">  </span><span class="c1">// Call service.</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_joint_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">move_joint_client</span><span class="o">-&gt;</span><span class="n">async_send_request</span><span class="p">(</span><span class="n">move_joint_req</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">move_joint_result</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"></span>
-<span class="w">      </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">FutureReturnCode</span><span class="o">::</span><span class="n">SUCCESS</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Successed to call move joint&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="k">else</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">get_logger</span><span class="p">(</span><span class="s">&quot;rclcpp&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Failed to call move joint&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_joint_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">move_joint_client</span><span class="o">-&gt;</span><span class="n">async_send_request</span><span class="p">(</span><span class="n">move_joint_req</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">move_joint_result</span><span class="p">)</span><span class="w"> </span><span class="o">==</span>
+<span class="w">      </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">FutureReturnCode</span><span class="o">::</span><span class="n">SUCCESS</span><span class="p">)</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Successed to call move joint&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">get_logger</span><span class="p">(</span><span class="s">&quot;rclcpp&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Failed to call move joint&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="w">  </span><span class="c1">// Create move line service client.</span>
-<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">move_line_client</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
-<span class="w">      </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">create_client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;/motion_service/move_line&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">move_line_client</span><span class="w"> </span><span class="o">=</span>
+<span class="w">      </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">create_client</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;/motion_service/move_line&quot;</span><span class="p">);</span>
 <span class="w">  </span><span class="c1">// Wait for service.</span>
-<span class="w">  </span><span class="n">move_line_client</span><span class="o">-&gt;</span><span class="n">wait_for_service</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Move line service exist.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">move_line_client</span><span class="o">-&gt;</span><span class="n">wait_for_service</span><span class="p">();</span>
+<span class="w">  </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Move line service exist.&quot;</span><span class="p">);</span>
 <span class="w">  </span><span class="c1">// generate a move line srv data.</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_line_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">::</span><span class="n">Request</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-1.9979141024218048</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.1726324385393299</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9936360553529241</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.0942076707586763</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.849345987492431</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8172282647460754</span><span class="p">};;</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">is_joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">vel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_line_req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">lebai_interfaces</span><span class="o">::</span><span class="n">srv</span><span class="o">::</span><span class="n">MoveLine</span><span class="o">::</span><span class="n">Request</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-1.9979141024218048</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.1726324385393299</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9936360553529241</span><span class="p">,</span><span class="w"> </span><span class="mf">-1.0942076707586763</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.849345987492431</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.8172282647460754</span><span class="p">};;</span>
+<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">is_joint_pose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">vel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span>
+<span class="w">  </span><span class="n">move_line_req</span><span class="o">-&gt;</span><span class="n">common</span><span class="p">.</span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 <span class="w">  </span><span class="c1">// Call service.</span>
-<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_line_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">move_line_client</span><span class="o">-&gt;</span><span class="n">async_send_request</span><span class="p">(</span><span class="n">move_line_req</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">move_line_result</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"></span>
-<span class="w">      </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">FutureReturnCode</span><span class="o">::</span><span class="n">SUCCESS</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Successed to call move line&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="k">else</span><span class="w"></span>
-<span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">get_logger</span><span class="p">(</span><span class="s">&quot;rclcpp&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Failed to call move line&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">shutdown</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">move_line_result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">move_line_client</span><span class="o">-&gt;</span><span class="n">async_send_request</span><span class="p">(</span><span class="n">move_line_req</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">spin_until_future_complete</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">move_line_result</span><span class="p">)</span><span class="w"> </span><span class="o">==</span>
+<span class="w">      </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">FutureReturnCode</span><span class="o">::</span><span class="n">SUCCESS</span><span class="p">)</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Successed to call move line&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="n">rclcpp</span><span class="o">::</span><span class="n">get_logger</span><span class="p">(</span><span class="s">&quot;rclcpp&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Failed to call move line&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">shutdown</span><span class="p">();</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>在 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 中添加如下内容：</p>
@@ -303,25 +307,25 @@
 </div>
 <p>您可以尝试编译并运行</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># change to your own workspace.</span>
-<span class="nb">cd</span> lebai_ws
-colcon build
+<span class="nb">cd</span><span class="w"> </span>lebai_ws
+colcon<span class="w"> </span>build
 
 <span class="c1"># remember you need to run:</span>
 <span class="c1"># source lebai_ws/install/setup.bash.</span>
 <span class="c1"># you must run lebai-ros-sdk launch first:</span>
 <span class="c1"># ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:=xxx.xxx.xxx.xxx</span>
-ros2 run lebai_tutorials move_example
+ros2<span class="w"> </span>run<span class="w"> </span>lebai_tutorials<span class="w"> </span>move_example
 </pre></div>
 </div>
 </section>
 <section id="python">
-<h2><a class="toc-backref" href="#id5"><span class="section-number">4.3. </span><code class="docutils literal notranslate"><span class="pre">python</span></code> 部分</a><a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5"><span class="section-number">4.3. </span><code class="docutils literal notranslate"><span class="pre">python</span></code> 部分</a><a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <p>在 <code class="docutils literal notranslate"><span class="pre">src</span></code> 目录下，添加 <code class="docutils literal notranslate"><span class="pre">python</span></code> 模块目录和相应的文件。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> lebai_tutorials
-mkdir scripts
-touch scripts/move_example.py
-touch scripts/io_example.py
-touch scripts/joint_state_subscriber.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>lebai_tutorials
+mkdir<span class="w"> </span>scripts
+touch<span class="w"> </span>scripts/move_example.py
+touch<span class="w"> </span>scripts/io_example.py
+touch<span class="w"> </span>scripts/joint_state_subscriber.py
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">move_example.py</span></code> 内容如下：</p>
@@ -534,16 +538,16 @@ touch scripts/joint_state_subscriber.py
 </div>
 <p>您可以尝试编译并运行</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># change to your own workspace.</span>
-<span class="nb">cd</span> lebai_ws
-colcon build
+<span class="nb">cd</span><span class="w"> </span>lebai_ws
+colcon<span class="w"> </span>build
 
 <span class="c1"># remember you need to run:</span>
 <span class="c1"># source lebai_ws/install/setup.bash.</span>
 <span class="c1"># you must run lebai-ros-sdk launch first:</span>
 <span class="c1"># ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:=xxx.xxx.xxx.xxx</span>
-ros2 run lebai_tutorials move_example.py
-ros2 run lebai_tutorials io_example.py
-ros2 run lebai_tutorials joint_state_subscriber.py
+ros2<span class="w"> </span>run<span class="w"> </span>lebai_tutorials<span class="w"> </span>move_example.py
+ros2<span class="w"> </span>run<span class="w"> </span>lebai_tutorials<span class="w"> </span>io_example.py
+ros2<span class="w"> </span>run<span class="w"> </span>lebai_tutorials<span class="w"> </span>joint_state_subscriber.py
 </pre></div>
 </div>
 </section>

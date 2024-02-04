@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2. 运行 &mdash; lebai-ros-sdk</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+
+  
     <link rel="shortcut icon" href="../_static/logo.png"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -17,7 +19,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -203,7 +207,7 @@
            <div itemprop="articleBody">
              
   <section id="galactic-execution">
-<span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#galactic-execution" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">2. </span>运行<a class="headerlink" href="#galactic-execution" title="Permalink to this heading">¶</a></h1>
 <div class="contents local topic" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
@@ -224,14 +228,14 @@
 </div>
 <p>在运行程序前，确保您已经正确的编译 <code class="docutils literal notranslate"><span class="pre">lebai-ros-sdk</span></code>，并且设置了工作空间。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># remember to run the source</span>
-<span class="nb">source</span> ~/lebai_ws/install/setup.bash
+<span class="nb">source</span><span class="w"> </span>~/lebai_ws/install/setup.bash
 </pre></div>
 </div>
 <section id="id4">
-<h2><a class="toc-backref" href="#id6"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6"><span class="section-number">2.1. </span>基本驱动程序</a><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动基本的驱动程序：</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_support robot_interface_lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx has_gripper:<span class="o">=</span><span class="nb">false</span> rviz2:<span class="o">=</span><span class="nb">true</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_support<span class="w"> </span>robot_interface_lm3.launch.py<span class="w"> </span>robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx<span class="w"> </span>has_gripper:<span class="o">=</span><span class="nb">false</span><span class="w"> </span>rviz2:<span class="o">=</span><span class="nb">true</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -241,15 +245,15 @@
 </ul>
 </div></blockquote>
 <p>运行成功后，您可以打开另一个终端，并通过命令行查看。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 topic list
-ros2 service list
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list
+ros2<span class="w"> </span>service<span class="w"> </span>list
 </pre></div>
 </div>
 </section>
 <section id="moveit">
-<h2><a class="toc-backref" href="#id7"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7"><span class="section-number">2.2. </span><code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> 程序</a><a class="headerlink" href="#moveit" title="Permalink to this heading">¶</a></h2>
 <p>按照如下方式启动 <a class="reference external" href="https://moveit.ros.org/">MoveIt</a> 驱动程序：</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2 launch lebai_lm3_moveit_config lm3.launch.py robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span>robot_ip:<span class="o">=</span>xxx.xxx.xxx.xxx
 </pre></div>
 </div>
 <div class="admonition note">
