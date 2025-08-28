@@ -1,5 +1,5 @@
-import roslib
-#  roslib.load_manifest('urdfdom_py')
+# import roslib
+# roslib.load_manifest('urdfdom_py')
 # import urdfdom_py
 
 from urdf_parser_py.urdf import URDF
