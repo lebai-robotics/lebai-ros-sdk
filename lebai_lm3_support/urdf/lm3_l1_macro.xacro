@@ -58,33 +58,62 @@
 <xacro:property name="joint5_vel_limit" value="3.14" />
 <xacro:property name="joint6_vel_limit" value="3.14" />
 
-<xacro:macro name="lebai_lm3" params="prefix">
+<!-- Debug geometry sizes (used when use_simple_geometries:=true) -->
+<xacro:property name="debug_box_base" value="0.25 0.25 0.12" />
+<xacro:property name="debug_box_link1" value="0.12 0.12 0.25" />
+<xacro:property name="debug_box_link2" value="0.08 0.08 0.45" />
+<xacro:property name="debug_box_link3" value="0.07 0.07 0.40" />
+<xacro:property name="debug_box_link4" value="0.06 0.06 0.20" />
+<xacro:property name="debug_box_link5" value="0.06 0.06 0.18" />
+<xacro:property name="debug_box_link6" value="0.06 0.06 0.15" />
+
+<xacro:macro name="lebai_lm3" params="prefix use_simple_geometries:=false">
 
 
 <!-- link list -->
 <link name="${prefix}base_link">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_base}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_base}"/>
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_base}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_base}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
 </link>
 <link name="${prefix}link_1">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link1}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link1}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link1}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link1}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
 
@@ -100,13 +129,23 @@
 <link name="${prefix}link_2">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link2}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link2}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link2}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link2}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
 
@@ -122,13 +161,23 @@
 <link name="${prefix}link_3">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link3}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link3}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link3}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link3}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
 
@@ -145,13 +194,23 @@
 <link name="${prefix}link_4">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link4}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link4}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link4}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link4}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
 
@@ -167,13 +226,23 @@
 <link name="${prefix}link_5">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link5}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link5}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link5}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link5}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
     <inertial>
@@ -188,13 +257,23 @@
 <link name="${prefix}link_6">
 	<visual>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link6}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${visual_link6}" />
+			</xacro:unless>
 		</geometry>
     	<xacro:material_white name="white"/>
 	</visual>
 	<collision>
 		<geometry>
+			<xacro:if value="${use_simple_geometries}">
+				<box size="${debug_box_link6}" />
+			</xacro:if>
+			<xacro:unless value="${use_simple_geometries}">
 			<mesh filename="${collision_link6}" />
+			</xacro:unless>
 		</geometry>
 	</collision>
     <inertial>
@@ -207,8 +286,25 @@
     </inertial>
 </link>
 
-<link name="${prefix}base" />
-<link name="${prefix}tool0"/>
+<!-- Note: Empty links crash MoveIt Setup Assistant on WSL. Adding tiny invisible geometry. -->
+<link name="${prefix}base">
+  <visual>
+    <geometry><box size="0.001 0.001 0.001"/></geometry>
+    <material name="invisible"><color rgba="0 0 0 0"/></material>
+  </visual>
+  <collision>
+    <geometry><box size="0.001 0.001 0.001"/></geometry>
+  </collision>
+</link>
+<link name="${prefix}tool0">
+  <visual>
+    <geometry><box size="0.001 0.001 0.001"/></geometry>
+    <material name="invisible"><color rgba="0 0 0 0"/></material>
+  </visual>
+  <collision>
+    <geometry><box size="0.001 0.001 0.001"/></geometry>
+  </collision>
+</link>
 <!-- end of link list -->
 
 

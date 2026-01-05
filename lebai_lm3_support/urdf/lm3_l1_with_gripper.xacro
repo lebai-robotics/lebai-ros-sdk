@@ -1,14 +1,11 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lebai_lm3">  
-  	<link name="world"/>  
+<!-- Note: Do NOT add a 'world' link here - it causes crashes in MoveIt Setup Assistant on WSL.
+     Instead, use a virtual_joint in the SRDF to attach the robot to the world frame. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lebai_lm3">
 	<xacro:include filename="$(find lebai_lm3_support)/urdf/lm3_l1_macro.xacro"/>
 	<xacro:include filename="$(find lebai_lm3_support)/urdf/gripper_macro.xacro"/>
   	<xacro:lebai_lm3 prefix=""/>
 	<xacro:lebai_gripper prefix=""/>
-  	<joint name="fixed_robot" type="fixed">
-    	<parent link="world"/>
-    	<child link="base_link"/>
-  	</joint>
   	<joint name="fixed_gripper" type="fixed">
     	<parent link="tool0"/>
     	<child link="gripper_base_link"/>
