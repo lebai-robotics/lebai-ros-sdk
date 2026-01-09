@@ -12,15 +12,15 @@
 <xacro:property name="a2" value="-0.28" />
 <xacro:property name="a3" value="-0.26"/> -->
 <!-- Robot visual and  collision dir-->
-<xacro:property name="gripper_visual_base" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_base.gltf" />
-<xacro:property name="gripper_visual_link1" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link1.gltf" />
-<xacro:property name="gripper_visual_link2" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link2.gltf" />
-<xacro:property name="gripper_visual_link_finger" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link_finger.dagltfe" />
+<xacro:property name="gripper_visual_base" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_base.dae" />
+<xacro:property name="gripper_visual_link1" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link1.dae" />
+<xacro:property name="gripper_visual_link2" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link2.dae" />
+<xacro:property name="gripper_visual_link_finger" value="package://lebai_lm3_support/meshes/gripper/visual/gripper_link_finger.dae" />
 
-<xacro:property name="gripper_collision_base" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_base.gltf" />
-<xacro:property name="gripper_collision_link1" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link1.gltf" />
-<xacro:property name="gripper_collision_link2" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link2.gltf" />
-<xacro:property name="gripper_collision_link_finger" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link_finger.gltf" />
+<xacro:property name="gripper_collision_base" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_base.dae" />
+<xacro:property name="gripper_collision_link1" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link1.dae" />
+<xacro:property name="gripper_collision_link2" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link2.dae" />
+<xacro:property name="gripper_collision_link_finger" value="package://lebai_lm3_support/meshes/gripper/collision/gripper_link_finger.dae" />
 
 
 <xacro:macro name="lebai_gripper" params="prefix">
