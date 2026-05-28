@@ -10,6 +10,9 @@ class FakeRobot:
         self.analog_outputs = {}
         self.dio_modes = {}
         self.claw = FakeClawData()
+        self.next_motion_id = 100
+        self.running_motion_id = 0
+        self.motion_states = {}
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -45,6 +48,51 @@ class FakeRobot:
 
     def reboot(self):
         self._record('reboot')
+
+    def movej(self, target, acceleration, velocity, time, blend_radius):
+        self._record('movej', target, acceleration, velocity, time, blend_radius)
+        return self._next_motion_id()
+
+    def movel(self, target, acceleration, velocity, time, blend_radius):
+        self._record('movel', target, acceleration, velocity, time, blend_radius)
+        return self._next_motion_id()
+
+    def movec(self, via, target, rad, acceleration, velocity, time, blend_radius):
+        self._record('movec', via, target, rad, acceleration, velocity, time, blend_radius)
+        return self._next_motion_id()
+
+    def speedj(self, acceleration, velocities, time=0.0):
+        self._record('speedj', acceleration, velocities, time)
+        return self._next_motion_id()
+
+    def speedl(self, acceleration, velocity, time=0.0, reference=None):
+        self._record('speedl', acceleration, velocity, time, reference)
+        return self._next_motion_id()
+
+    def move_pvat(self, positions, velocities, accelerations, duration):
+        self._record('move_pvat', positions, velocities, accelerations, duration)
+
+    def wait_move(self, motion_id=0):
+        self._record('wait_move', motion_id)
+
+    def stop_move(self):
+        self._record('stop_move')
+
+    def skip_move(self):
+        self._record('skip_move')
+
+    def get_running_motion(self):
+        self._record('get_running_motion')
+        return self.running_motion_id
+
+    def get_motion_state(self, motion_id):
+        self._record('get_motion_state', motion_id)
+        return self.motion_states.get(motion_id, '')
+
+    def _next_motion_id(self):
+        motion_id = self.next_motion_id
+        self.next_motion_id += 1
+        return motion_id
 
     def set_do(self, device, pin, value):
         self._record('set_do', device, pin, value)
