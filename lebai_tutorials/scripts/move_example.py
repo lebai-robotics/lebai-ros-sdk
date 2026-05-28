@@ -2,84 +2,67 @@
 
 import rclpy
 from rclpy.node import Node
+from lebai_interfaces.msg import MotionParams, MotionTarget
 from lebai_interfaces.srv import MoveJoint
-from lebai_interfaces.srv import MoveLine
-from geometry_msgs.msg import Point
-from geometry_msgs.msg import Quaternion
+from lebai_interfaces.srv import MoveLinear
 
 
 class MoveExample(Node):
     def __init__(self):
         super().__init__('move_example')
 
-    def SendMoveJoint(self):
-        move_joint_srv = self.create_client(
-            MoveJoint, '/motion_service/move_joint')
-        while not move_joint_srv.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service "move_joint" not available, waiting...')
+    def send_move_joint(self):
+        srv = self.create_client(MoveJoint, '/lebai/motion/movej')
+        while not srv.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service "motion/movej" not available, waiting...')
         req = MoveJoint.Request()
-        req.is_joint_pose = True
-        req.joint_pose = [-0.516, -1.384, 0.932, -1.084, -0.833, -0.792]
-        req.common.vel = 0.1
-        req.common.acc = 1.0
-        req.common.radius = 0.0
-        future = move_joint_srv.call_async(req)
+        req.target = MotionTarget(
+            is_joint_pose=True,
+            joint_positions=[-0.516, -1.384, 0.932, -1.084, -0.833, -0.792],
+        )
+        req.params = MotionParams(acceleration=1.0, velocity=0.1)
+        self._call(srv, req, 'motion/movej')
+
+    def send_move_linear(self):
+        srv = self.create_client(MoveLinear, '/lebai/motion/movel')
+        while not srv.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service "motion/movel" not available, waiting...')
+        req = MoveLinear.Request()
+        req.target.is_joint_pose = False
+        req.target.cartesian_pose.x = 0.022
+        req.target.cartesian_pose.y = 0.473
+        req.target.cartesian_pose.z = 0.431
+        req.target.cartesian_pose.rx = 0.918
+        req.target.cartesian_pose.ry = 0.128
+        req.target.cartesian_pose.rz = -0.364
+        req.params = MotionParams(acceleration=1.0, velocity=0.1)
+        self._call(srv, req, 'motion/movel')
+
+    def _call(self, srv, req, label):
+        future = srv.call_async(req)
         while rclpy.ok():
             rclpy.spin_once(self)
             if future.done():
                 try:
                     future.result()
                 except Exception as e:
-                    self.get_logger().info(
-                        'Service "move_joint" call failed %r' % (e,))
+                    self.get_logger().info('Service "%s" failed %r' % (label, e))
                 else:
-                    self.get_logger().info(
-                        'Service "move_joint" call succeed.')
-                break
-
-    def SendMoveLine(self):
-        move_line_srv = self.create_client(
-            MoveLine, '/motion_service/move_line')
-        while not move_line_srv.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service "move_line" not available, waiting...')
-        req = MoveLine.Request()
-        req.is_joint_pose = False
-        req.cartesian_pose.position.x = 0.022
-        req.cartesian_pose.position.y = 0.473
-        req.cartesian_pose.position.z = 0.431
-        req.cartesian_pose.orientation.x = 0.918
-        req.cartesian_pose.orientation.y = 0.128
-        req.cartesian_pose.orientation.z = -0.364
-        req.cartesian_pose.orientation.w = -0.091
-        req.common.vel = 0.1
-        req.common.acc = 1.0
-        req.common.radius = 0.0
-        future = move_line_srv.call_async(req)
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if future.done():
-                try:
-                    future.result()
-                except Exception as e:
-                    self.get_logger().info(
-                        'Service "move_line" call failed %r' % (e,))
-                else:
-                    self.get_logger().info(
-                        'Service "move_line" call succeed.')
+                    self.get_logger().info('Service "%s" succeeded.' % label)
                 break
 
 
-def Run():
+def run():
     move_example = MoveExample()
-    move_example.SendMoveJoint()
-    move_example.SendMoveLine()
-    # SendMoveCircle()
+    move_example.send_move_joint()
+    move_example.send_move_linear()
+    move_example.destroy_node()
     return
 
 
 def main():
     rclpy.init()
-    Run()
+    run()
     rclpy.shutdown()
 
 

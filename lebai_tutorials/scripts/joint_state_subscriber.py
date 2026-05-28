@@ -11,7 +11,7 @@ class JointStateSubscriber(Node):
         super().__init__('joint_state_subscriber')
         self.subscription = self.create_subscription(
             JointState,
-            'joint_states',
+            '/lebai/status/joint_states',
             self.joint_state_callback,
             10)
         self.subscription  # prevent unused variable warning
