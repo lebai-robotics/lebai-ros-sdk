@@ -18,7 +18,7 @@ setup(
         (os.path.join('share', package_name, 'config'),
          glob(os.path.join('config', '*.yaml'))),
     ],
-    # install_requires=['setuptools'],
+    install_requires=['setuptools', 'pylebai'],
     zip_safe=True,
     maintainer='liufang',
     maintainer_email='liufang_robot@outlook.com',
@@ -27,10 +27,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'robot_state = lebai_driver.robot_state.robot_state_node:main',
-            'io_service = lebai_driver.io_service.io_service_node:main',
-            'system_service = lebai_driver.system_service.system_service_node:main',
-            'motion = lebai_driver.motion.motion_node:main',
+            'driver = lebai_driver.driver_node:main',
+            'discovery = lebai_driver.discovery_node:main',
+            'serial_gripper = lebai_driver.serial_gripper_node:main',
         ],
     },
 )
