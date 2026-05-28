@@ -315,6 +315,26 @@ class FakeDiscovery:
         return self.controllers
 
 
+class FakeControllerInfo:
+    def __init__(
+        self,
+        hostname='',
+        ip_address='',
+        mac_address='',
+        model='',
+        ds_version='',
+        rc_version='',
+        id='',
+    ):
+        self.hostname = hostname
+        self.ip_address = ip_address
+        self.mac_address = mac_address
+        self.model = model
+        self.ds_version = ds_version
+        self.rc_version = rc_version
+        self.id = id
+
+
 class FakeStandaloneGripper:
     def __init__(self):
         self.calls = []
