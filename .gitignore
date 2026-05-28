@@ -24,6 +24,8 @@ devel_isolated/
 # Ignore generated docs
 *.dox
 *.wikidoc
+site/
+docs/_build/
 
 # eclipse stuff
 .project
