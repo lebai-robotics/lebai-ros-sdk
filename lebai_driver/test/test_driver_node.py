@@ -1,0 +1,32 @@
+import rclpy
+
+from fakes import FakeRobotFactory
+
+
+def test_driver_node_declares_runtime_parameters():
+    from lebai_driver.driver_node import LebaiDriverNode
+
+    rclpy.init()
+    node = None
+    try:
+        node = LebaiDriverNode(robot_factory=FakeRobotFactory())
+
+        expected_names = {
+            'robot_ip',
+            'simulator',
+            'joint_names',
+            'namespace',
+            'joint_state_publish_rate',
+            'robot_state_publish_rate',
+            'joint_motion_publish_rate',
+            'io_state_publish_rate',
+            'gripper_state_publish_rate',
+        }
+
+        for name in expected_names:
+            assert node.has_parameter(name)
+        assert node.get_name() == 'lebai_driver'
+    finally:
+        if node is not None:
+            node.destroy_node()
+        rclpy.shutdown()
