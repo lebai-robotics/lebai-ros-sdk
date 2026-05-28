@@ -1,0 +1,83 @@
+name: ROS2 Humble CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - humble-dev
+      - dev/refactor-pylebai-ros2-core
+
+permissions:
+  contents: read
+
+jobs:
+  humble:
+    name: Humble unit and simulator tests
+    runs-on: ubuntu-22.04
+    container:
+      image: ros:humble-ros-base
+      options: --user 0
+    services:
+      lmaster:
+        image: registry.cn-shanghai.aliyuncs.com/lebai/l-master:3.1.6
+        options: >-
+          --health-cmd="curl -f http://localhost:8080 || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          apt-get update
+          apt-get install -y \
+            curl \
+            git \
+            python3-colcon-common-extensions \
+            python3-pip \
+            python3-pytest \
+            python3-rosdep \
+            python3-vcstool
+          if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+            rosdep init
+          fi
+          rosdep update
+          python3 -m pip install pylebai
+          rosdep install \
+            --from-paths lebai_interfaces lebai_driver lebai_tutorials \
+            --ignore-src \
+            --rosdistro humble \
+            --skip-keys pylebai \
+            -y
+
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          source /opt/ros/humble/setup.bash
+          colcon build \
+            --packages-select lebai_interfaces lebai_driver lebai_tutorials \
+            --symlink-install
+
+      - name: Run unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          source install/setup.bash
+          python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
+
+      - name: Run simulator smoke tests
+        shell: bash
+        env:
+          LEBAI_TEST_ROBOT_IP: ""
+        run: |
+          set -euo pipefail
+          source install/setup.bash
+          export LEBAI_TEST_ROBOT_IP="$(getent hosts lmaster | awk '{print $1}')"
+          python3 -m pytest lebai_driver/test/test_simulator_smoke.py -q -m integration
