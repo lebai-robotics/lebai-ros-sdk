@@ -4,6 +4,11 @@ class FakeRobot:
         self.simulator = simulator
         self.calls = []
         self.exceptions = {}
+        self.digital_inputs = {}
+        self.digital_outputs = {}
+        self.analog_inputs = {}
+        self.analog_outputs = {}
+        self.dio_modes = {}
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -39,6 +44,38 @@ class FakeRobot:
 
     def reboot(self):
         self._record('reboot')
+
+    def set_do(self, device, pin, value):
+        self._record('set_do', device, pin, value)
+        self.digital_outputs[(device, pin)] = bool(value)
+
+    def get_di(self, device, pin):
+        self._record('get_di', device, pin)
+        return self.digital_inputs.get((device, pin), False)
+
+    def get_do(self, device, pin):
+        self._record('get_do', device, pin)
+        return self.digital_outputs.get((device, pin), False)
+
+    def set_ao(self, device, pin, value):
+        self._record('set_ao', device, pin, value)
+        self.analog_outputs[(device, pin)] = value
+
+    def get_ai(self, device, pin):
+        self._record('get_ai', device, pin)
+        return self.analog_inputs.get((device, pin), 0.0)
+
+    def get_ao(self, device, pin):
+        self._record('get_ao', device, pin)
+        return self.analog_outputs.get((device, pin), 0.0)
+
+    def set_dio_mode(self, device, pin, is_output):
+        self._record('set_dio_mode', device, pin, is_output)
+        self.dio_modes[(device, pin)] = bool(is_output)
+
+    def get_dio_mode(self, device, pin):
+        self._record('get_dio_mode', device, pin)
+        return self.dio_modes.get((device, pin), False)
 
 
 class FakeRobotFactory:
