@@ -3,9 +3,42 @@ class FakeRobot:
         self.robot_ip = robot_ip
         self.simulator = simulator
         self.calls = []
+        self.exceptions = {}
+
+    def _record(self, name, *args, **kwargs):
+        self.calls.append((name, args, kwargs))
+        if name in self.exceptions:
+            raise self.exceptions[name]
 
     def start_sys(self):
-        self.calls.append(('start_sys', (), {}))
+        self._record('start_sys')
+
+    def stop_sys(self):
+        self._record('stop_sys')
+
+    def powerdown(self):
+        self._record('powerdown')
+
+    def stop(self):
+        self._record('stop')
+
+    def estop(self):
+        self._record('estop')
+
+    def start_teach_mode(self):
+        self._record('start_teach_mode')
+
+    def end_teach_mode(self):
+        self._record('end_teach_mode')
+
+    def pause_move(self):
+        self._record('pause_move')
+
+    def resume_move(self):
+        self._record('resume_move')
+
+    def reboot(self):
+        self._record('reboot')
 
 
 class FakeRobotFactory:
@@ -15,6 +48,15 @@ class FakeRobotFactory:
     def __call__(self, robot_ip, simulator=False):
         self.calls.append((robot_ip, simulator))
         return FakeRobot(robot_ip=robot_ip, simulator=simulator)
+
+
+class FakeNode:
+    def __init__(self):
+        self.services = []
+
+    def create_service(self, srv_type, name, callback):
+        self.services.append((srv_type, name, callback))
+        return callback
 
 
 class FakeDiscovery:
