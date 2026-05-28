@@ -1,3 +1,6 @@
+from builtin_interfaces.msg import Time
+
+
 class FakeRobot:
     def __init__(self, robot_ip='127.0.0.1', simulator=False):
         self.robot_ip = robot_ip
@@ -13,6 +16,19 @@ class FakeRobot:
         self.next_motion_id = 100
         self.running_motion_id = 0
         self.motion_states = {}
+        self.robot_state = 0
+        self.estop_reason = 0
+        self.disconnected = False
+        self.down = False
+        self.actual_joint_positions = []
+        self.target_joint_positions = []
+        self.actual_joint_speed = []
+        self.target_joint_speed = []
+        self.actual_joint_torques = []
+        self.target_joint_torques = []
+        self.actual_tcp_pose = {}
+        self.target_tcp_pose = {}
+        self.actual_flange_pose = {}
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -94,6 +110,60 @@ class FakeRobot:
         self.next_motion_id += 1
         return motion_id
 
+    def get_robot_state(self):
+        self._record('get_robot_state')
+        return self.robot_state
+
+    def get_estop_reason(self):
+        self._record('get_estop_reason')
+        return self.estop_reason
+
+    def is_disconnected(self):
+        self._record('is_disconnected')
+        return self.disconnected
+
+    def is_down(self):
+        self._record('is_down')
+        return self.down
+
+    def get_actual_joint_positions(self):
+        self._record('get_actual_joint_positions')
+        return self.actual_joint_positions
+
+    def get_target_joint_positions(self):
+        self._record('get_target_joint_positions')
+        return self.target_joint_positions
+
+    def get_actual_joint_speed(self):
+        self._record('get_actual_joint_speed')
+        return self.actual_joint_speed
+
+    def get_target_joint_speed(self):
+        self._record('get_target_joint_speed')
+        return self.target_joint_speed
+
+    def get_actual_joint_torques(self):
+        self._record('get_actual_joint_torques')
+        return self.actual_joint_torques
+
+    def get_target_joint_torques(self):
+        self._record('get_target_joint_torques')
+        return self.target_joint_torques
+
+    def get_actual_tcp_pose(self):
+        self._record('get_actual_tcp_pose')
+        return self.actual_tcp_pose
+
+    def get_target_tcp_pose(self):
+        self._record('get_target_tcp_pose')
+        return self.target_tcp_pose
+
+    def get_kin_data(self):
+        self._record('get_kin_data')
+        return FakeJointMotionData(
+            actual_flange_pose=self.actual_flange_pose,
+        )
+
     def set_do(self, device, pin, value):
         self._record('set_do', device, pin, value)
         self.digital_outputs[(device, pin)] = bool(value)
@@ -146,6 +216,11 @@ class FakeClawData:
         self.hold_on = hold_on
 
 
+class FakeJointMotionData:
+    def __init__(self, actual_flange_pose=None):
+        self.actual_flange_pose = actual_flange_pose or {}
+
+
 class FakeRobotFactory:
     def __init__(self):
         self.calls = []
@@ -158,10 +233,76 @@ class FakeRobotFactory:
 class FakeNode:
     def __init__(self):
         self.services = []
+        self.publishers = []
+        self.timers = []
+        self._now = Time(sec=12, nanosec=34)
 
     def create_service(self, srv_type, name, callback):
         self.services.append((srv_type, name, callback))
         return callback
+
+    def create_publisher(self, msg_type, name, depth):
+        publisher = FakePublisher(msg_type, name, depth)
+        self.publishers.append(publisher)
+        return publisher
+
+    def create_timer(self, period, callback):
+        timer = FakeTimer(period, callback)
+        self.timers.append(timer)
+        return timer
+
+    def get_clock(self):
+        return FakeClock(self._now)
+
+    def get_parameter(self, name):
+        values = {
+            'joint_names': ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6'],
+            'joint_state_publish_rate': 20.0,
+            'robot_state_publish_rate': 10.0,
+            'joint_motion_publish_rate': 20.0,
+            'io_state_publish_rate': 10.0,
+            'gripper_state_publish_rate': 10.0,
+            'io_state_device': 'robot',
+            'io_state_digital_input_count': 0,
+            'io_state_digital_output_count': 0,
+            'io_state_analog_input_count': 0,
+            'io_state_analog_output_count': 0,
+            'io_state_dio_count': 0,
+        }
+        return FakeParameter(values[name])
+
+
+class FakePublisher:
+    def __init__(self, msg_type, name, depth):
+        self.msg_type = msg_type
+        self.name = name
+        self.depth = depth
+        self.messages = []
+
+    def publish(self, message):
+        self.messages.append(message)
+
+
+class FakeTimer:
+    def __init__(self, period, callback):
+        self.period = period
+        self.callback = callback
+
+
+class FakeParameter:
+    def __init__(self, value):
+        self.value = value
+
+
+class FakeClock:
+    def __init__(self, message):
+        self.message = message
+
+    def now(self):
+        return self
+
+    def to_msg(self):
+        return self.message
 
 
 class FakeDiscovery:
