@@ -17,4 +17,10 @@ DEFAULT_PARAMETERS = {
     'joint_motion_publish_rate': 20.0,
     'io_state_publish_rate': 10.0,
     'gripper_state_publish_rate': 10.0,
+    'io_state_device': 'robot',
+    'io_state_digital_input_count': 0,
+    'io_state_digital_output_count': 0,
+    'io_state_analog_input_count': 0,
+    'io_state_analog_output_count': 0,
+    'io_state_dio_count': 0,
 }

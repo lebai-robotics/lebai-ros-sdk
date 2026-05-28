@@ -21,6 +21,12 @@ def test_driver_node_declares_runtime_parameters():
             'joint_motion_publish_rate',
             'io_state_publish_rate',
             'gripper_state_publish_rate',
+            'io_state_device',
+            'io_state_digital_input_count',
+            'io_state_digital_output_count',
+            'io_state_analog_input_count',
+            'io_state_analog_output_count',
+            'io_state_dio_count',
         }
 
         for name in expected_names:
