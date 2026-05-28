@@ -1,0 +1,6 @@
+float64 acceleration
+float64[] velocities
+float64 time
+---
+lebai_interfaces/Result result
+uint32 motion_id

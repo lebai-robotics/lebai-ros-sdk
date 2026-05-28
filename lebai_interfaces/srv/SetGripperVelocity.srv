@@ -1,0 +1,4 @@
+uint32 velocity
+bool persistent
+---
+lebai_interfaces/Result result

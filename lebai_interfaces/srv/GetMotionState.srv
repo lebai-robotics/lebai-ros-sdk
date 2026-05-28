@@ -1,0 +1,4 @@
+uint32 motion_id
+---
+lebai_interfaces/Result result
+string state

@@ -1,0 +1,5 @@
+string device
+uint32 pin
+float64 value
+---
+lebai_interfaces/Result result

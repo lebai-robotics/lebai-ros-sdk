@@ -1,0 +1,12 @@
+std_msgs/Header header
+bool connected
+float64[] actual_joint_positions
+float64[] target_joint_positions
+float64[] actual_joint_speed
+float64[] target_joint_speed
+float64[] actual_joint_torques
+float64[] target_joint_torques
+lebai_interfaces/CartesianPose actual_tcp_pose
+lebai_interfaces/CartesianPose target_tcp_pose
+lebai_interfaces/CartesianPose actual_flange_pose
+string message
