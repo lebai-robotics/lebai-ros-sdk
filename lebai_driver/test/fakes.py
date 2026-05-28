@@ -336,8 +336,60 @@ class FakeControllerInfo:
 
 
 class FakeStandaloneGripper:
-    def __init__(self):
+    def __init__(self, port_name='/dev/ttyUSB0'):
+        self.port_name = port_name
         self.calls = []
+        self.exceptions = {}
+        self.position = 0
+        self.force = 0
+        self.velocity = 0
+        self.persistent_velocity = 0
+        self.calibrated = False
 
-    def move(self, position):
-        self.calls.append(('move', (position,), {}))
+    def _record(self, name, *args, **kwargs):
+        self.calls.append((name, args, kwargs))
+        if name in self.exceptions:
+            raise self.exceptions[name]
+
+    def set_position(self, position):
+        self._record('set_position', position)
+        self.position = position
+
+    def get_current_position(self):
+        self._record('get_current_position')
+        return self.position
+
+    def set_force(self, force):
+        self._record('set_force', force)
+        self.force = force
+
+    def get_current_force(self):
+        self._record('get_current_force')
+        return self.force
+
+    def set_velocity(self, velocity, persistent):
+        self._record('set_velocity', velocity, persistent)
+        if persistent:
+            self.persistent_velocity = velocity
+        else:
+            self.velocity = velocity
+
+    def get_current_velocity(self, persistent):
+        self._record('get_current_velocity', persistent)
+        if persistent:
+            return self.persistent_velocity
+        return self.velocity
+
+    def do_calibration(self):
+        self._record('do_calibration')
+        self.calibrated = True
+
+    def is_calibrated(self):
+        self._record('is_calibrated')
+        return self.calibrated
+
+    def turn_on_auto_calibration(self):
+        self._record('turn_on_auto_calibration')
+
+    def turn_off_auto_calibration(self):
+        self._record('turn_off_auto_calibration')
