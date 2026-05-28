@@ -9,6 +9,7 @@ class FakeRobot:
         self.analog_inputs = {}
         self.analog_outputs = {}
         self.dio_modes = {}
+        self.claw = FakeClawData()
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -76,6 +77,25 @@ class FakeRobot:
     def get_dio_mode(self, device, pin):
         self._record('get_dio_mode', device, pin)
         return self.dio_modes.get((device, pin), False)
+
+    def init_claw(self, force_initialization=False):
+        self._record('init_claw', force_initialization)
+
+    def set_claw(self, force, amplitude):
+        self._record('set_claw', force, amplitude)
+        self.claw.force = force
+        self.claw.amplitude = amplitude
+
+    def get_claw(self):
+        self._record('get_claw')
+        return self.claw
+
+
+class FakeClawData:
+    def __init__(self, force=0.0, amplitude=0.0, hold_on=False):
+        self.force = force
+        self.amplitude = amplitude
+        self.hold_on = hold_on
 
 
 class FakeRobotFactory:
