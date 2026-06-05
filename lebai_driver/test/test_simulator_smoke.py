@@ -17,7 +17,7 @@ def test_driver_talks_to_simulator_topics_and_services():
 
     from lebai_driver.driver_node import LebaiDriverNode
     from lebai_interfaces.msg import RobotState
-    from lebai_interfaces.srv import Command, GetRunningMotion
+    from lebai_interfaces.srv import Command, GetClaw, GetRunningMotion, SetClaw
     from sensor_msgs.msg import JointState
 
     args = [
@@ -65,6 +65,39 @@ def test_driver_talks_to_simulator_topics_and_services():
             GetRunningMotion.Request(),
         )
         assert running_motion.result.success is True
+
+        claw_before = _call_service(
+            executor,
+            probe,
+            GetClaw,
+            '/lebai/claw/get_claw',
+            GetClaw.Request(),
+        )
+        assert claw_before.result.success is True
+        assert claw_before.state.connected is True
+
+        set_claw_request = SetClaw.Request()
+        set_claw_request.force = 50.0
+        set_claw_request.amplitude = 40.0
+        set_claw_result = _call_service(
+            executor,
+            probe,
+            SetClaw,
+            '/lebai/claw/set_claw',
+            set_claw_request,
+        )
+        assert set_claw_result.result.success is True
+
+        claw_after = _call_service(
+            executor,
+            probe,
+            GetClaw,
+            '/lebai/claw/get_claw',
+            GetClaw.Request(),
+        )
+        assert claw_after.result.success is True
+        assert claw_after.state.force == pytest.approx(50.0)
+        assert claw_after.state.amplitude == pytest.approx(40.0)
 
         if os.environ.get('LEBAI_TEST_START_STOP') == '1':
             start_result = _call_command(
