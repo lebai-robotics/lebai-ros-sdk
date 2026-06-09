@@ -45,7 +45,7 @@ Develop on topic branches and open pull requests into the matching distro
 branch. Current active target:
 
 ```text
-dev/refactor-pylebai-ros2-core -> humble-dev
+humble-dev-refactor -> humble-dev
 ```
 
 Future distro branches should carry distro-specific fixes instead of mixing

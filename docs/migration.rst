@@ -1,49 +1,103 @@
-Migration
-=========
+旧版本用户迁移
+==============
 
-This refactor is intentionally a breaking ROS API change.
+如果你使用过旧版 ``lebai-ros-sdk``，升级后主要需要修改启动命令、topic 名称、
+service 名称和接口类型。
 
-What Changed
+启动方式
+--------
+
+使用新的主驱动 launch：
+
+.. code-block:: bash
+
+   ros2 launch lebai_driver driver.launch.py robot_ip:=192.168.1.100
+
+旧的分散 launch 文件不再作为推荐入口使用。状态、运动、IO 和 claw 服务都由
+主驱动节点提供。
+
+命名空间
+--------
+
+默认命名空间是 ``/lebai``。如果你以前在代码里写死了旧 topic 或 service
+路径，需要改成新的路径：
+
+.. code-block:: text
+
+   /lebai/<category>/<name>
+
+例如：
+
+.. code-block:: text
+
+   /lebai/status/robot
+   /lebai/motion/movej
+   /lebai/io/set_do
+   /lebai/claw/set_claw
+
+常用名称替换
 ------------
-
-- ROS1 support is not part of active branches.
-- C++ runtime driver code has been removed from the active driver path.
-- Runtime controller access now uses released ``pylebai``.
-- Old service and topic names are not preserved.
-- Motion actions are deferred; phase 1 uses services.
-- MoveIt configuration remains present but is deferred for redesign.
-
-Old Package Concepts
---------------------
-
-The old runtime split used categories such as ``robot_state``, ``io_service``,
-``system_service``, and ``motion``. The new API follows the SDK categories
-instead:
 
 .. list-table::
    :header-rows: 1
 
-   * - Old concept
-     - New category
+   * - 旧概念
+     - 新用法
    * - ``system_service``
-     - ``start_stop``
-   * - ``motion``
-     - ``motion``
+     - 使用 ``/lebai/start_stop/...`` 服务。
    * - ``robot_state``
-     - ``status``
+     - 订阅 ``/lebai/status/...`` topic。
    * - ``io_service``
-     - ``io`` and ``claw``
-   * - standalone gripper package
-     - ``gripper`` through ``pylebai``
+     - 使用 ``/lebai/io/...`` 和 ``/lebai/claw/...`` 服务。
+   * - 旧 gripper 包
+     - 使用 ``serial_gripper.launch.py`` 和 ``/lebai/gripper/...`` 服务。
 
-Migration Checklist
--------------------
+运动接口
+--------
 
-1. Replace old service names with the new ``/lebai/<sdk-category>/...`` paths.
-2. Replace old message and service types with the phase-1
-   ``lebai_interfaces`` types.
-3. Replace action clients with service calls for phase 1.
-4. Use ``CartesianPose`` fields ``x``, ``y``, ``z``, ``rx``, ``ry``, ``rz``
-   instead of ``geometry_msgs/Pose`` for SDK-style Cartesian data.
-5. Move direct gripper serial code to the standalone gripper node where
-   supported by released ``pylebai``.
+Phase 1 使用 service 调用运动接口。典型调用：
+
+.. code-block:: bash
+
+   ros2 service call /lebai/motion/movej lebai_interfaces/srv/MoveJoint "{
+     target: {
+       is_joint_pose: true,
+       joint_positions: [0.0, -0.5, 0.5, 0.0, 0.5, 0.0]
+     },
+     params: {
+       acceleration: 0.5,
+       velocity: 0.5,
+       time: 0.0,
+       blend_radius: 0.0
+     }
+   }"
+
+如果你的旧程序使用 action client，需要先改成 service client。
+
+笛卡尔数据
+----------
+
+SDK 风格的笛卡尔数据使用 ``lebai_interfaces/msg/CartesianPose``：
+
+.. code-block:: text
+
+   x
+   y
+   z
+   rx
+   ry
+   rz
+
+不要在新的运动 service 中直接传 ``geometry_msgs/Pose``。
+
+模型和 TF
+---------
+
+启动驱动后默认发布机器人模型和 TF：
+
+.. code-block:: bash
+
+   ros2 topic echo /lebai/model/joint_states
+   ros2 topic echo /tf
+
+如果旧工程单独启动 ``robot_state_publisher``，请确认不要重复发布相同模型。

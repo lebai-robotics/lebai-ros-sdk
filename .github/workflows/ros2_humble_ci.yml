@@ -3,10 +3,11 @@ name: ROS2 Humble CI
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+      - humble-dev-refactor
   push:
     branches:
-      - humble-dev
-      - dev/refactor-pylebai-ros2-core
+      - humble-dev-refactor
 
 permissions:
   contents: read
@@ -20,7 +21,7 @@ jobs:
       options: --user 0
     services:
       lmaster:
-        image: registry.cn-shanghai.aliyuncs.com/lebai/l-master:3.1.6
+        image: registry.cn-shanghai.aliyuncs.com/lebai/l-master:latest
         options: >-
           --health-cmd="curl -f http://localhost:8080 || exit 1"
           --health-interval=10s
