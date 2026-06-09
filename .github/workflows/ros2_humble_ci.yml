@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          set -euo pipefail
+          set -eo pipefail
           apt-get update
           apt-get install -y \
             curl \
@@ -51,7 +51,7 @@ jobs:
           rosdep update
           python3 -m pip install pylebai
           rosdep install \
-            --from-paths lebai_interfaces lebai_driver lebai_tutorials \
+            --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \
             --rosdistro humble \
             --skip-keys pylebai \
@@ -60,25 +60,26 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          set -euo pipefail
+          set -eo pipefail
           source /opt/ros/humble/setup.bash
           colcon build \
-            --packages-select lebai_interfaces lebai_driver lebai_tutorials \
+            --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --symlink-install
 
       - name: Run unit tests
         shell: bash
         run: |
-          set -euo pipefail
+          set -eo pipefail
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
+          python3 -m pytest lebai_lm3_support/test -q
 
       - name: Run simulator smoke tests
         shell: bash
         env:
           LEBAI_TEST_ROBOT_IP: ""
         run: |
-          set -euo pipefail
+          set -eo pipefail
           source install/setup.bash
           export LEBAI_TEST_ROBOT_IP="$(getent hosts lmaster | awk '{print $1}')"
           python3 -m pytest lebai_driver/test/test_simulator_smoke.py -q -m integration
