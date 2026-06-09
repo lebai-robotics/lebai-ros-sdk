@@ -132,10 +132,27 @@ def gripper_joint_state_from_claw(robot, joint_name):
     return message
 
 
+def model_joint_state_from_sdk(robot, joint_names, gripper_joint_name):
+    message = joint_state_from_sdk(robot, joint_names)
+    gripper_joint_state = gripper_joint_state_from_claw(robot, gripper_joint_name)
+    message.name.append(gripper_joint_state.name[0])
+    message.position.append(gripper_joint_state.position[0])
+    message.velocity.append(0.0)
+    message.effort.append(0.0)
+    return message
+
+
 def gripper_joint_state_error(exc, joint_name):
     message = JointState()
     message.name = [joint_name]
     del exc
+    return message
+
+
+def model_joint_state_error(exc, joint_names, gripper_joint_name):
+    message = joint_state_error(exc, joint_names)
+    message.name.append(gripper_joint_name)
+    message.position = [0.0 for _name in message.name]
     return message
 
 

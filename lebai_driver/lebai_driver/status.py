@@ -12,6 +12,8 @@ from lebai_driver.conversions import (
     joint_motion_from_sdk,
     joint_state_error,
     joint_state_from_sdk,
+    model_joint_state_error,
+    model_joint_state_from_sdk,
     robot_state_error,
     robot_state_from_sdk,
 )
@@ -54,6 +56,17 @@ def register_status_publishers(node, connection):
             _parameter_value(node, 'gripper_state_publish_rate', 10.0),
             lambda robot: gripper_joint_state_from_claw(robot, gripper_joint_name),
             lambda exc: gripper_joint_state_error(exc, gripper_joint_name),
+        ),
+        _PublisherRegistration(
+            JointState,
+            'model/joint_states',
+            _parameter_value(node, 'joint_state_publish_rate', 20.0),
+            lambda robot: model_joint_state_from_sdk(
+                robot,
+                joint_names,
+                gripper_joint_name,
+            ),
+            lambda exc: model_joint_state_error(exc, joint_names, gripper_joint_name),
         ),
         _PublisherRegistration(
             RobotState,

@@ -1,7 +1,10 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -30,11 +33,24 @@ def generate_launch_description():
         ),
         'io_state_dio_count': LaunchConfiguration('io_state_dio_count'),
     }
+    robot_description = ParameterValue(
+        Command([
+            'xacro ',
+            PathJoinSubstitution([
+                FindPackageShare('lebai_lm3_support'),
+                'urdf',
+                LaunchConfiguration('robot_model'),
+            ]),
+        ]),
+        value_type=str,
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument('robot_ip', default_value='127.0.0.1'),
         DeclareLaunchArgument('simulator', default_value='false'),
         DeclareLaunchArgument('namespace', default_value='lebai'),
+        DeclareLaunchArgument('publish_robot_description', default_value='true'),
+        DeclareLaunchArgument('robot_model', default_value='lm3_with_gripper.xacro'),
         DeclareLaunchArgument('joint_state_publish_rate', default_value='20.0'),
         DeclareLaunchArgument('robot_state_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('joint_motion_publish_rate', default_value='20.0'),
@@ -54,5 +70,15 @@ def generate_launch_description():
             namespace=LaunchConfiguration('namespace'),
             output='screen',
             parameters=[parameters],
+        ),
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            namespace=LaunchConfiguration('namespace'),
+            output='screen',
+            parameters=[{'robot_description': robot_description}],
+            remappings=[('joint_states', 'model/joint_states')],
+            condition=IfCondition(LaunchConfiguration('publish_robot_description')),
         ),
     ])
