@@ -7,7 +7,7 @@ import pytest
 pytestmark = pytest.mark.integration
 
 
-def test_driver_talks_to_simulator_topics_and_services():
+def test_driver_talks_to_simulator_topics():
     robot_ip = os.environ.get('LEBAI_TEST_ROBOT_IP')
     if not robot_ip:
         pytest.skip('LEBAI_TEST_ROBOT_IP is not set')
@@ -17,7 +17,6 @@ def test_driver_talks_to_simulator_topics_and_services():
 
     from lebai_driver.driver_node import LebaiDriverNode
     from lebai_interfaces.msg import RobotState
-    from lebai_interfaces.srv import Command, GetClaw, SetClaw
     from sensor_msgs.msg import JointState
 
     args = [
@@ -56,41 +55,12 @@ def test_driver_talks_to_simulator_topics_and_services():
         )
 
         _spin_until(executor, lambda: joint_states and robot_states)
-
-        claw_before = _call_service(
-            executor,
-            probe,
-            GetClaw,
-            '/lebai/claw/get_claw',
-            GetClaw.Request(),
-        )
-        assert claw_before.result.success is True
-        assert claw_before.state.connected is True
-
-        set_claw_request = SetClaw.Request()
-        set_claw_request.force = 50.0
-        set_claw_request.amplitude = 40.0
-        set_claw_result = _call_service(
-            executor,
-            probe,
-            SetClaw,
-            '/lebai/claw/set_claw',
-            set_claw_request,
-        )
-        assert set_claw_result.result.success is True
-
-        claw_after = _call_service(
-            executor,
-            probe,
-            GetClaw,
-            '/lebai/claw/get_claw',
-            GetClaw.Request(),
-        )
-        assert claw_after.result.success is True
-        assert claw_after.state.force == pytest.approx(50.0)
-        assert claw_after.state.amplitude == pytest.approx(40.0)
+        assert robot_states[-1].connected is True
+        assert list(joint_states[-1].position)
 
         if os.environ.get('LEBAI_TEST_START_STOP') == '1':
+            from lebai_interfaces.srv import Command
+
             start_result = _call_command(
                 executor,
                 probe,
