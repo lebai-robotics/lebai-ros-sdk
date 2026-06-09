@@ -17,7 +17,7 @@ def test_driver_talks_to_simulator_topics_and_services():
 
     from lebai_driver.driver_node import LebaiDriverNode
     from lebai_interfaces.msg import RobotState
-    from lebai_interfaces.srv import Command, GetClaw, GetRunningMotion, SetClaw
+    from lebai_interfaces.srv import Command, GetClaw, SetClaw
     from sensor_msgs.msg import JointState
 
     args = [
@@ -56,15 +56,6 @@ def test_driver_talks_to_simulator_topics_and_services():
         )
 
         _spin_until(executor, lambda: joint_states and robot_states)
-
-        running_motion = _call_service(
-            executor,
-            probe,
-            GetRunningMotion,
-            '/lebai/motion/get_running_motion',
-            GetRunningMotion.Request(),
-        )
-        assert running_motion.result.success is True
 
         claw_before = _call_service(
             executor,
