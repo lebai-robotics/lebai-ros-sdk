@@ -1,3 +1,5 @@
+import math
+
 from lebai_interfaces.msg import CartesianPose, ClawState, IOState, JointMotion, RobotState
 from sensor_msgs.msg import JointState
 
@@ -5,6 +7,7 @@ from lebai_driver.errors import exception_message
 
 
 _POSE_FIELDS = ('x', 'y', 'z', 'rx', 'ry', 'rz')
+_GRIPPER_MAX_ANGLE = math.pi / 3.0
 
 
 def cartesian_pose_from_sdk(data):
@@ -121,6 +124,21 @@ def claw_state_error(exc):
     return ClawState(connected=False, message=exception_message(exc))
 
 
+def gripper_joint_state_from_claw(robot, joint_name):
+    claw_state = claw_state_from_sdk(robot)
+    message = JointState()
+    message.name = [joint_name]
+    message.position = [_amplitude_to_gripper_angle(claw_state.amplitude)]
+    return message
+
+
+def gripper_joint_state_error(exc, joint_name):
+    message = JointState()
+    message.name = [joint_name]
+    del exc
+    return message
+
+
 def _actual_flange_pose(robot):
     data = robot.get_kin_data()
     return _value(data, 0, 'actual_flange_pose', {})
@@ -130,6 +148,11 @@ def _float_list(values):
     if values is None:
         return []
     return [float(value) for value in values]
+
+
+def _amplitude_to_gripper_angle(amplitude):
+    amplitude = max(0.0, min(100.0, float(amplitude)))
+    return _GRIPPER_MAX_ANGLE * amplitude / 100.0
 
 
 def _value(data, index, name, default):

@@ -122,6 +122,35 @@ def test_io_and_claw_conversion_maps_sdk_fields():
     assert claw_state.hold_on is True
 
 
+def test_claw_amplitude_maps_to_independent_gripper_joint_angle():
+    from lebai_driver.conversions import gripper_joint_state_from_claw
+
+    robot = FakeRobot()
+    robot.claw = FakeClawData(amplitude=50.0)
+
+    message = gripper_joint_state_from_claw(robot, 'gripper_r_joint1')
+
+    assert isinstance(message, JointState)
+    assert message.name == ['gripper_r_joint1']
+    assert list(message.position) == [0.5235987755982988]
+    assert list(message.velocity) == []
+    assert list(message.effort) == []
+
+
+def test_claw_amplitude_mapping_clamps_to_zero_and_one_hundred_percent():
+    from lebai_driver.conversions import gripper_joint_state_from_claw
+
+    robot = FakeRobot()
+    robot.claw = FakeClawData(amplitude=-20.0)
+    closed = gripper_joint_state_from_claw(robot, 'gripper_r_joint1')
+
+    robot.claw = FakeClawData(amplitude=150.0)
+    open_ = gripper_joint_state_from_claw(robot, 'gripper_r_joint1')
+
+    assert list(closed.position) == [0.0]
+    assert list(open_.position) == [1.0471975511965976]
+
+
 def test_status_publishers_register_topics_and_periods():
     node, handles = _register(FakeRobot())
 
@@ -132,13 +161,14 @@ def test_status_publishers_register_topics_and_periods():
 
     assert published_topics == [
         (JointState, 'status/joint_states', 10),
+        (JointState, 'claw/joint_states', 10),
         (RobotState, 'status/robot', 10),
         (JointMotion, 'status/joint_motion', 10),
         (IOState, 'io/state', 10),
         (ClawState, 'claw/state', 10),
     ]
-    assert [timer.period for timer in node.timers] == [0.05, 0.1, 0.05, 0.1, 0.1]
-    assert len(handles) == 5
+    assert [timer.period for timer in node.timers] == [0.05, 0.1, 0.1, 0.05, 0.1, 0.1]
+    assert len(handles) == 6
 
 
 def test_status_publishers_publish_messages_and_map_errors_to_message_field():
@@ -152,12 +182,14 @@ def test_status_publishers_publish_messages_and_map_errors_to_message_field():
     for timer in node.timers:
         timer.callback()
 
-    joint_state, robot_state, joint_motion, io_state, claw_state = [
+    joint_state, gripper_joint_state, robot_state, joint_motion, io_state, claw_state = [
         publisher.messages[-1]
         for publisher in node.publishers
     ]
     assert joint_state.header.stamp.sec == 12
     assert list(joint_state.position) == [1.0]
+    assert gripper_joint_state.header.stamp.sec == 12
+    assert gripper_joint_state.name == ['gripper_r_joint1']
     assert robot_state.header.stamp.sec == 12
     assert robot_state.connected is True
     assert robot_state.state == 9
@@ -169,8 +201,8 @@ def test_status_publishers_publish_messages_and_map_errors_to_message_field():
     assert claw_state.connected is True
 
     robot.exceptions['get_robot_state'] = RuntimeError('status offline')
-    node.timers[1].callback()
+    node.timers[2].callback()
 
-    failed_state = node.publishers[1].messages[-1]
+    failed_state = node.publishers[2].messages[-1]
     assert failed_state.connected is False
     assert failed_state.message == 'status offline'

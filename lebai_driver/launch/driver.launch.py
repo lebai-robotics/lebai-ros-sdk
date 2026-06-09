@@ -14,6 +14,7 @@ def generate_launch_description():
         'joint_motion_publish_rate': LaunchConfiguration('joint_motion_publish_rate'),
         'io_state_publish_rate': LaunchConfiguration('io_state_publish_rate'),
         'gripper_state_publish_rate': LaunchConfiguration('gripper_state_publish_rate'),
+        'gripper_joint_name': LaunchConfiguration('gripper_joint_name'),
         'io_state_device': LaunchConfiguration('io_state_device'),
         'io_state_digital_input_count': LaunchConfiguration(
             'io_state_digital_input_count',
@@ -39,6 +40,7 @@ def generate_launch_description():
         DeclareLaunchArgument('joint_motion_publish_rate', default_value='20.0'),
         DeclareLaunchArgument('io_state_publish_rate', default_value='10.0'),
         DeclareLaunchArgument('gripper_state_publish_rate', default_value='10.0'),
+        DeclareLaunchArgument('gripper_joint_name', default_value='gripper_r_joint1'),
         DeclareLaunchArgument('io_state_device', default_value='robot'),
         DeclareLaunchArgument('io_state_digital_input_count', default_value='0'),
         DeclareLaunchArgument('io_state_digital_output_count', default_value='0'),
