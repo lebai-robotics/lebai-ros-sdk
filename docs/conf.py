@@ -7,15 +7,7 @@ extensions = []
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'superpowers']
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_title = 'Lebai ROS2 SDK'
 html_static_path = ['_static']
 html_js_files = ['version-switcher.js']
-
-html_theme_options = {
-    'description': 'ROS2 Python driver backed by pylebai',
-    'github_user': 'lebai-robotics',
-    'github_repo': 'lebai-ros-sdk',
-    'github_banner': True,
-    'github_button': True,
-}
