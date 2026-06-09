@@ -7,6 +7,16 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+  add_test(
+    NAME test_gripper_mimic
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_gripper_mimic.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+endif()
+
 
 install(DIRECTORY launch meshes config rviz urdf DESTINATION 
     share/${PROJECT_NAME}
