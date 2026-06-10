@@ -25,7 +25,7 @@
 
    mkdir -p ~/lebai_ws/src
    cd ~/lebai_ws/src
-   git clone https://github.com/lebai-robotics/lebai-ros-sdk.git
+   git clone --branch lyrical-dev https://github.com/lebai-robotics/lebai-ros-sdk.git
    cd ~/lebai_ws
 
 安装依赖
