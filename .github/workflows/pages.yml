@@ -1,0 +1,108 @@
+name: Publish Documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      humble_ref:
+        description: Git ref to use for Humble docs
+        required: false
+        default: humble-dev
+      jazzy_ref:
+        description: Git ref to use for Jazzy docs
+        required: false
+        default: jazzy-dev
+      lyrical_ref:
+        description: Git ref to use for Lyrical docs
+        required: false
+        default: lyrical-dev
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build documentation site
+    runs-on: ubuntu-latest
+    env:
+      HUMBLE_REF: ${{ inputs.humble_ref || 'humble-dev' }}
+      JAZZY_REF: ${{ inputs.jazzy_ref || 'jazzy-dev' }}
+      LYRICAL_REF: ${{ inputs.lyrical_ref || 'lyrical-dev' }}
+    steps:
+      - name: Checkout main landing branch
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: Checkout Humble docs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HUMBLE_REF }}
+          path: branches/humble
+
+      - name: Checkout Jazzy docs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.JAZZY_REF }}
+          path: branches/jazzy
+
+      - name: Checkout Lyrical docs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LYRICAL_REF }}
+          path: branches/lyrical
+
+      - name: Checkout existing Pages archive
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: legacy-pages
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install documentation dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install \
+            -r branches/humble/docs/requirements.txt \
+            -r branches/jazzy/docs/requirements.txt \
+            -r branches/lyrical/docs/requirements.txt
+
+      - name: Build combined site
+        run: |
+          . .venv/bin/activate
+          bash main/scripts/build-pages.sh "$PWD/site" "$PWD/branches" "$PWD/legacy-pages"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy documentation site
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
