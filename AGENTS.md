@@ -41,9 +41,9 @@ LED, signal, and other SDK areas are later phases.
 
 ## Branch Workflow
 
-Develop on topic branches and open pull requests into the matching distro
-branch. Temporary refactor or feature branches are working branches only; once
-the work is accepted, merge them into the matching stable branch.
+Develop on topic or feature branches and open pull requests into the matching
+distro branch. Working branches are temporary; once the work is accepted, merge
+them into the matching stable branch.
 
 The intended final branch layout is:
 
