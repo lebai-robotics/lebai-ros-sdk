@@ -30,7 +30,7 @@
      - 状态
    * - Lyrical
      - 26.04
-     - ``lyrical-dev-refactor``
+     - ``lyrical-dev``
      - 当前文档对应环境
 
 后续计划

@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - lyrical-dev-refactor
+      - lyrical-dev
   push:
     branches:
-      - lyrical-dev-refactor
+      - lyrical-dev
 
 permissions:
   contents: read
