@@ -30,7 +30,7 @@
      - 状态
    * - Jazzy
      - 24.04
-     - ``jazzy-dev-refactor``
+     - ``jazzy-dev``
      - 当前文档对应环境
 
 后续计划

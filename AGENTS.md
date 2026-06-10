@@ -1,6 +1,6 @@
 # Agent Guide
 
-This repository is being refactored into a ROS2-only Lebai driver whose runtime
+This repository contains the ROS2 Jazzy Lebai driver whose runtime
 code is Python and whose controller access goes through released `pylebai`.
 
 ## Repository Map
