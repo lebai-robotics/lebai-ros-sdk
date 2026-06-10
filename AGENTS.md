@@ -45,7 +45,7 @@ Develop on topic branches and open pull requests into the matching distro
 branch. Current active target:
 
 ```text
-jazzy-dev-refactor -> jazzy-dev
+lyrical-dev -> lyrical-dev
 ```
 
 Future distro branches should carry distro-specific fixes instead of mixing
@@ -53,10 +53,10 @@ Humble, Jazzy, and future ROS releases in one branch.
 
 ## Verification
 
-Use ROS Jazzy locally for this branch:
+Use ROS Lyrical locally for this branch:
 
 ```bash
-source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash
+source /opt/ros/${ROS_DISTRO:-lyrical}/setup.bash
 source .venv/bin/activate
 colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
 source install/setup.bash

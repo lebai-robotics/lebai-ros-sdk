@@ -4,19 +4,19 @@
 环境要求
 --------
 
-当前文档面向 Ubuntu 24.04 和 ROS2 Jazzy：
+当前文档面向 Ubuntu 26.04 和 ROS2 Lyrical：
 
 .. code-block:: text
 
-   Ubuntu 24.04
-   ROS2 Jazzy
+   Ubuntu 26.04
+   ROS2 Lyrical
    Python 3
 
 安装 ROS2 后，先加载 ROS 环境：
 
 .. code-block:: bash
 
-   source /opt/ros/jazzy/setup.bash
+   source /opt/ros/lyrical/setup.bash
 
 创建工作空间
 ------------
@@ -31,7 +31,7 @@
 安装依赖
 --------
 
-Ubuntu 24.04 的系统 Python 由 apt 管理，不建议直接用 ``pip`` 写入系统
+Ubuntu 26.04 的系统 Python 由 apt 管理，不建议直接用 ``pip`` 写入系统
 Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安装
 ``pylebai``：
 
@@ -46,7 +46,7 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 .. code-block:: bash
 
    rosdep update
-   rosdep install --from-paths src --ignore-src --rosdistro jazzy -y --skip-keys pylebai
+   rosdep install --from-paths src --ignore-src --rosdistro lyrical -y --skip-keys pylebai
 
 构建
 ----

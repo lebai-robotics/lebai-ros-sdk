@@ -28,9 +28,9 @@
      - Ubuntu
      - 分支
      - 状态
-   * - Jazzy
-     - 24.04
-     - ``jazzy-dev-refactor``
+   * - Lyrical
+     - 26.04
+     - ``lyrical-dev``
      - 当前文档对应环境
 
 后续计划

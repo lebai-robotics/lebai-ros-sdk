@@ -1,23 +1,24 @@
-name: ROS2 Jazzy CI
+name: ROS2 Lyrical CI
 
 on:
   workflow_dispatch:
   pull_request:
     branches:
-      - jazzy-dev-refactor
+      - lyrical-dev
   push:
     branches:
-      - jazzy-dev-refactor
+      - lyrical-dev
 
 permissions:
   contents: read
 
 jobs:
-  jazzy:
-    name: Jazzy unit and simulator tests
+  lyrical:
+    name: Lyrical unit and simulator tests
+    # The ROS/Ubuntu environment under test is the Lyrical container below.
     runs-on: ubuntu-24.04
     container:
-      image: ros:jazzy-ros-base
+      image: ros:lyrical-ros-base
       options: --user 0
     services:
       lmaster:
@@ -56,7 +57,7 @@ jobs:
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \
-            --rosdistro jazzy \
+            --rosdistro lyrical \
             --skip-keys pylebai \
             -y
 
@@ -64,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -eo pipefail
-          source /opt/ros/jazzy/setup.bash
+          source /opt/ros/lyrical/setup.bash
           source .venv/bin/activate
           colcon build \
             --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
