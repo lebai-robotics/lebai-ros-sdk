@@ -1,46 +1,46 @@
 # Lebai ROS SDK
 
-This repository hosts ROS drivers, examples, robot descriptions, and
-documentation for Lebai robots.
+> **在线文档入口：**
+> <https://lebai-robotics.github.io/lebai-ros-sdk/>
 
-The `main` branch is a landing branch only. Do not build robot driver packages
-from `main`; choose the branch that matches your ROS distribution.
+本仓库提供 Lebai 机器人在 ROS/ROS2 下使用的驱动、示例、机器人模型和文档。
 
-## Active ROS2 Branches
+`main` 分支只作为项目入口和 GitHub Pages 文档发布分支使用，不用于构建机器人
+驱动。请根据你的 Ubuntu 和 ROS 发行版选择对应分支。
 
-| ROS distribution | Ubuntu | Branch | Clone command |
+## 当前 ROS2 分支
+
+| ROS 发行版 | Ubuntu | 代码分支 | 获取代码 |
 | --- | --- | --- | --- |
 | ROS2 Humble | Ubuntu 22.04 | `humble-dev` | `git clone --branch humble-dev https://github.com/lebai-robotics/lebai-ros-sdk.git` |
 | ROS2 Jazzy | Ubuntu 24.04 | `jazzy-dev` | `git clone --branch jazzy-dev https://github.com/lebai-robotics/lebai-ros-sdk.git` |
 | ROS2 Lyrical | Ubuntu 26.04 | `lyrical-dev` | `git clone --branch lyrical-dev https://github.com/lebai-robotics/lebai-ros-sdk.git` |
 
-## Legacy Branches
+## 历史分支
 
-These branches are kept for existing users and are not part of current
-development:
+以下分支保留给已有用户参考，不再作为当前开发目标：
 
-| ROS distribution | Branch |
+| ROS 发行版 | 代码分支 |
 | --- | --- |
 | ROS Noetic | `noetic-dev` |
 | ROS2 Galactic | `galactic-dev` |
 | ROS Melodic | `melodic-dev` |
 
-## Documentation
+## 文档发布
 
-GitHub Pages is orchestrated from this landing branch. The Pages workflow builds
-the Chinese landing page with Sphinx and the Read the Docs theme, checks out
-each active distro branch, builds that branch's Sphinx documentation, and
-publishes a combined documentation site to the `gh-pages` branch:
+GitHub Pages 由 `main` 分支统一发布。发布流程会构建中文 Sphinx 首页，使用
+Read the Docs 主题，然后分别检出当前 ROS2 分支并构建各自的 Sphinx 文档，最后
+把合并后的站点发布到 `gh-pages` 分支：
 
 ```text
-/              branch selector
-/humble/       docs built from humble-dev
-/jazzy/        docs built from jazzy-dev
-/lyrical/      docs built from lyrical-dev
-/noetic/       legacy archive, if preserved
-/galactic/     legacy archive, if preserved
-/melodic/      legacy archive, if preserved
+/              文档入口和分支选择页
+/humble/       从 humble-dev 构建的文档
+/jazzy/        从 jazzy-dev 构建的文档
+/lyrical/      从 lyrical-dev 构建的文档
+/noetic/       历史文档入口
+/galactic/     历史文档入口
+/melodic/      历史文档入口
 ```
 
-Active distro branches run their own CI to validate code, tests, and local docs.
-They do not deploy GitHub Pages.
+各发行版分支会运行自己的 CI，用于验证代码、测试和本地文档构建；它们不直接发布
+GitHub Pages。
