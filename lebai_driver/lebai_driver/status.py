@@ -17,6 +17,7 @@ from lebai_driver.conversions import (
     robot_state_error,
     robot_state_from_sdk,
 )
+from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 
 
 _DEPTH = 10
@@ -26,7 +27,7 @@ def register_status_publishers(node, connection):
     joint_names = _parameter_value(
         node,
         'joint_names',
-        ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6'],
+        DEFAULT_JOINT_NAMES,
     )
     gripper_joint_name = _parameter_value(
         node,
