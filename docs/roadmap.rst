@@ -30,7 +30,7 @@
      - 状态
    * - Humble
      - 22.04
-     - ``humble-dev-refactor``
+     - ``humble-dev``
      - 当前文档对应环境
 
 后续计划
