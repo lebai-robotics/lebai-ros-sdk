@@ -27,9 +27,9 @@ development:
 
 ## Documentation
 
-GitHub Pages is published from this landing branch. The Pages workflow checks
+GitHub Pages is orchestrated from this landing branch. The Pages workflow checks
 out each active distro branch, builds that branch's Sphinx documentation, and
-publishes a combined documentation site:
+publishes a combined documentation site to the `gh-pages` branch:
 
 ```text
 /              branch selector
