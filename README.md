@@ -27,8 +27,9 @@ development:
 
 ## Documentation
 
-GitHub Pages is orchestrated from this landing branch. The Pages workflow checks
-out each active distro branch, builds that branch's Sphinx documentation, and
+GitHub Pages is orchestrated from this landing branch. The Pages workflow builds
+the Chinese landing page with Sphinx and the Read the Docs theme, checks out
+each active distro branch, builds that branch's Sphinx documentation, and
 publishes a combined documentation site to the `gh-pages` branch:
 
 ```text

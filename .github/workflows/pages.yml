@@ -76,6 +76,7 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip install \
+            -r main/docs/requirements.txt \
             -r branches/humble/docs/requirements.txt \
             -r branches/jazzy/docs/requirements.txt \
             -r branches/lyrical/docs/requirements.txt

@@ -14,10 +14,10 @@ runtime ROS driver packages to this branch.
 
 ## Documentation Publishing
 
-The Pages workflow on `main` builds a combined documentation site by checking
-out each active distro branch, copying that branch's generated Sphinx output
-under its distro path, and publishing the final `site/` directory to the
-`gh-pages` branch:
+The Pages workflow on `main` builds a Chinese Sphinx landing page with the Read
+the Docs theme, checks out each active distro branch, copies that branch's
+generated Sphinx output under its distro path, adds redirects for legacy clean
+URLs, and publishes the final `site/` directory to the `gh-pages` branch:
 
 ```text
 site/

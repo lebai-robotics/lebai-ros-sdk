@@ -20,9 +20,44 @@ prepare_site_root() {
     )
   fi
 
-  cp "$ROOT/docs/index.html" "$SITE_DIR/index.html"
-  cp "$ROOT/docs/versions.json" "$SITE_DIR/versions.json"
   touch "$SITE_DIR/.nojekyll"
+}
+
+build_landing_docs() {
+  python3 -m sphinx \
+    -W \
+    -b html \
+    "$ROOT/docs" \
+    "$SITE_DIR"
+}
+
+write_legacy_redirect() {
+  local path="$1"
+  local target="$2"
+  local title="$3"
+  local dir="$SITE_DIR/$path"
+
+  mkdir -p "$dir"
+  cat > "$dir/index.html" <<EOF
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=../$target">
+    <link rel="canonical" href="../$target">
+    <title>$title</title>
+  </head>
+  <body>
+    <p><a href="../$target">$title</a></p>
+  </body>
+</html>
+EOF
+}
+
+write_legacy_redirects() {
+  write_legacy_redirect noetic Noetic.html "ROS Noetic 历史文档"
+  write_legacy_redirect galactic Galactic.html "ROS2 Galactic 历史文档"
+  write_legacy_redirect melodic Melodic.html "ROS Melodic 历史文档"
 }
 
 build_branch_docs() {
@@ -46,6 +81,8 @@ build_branch_docs() {
 }
 
 prepare_site_root
+build_landing_docs
+write_legacy_redirects
 
 build_branch_docs humble
 build_branch_docs jazzy
