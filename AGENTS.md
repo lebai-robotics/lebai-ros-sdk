@@ -42,20 +42,45 @@ LED, signal, and other SDK areas are later phases.
 ## Branch Workflow
 
 Develop on topic branches and open pull requests into the matching distro
-branch. Current active target:
+branch. Temporary refactor or feature branches are working branches only; once
+the work is accepted, merge them into the matching stable branch.
+
+The intended final branch layout is:
 
 ```text
-humble-dev-refactor -> humble-dev
+main
+humble-dev
+jazzy-dev
+lyrical-dev
+noetic-dev      # old/deprecated; do not change
+galactic-dev    # old/deprecated; do not change
+melodic-dev     # old/deprecated; do not change
 ```
 
-Future distro branches should carry distro-specific fixes instead of mixing
-Humble, Jazzy, and future ROS releases in one branch.
+Shared fixes found during development, such as topic, TF, RViz, or test fixes,
+should be propagated to every active stable distro branch that carries the same
+code. Distro-specific fixes should stay on that distro branch instead of mixing
+Humble, Jazzy, and future ROS releases in one branch. Do not modify old
+deprecated distro branches unless explicitly requested.
 
 ## Verification
+
+ROS2 workspaces normally use this layout:
+
+```text
+xxx_ws/
+  src/
+    lebai-ros-sdk/
+```
+
+Run `colcon build` and workspace-level tests from the workspace root
+(`xxx_ws`), not from `xxx_ws/src/lebai-ros-sdk`. Repository-local commands such
+as `./scripts/build-docs.sh` should still be run from the repository root.
 
 Use ROS Humble locally unless the branch says otherwise:
 
 ```bash
+cd /path/to/xxx_ws
 source /opt/ros/${ROS_DISTRO:-humble}/setup.bash
 colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
 source install/setup.bash
