@@ -49,7 +49,7 @@ jobs:
             rosdep init
           fi
           rosdep update
-          python3 -m pip install pylebai
+          python3 -m pip install --break-system-packages pylebai
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \

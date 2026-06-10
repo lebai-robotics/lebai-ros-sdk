@@ -35,7 +35,7 @@
 
 .. code-block:: bash
 
-   python3 -m pip install pylebai
+   python3 -m pip install --break-system-packages pylebai
 
 安装 ROS 包依赖：
 
