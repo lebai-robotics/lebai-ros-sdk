@@ -44,12 +44,15 @@ jobs:
             python3-pip \
             python3-pytest \
             python3-rosdep \
+            python3-venv \
             python3-vcstool
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
           rosdep update
-          python3 -m pip install --break-system-packages pylebai
+          python3 -m venv .venv --system-site-packages
+          . .venv/bin/activate
+          python3 -m pip install pylebai
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \
@@ -62,6 +65,7 @@ jobs:
         run: |
           set -eo pipefail
           source /opt/ros/jazzy/setup.bash
+          source .venv/bin/activate
           colcon build \
             --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --symlink-install
@@ -70,6 +74,7 @@ jobs:
         shell: bash
         run: |
           set -eo pipefail
+          source .venv/bin/activate
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
           python3 -m pytest lebai_lm3_support/test -q
@@ -80,6 +85,7 @@ jobs:
           LEBAI_TEST_ROBOT_IP: ""
         run: |
           set -eo pipefail
+          source .venv/bin/activate
           source install/setup.bash
           export LEBAI_TEST_ROBOT_IP="$(getent hosts lmaster | awk '{print $1}')"
           python3 -m pytest lebai_driver/test/test_simulator_smoke.py -q -m integration

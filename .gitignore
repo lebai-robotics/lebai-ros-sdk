@@ -1,4 +1,5 @@
 .vscode
+.venv/
 \devel/
 logs/
 build/

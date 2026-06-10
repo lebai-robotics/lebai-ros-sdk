@@ -57,6 +57,7 @@ Use ROS Jazzy locally for this branch:
 
 ```bash
 source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash
+source .venv/bin/activate
 colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
 source install/setup.bash
 python3 -m pytest src/lebai-ros-sdk/lebai_driver/test -q -m "not integration and not linter"

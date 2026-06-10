@@ -9,6 +9,7 @@
 .. code-block:: bash
 
    source /opt/ros/jazzy/setup.bash
+   source .venv/bin/activate
    source install/setup.bash
    ros2 launch lebai_driver driver.launch.py robot_ip:=127.0.0.1 simulator:=true
 

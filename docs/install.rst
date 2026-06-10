@@ -31,11 +31,15 @@
 安装依赖
 --------
 
-安装 Python SDK：
+Ubuntu 24.04 的系统 Python 由 apt 管理，不建议直接用 ``pip`` 写入系统
+Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安装
+``pylebai``：
 
 .. code-block:: bash
 
-   python3 -m pip install --break-system-packages pylebai
+   python3 -m venv .venv --system-site-packages
+   source .venv/bin/activate
+   python3 -m pip install pylebai
 
 安装 ROS 包依赖：
 
@@ -49,6 +53,7 @@
 
 .. code-block:: bash
 
+   source .venv/bin/activate
    colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
    source install/setup.bash
 
