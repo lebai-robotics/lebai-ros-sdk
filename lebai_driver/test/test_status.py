@@ -229,7 +229,15 @@ def test_status_publishers_publish_messages_and_map_errors_to_message_field():
     assert gripper_joint_state.header.stamp.sec == 12
     assert gripper_joint_state.name == ['gripper_r_joint1']
     assert model_joint_state.header.stamp.sec == 12
-    assert model_joint_state.name == ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'gripper_r_joint1']
+    assert model_joint_state.name == [
+        'joint_1',
+        'joint_2',
+        'joint_3',
+        'joint_4',
+        'joint_5',
+        'joint_6',
+        'gripper_r_joint1',
+    ]
     assert robot_state.header.stamp.sec == 12
     assert robot_state.connected is True
     assert robot_state.state == 9

@@ -32,6 +32,14 @@ def test_driver_node_declares_runtime_parameters():
 
         for name in expected_names:
             assert node.has_parameter(name)
+        assert list(node.get_parameter('joint_names').value) == [
+            'joint_1',
+            'joint_2',
+            'joint_3',
+            'joint_4',
+            'joint_5',
+            'joint_6',
+        ]
         assert node.get_name() == 'lebai_driver'
     finally:
         if node is not None:
