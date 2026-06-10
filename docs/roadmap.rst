@@ -28,9 +28,9 @@
      - Ubuntu
      - 分支
      - 状态
-   * - Humble
-     - 22.04
-     - ``humble-dev-refactor``
+   * - Jazzy
+     - 24.04
+     - ``jazzy-dev-refactor``
      - 当前文档对应环境
 
 后续计划
@@ -43,7 +43,7 @@
 - 更多 SDK 分类接口，例如 ``config``、``file``、``modbus``、``serial``、
   ``storage``、``program``、``scene``、``robotics``、``led`` 和
   ``signal``。
-- 后续 ROS2 发行版分支，例如 Jazzy 和 Lyrical。
+- 后续 ROS2 发行版分支。
 
 如果你只需要当前机器人控制、状态读取、IO、claw、discovery 和 gripper 功能，
 可以直接使用当前接口。

@@ -8,7 +8,7 @@
 
 .. code-block:: bash
 
-   source /opt/ros/humble/setup.bash
+   source /opt/ros/jazzy/setup.bash
    source install/setup.bash
    ros2 launch lebai_driver driver.launch.py robot_ip:=127.0.0.1 simulator:=true
 

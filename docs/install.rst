@@ -4,19 +4,19 @@
 环境要求
 --------
 
-当前文档面向 Ubuntu 22.04 和 ROS2 Humble：
+当前文档面向 Ubuntu 24.04 和 ROS2 Jazzy：
 
 .. code-block:: text
 
-   Ubuntu 22.04
-   ROS2 Humble
+   Ubuntu 24.04
+   ROS2 Jazzy
    Python 3
 
 安装 ROS2 后，先加载 ROS 环境：
 
 .. code-block:: bash
 
-   source /opt/ros/humble/setup.bash
+   source /opt/ros/jazzy/setup.bash
 
 创建工作空间
 ------------
@@ -42,7 +42,7 @@
 .. code-block:: bash
 
    rosdep update
-   rosdep install --from-paths src --ignore-src --rosdistro humble -y --skip-keys pylebai
+   rosdep install --from-paths src --ignore-src --rosdistro jazzy -y --skip-keys pylebai
 
 构建
 ----

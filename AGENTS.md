@@ -45,7 +45,7 @@ Develop on topic branches and open pull requests into the matching distro
 branch. Current active target:
 
 ```text
-humble-dev-refactor -> humble-dev
+jazzy-dev-refactor -> jazzy-dev
 ```
 
 Future distro branches should carry distro-specific fixes instead of mixing
@@ -53,10 +53,10 @@ Humble, Jazzy, and future ROS releases in one branch.
 
 ## Verification
 
-Use ROS Humble locally unless the branch says otherwise:
+Use ROS Jazzy locally for this branch:
 
 ```bash
-source /opt/ros/${ROS_DISTRO:-humble}/setup.bash
+source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash
 colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
 source install/setup.bash
 python3 -m pytest src/lebai-ros-sdk/lebai_driver/test -q -m "not integration and not linter"

@@ -1,23 +1,23 @@
-name: ROS2 Humble CI
+name: ROS2 Jazzy CI
 
 on:
   workflow_dispatch:
   pull_request:
     branches:
-      - humble-dev-refactor
+      - jazzy-dev-refactor
   push:
     branches:
-      - humble-dev-refactor
+      - jazzy-dev-refactor
 
 permissions:
   contents: read
 
 jobs:
-  humble:
-    name: Humble unit and simulator tests
-    runs-on: ubuntu-22.04
+  jazzy:
+    name: Jazzy unit and simulator tests
+    runs-on: ubuntu-24.04
     container:
-      image: ros:humble-ros-base
+      image: ros:jazzy-ros-base
       options: --user 0
     services:
       lmaster:
@@ -53,7 +53,7 @@ jobs:
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \
-            --rosdistro humble \
+            --rosdistro jazzy \
             --skip-keys pylebai \
             -y
 
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -eo pipefail
-          source /opt/ros/humble/setup.bash
+          source /opt/ros/jazzy/setup.bash
           colcon build \
             --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --symlink-install
