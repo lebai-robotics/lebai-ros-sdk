@@ -81,6 +81,24 @@ RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
    lm3_with_gripper.xacro
    lm3_l1_with_gripper.xacro
 
+只显示模型
+----------
+
+如果只想检查 URDF、TF 和 RViz 显示效果，不连接控制器，可以使用
+``lebai_lm3_support`` 中的 display launch。
+
+显示 LM3：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_support display_lm3.launch.py
+
+显示独立 gripper：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_support display_gripper.launch
+
 调用启停服务
 ------------
 
