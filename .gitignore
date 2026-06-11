@@ -4,6 +4,7 @@
 
 # Python caches
 __pycache__/
+.pytest_cache/
 *.py[cod]
 
 # Editor and OS files
