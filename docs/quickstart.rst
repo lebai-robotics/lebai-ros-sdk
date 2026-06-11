@@ -79,6 +79,41 @@ RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
    lm3_with_gripper.xacro
    lm3_l1_with_gripper.xacro
 
+只显示模型
+----------
+
+如果只想检查 URDF、TF 和 RViz 显示效果，不连接控制器，可以使用
+``lebai_lm3_support`` 中的 display launch。
+
+显示 LM3：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_support display_lm3.launch.py
+
+显示独立 gripper：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_support display_gripper.launch
+
+``display_gripper.launch`` 默认使用专用 RViz 配置：
+
+.. code-block:: bash
+
+   $(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/gripper.rviz
+
+也可以传入自定义 RViz 配置：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_support display_gripper.launch \
+     rvizconfig:="$(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/gripper.rviz"
+
+驱动 launch 默认在 ``/lebai`` 命名空间下发布 ``/lebai/robot_description``。
+这些只显示模型的 launch 不使用 ``/lebai`` 命名空间，因此 RViz 配置应读取
+``/robot_description``。
+
 调用启停服务
 ------------
 
