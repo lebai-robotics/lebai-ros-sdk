@@ -19,18 +19,8 @@
 
 以下分支保留给已有用户参考，不再作为当前开发目标：
 
-| ROS 发行版 | 代码分支 |
-| --- | --- |
-| ROS Noetic | `noetic-dev` |
-| ROS2 Galactic | `galactic-dev` |
-| ROS Melodic | `melodic-dev` |
-
-```text
-/              文档入口和分支选择页
-/humble/       从 humble-dev 构建的文档
-/jazzy/        从 jazzy-dev 构建的文档
-/lyrical/      从 lyrical-dev 构建的文档
-/noetic/       历史文档入口
-/galactic/     历史文档入口
-/melodic/      历史文档入口
-```
+| ROS 发行版 | Ubuntu | 代码分支 | 文档 |
+| --- | --- | --- | --- |
+| ROS Noetic | Ubuntu 20.04 | `noetic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/noetic/> |
+| ROS2 Galactic | Ubuntu 20.04 | `galactic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/galactic/> |
+| ROS Melodic | Ubuntu 18.04 | `melodic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/melodic/> |
