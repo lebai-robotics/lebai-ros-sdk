@@ -41,6 +41,13 @@ def test_gripper_rviz_uses_global_description_topic_for_display_launch():
     assert description_topic["Durability Policy"] == "Transient Local"
 
 
+def test_gripper_rviz_fixed_frame_matches_standalone_gripper_root():
+    config = yaml.safe_load(GRIPPER_RVIZ_CONFIG.read_text())
+    global_options = config["Visualization Manager"]["Global Options"]
+
+    assert global_options["Fixed Frame"] == "gripper_base_link"
+
+
 def test_display_gripper_launch_defaults_to_gripper_rviz_config():
     launch_source = DISPLAY_GRIPPER_LAUNCH.read_text()
 
