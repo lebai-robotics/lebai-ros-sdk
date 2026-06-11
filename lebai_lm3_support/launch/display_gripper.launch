@@ -11,7 +11,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     lebai_lm3_support_path = get_package_share_path('lebai_lm3_support')
     lm3_model_path = lebai_lm3_support_path / 'urdf/gripper.xacro'
-    default_rviz_config_path = lebai_lm3_support_path / 'rviz/view.rviz'
+    default_rviz_config_path = lebai_lm3_support_path / 'rviz/gripper.rviz'
     rviz_config_arg = DeclareLaunchArgument(name='rvizconfig', default_value=str(default_rviz_config_path),
                                      description='Absolute path to rviz config file')
     robot_description = ParameterValue(Command(['xacro ', str(lm3_model_path)]),
