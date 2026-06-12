@@ -29,19 +29,10 @@ Lebai ROS SDK 文档
      - ``lyrical-dev``
      - `打开 Lyrical 文档 <lyrical/>`__
 
-获取代码
---------
-
-.. code-block:: bash
-
-   git clone --branch humble-dev https://github.com/lebai-robotics/lebai-ros-sdk.git
-   git clone --branch jazzy-dev https://github.com/lebai-robotics/lebai-ros-sdk.git
-   git clone --branch lyrical-dev https://github.com/lebai-robotics/lebai-ros-sdk.git
-
 历史文档
 --------
 
-以下分支保留给老用户参考，不再作为当前开发目标：
+以下为旧版本SDK，不再开发维护：
 
 .. list-table::
    :header-rows: 1

@@ -1,42 +1,33 @@
 # Agent Guide
 
-The `main` branch is a landing and documentation publishing branch. Do not add
-runtime ROS driver packages to this branch.
+`main` is the landing-page and GitHub Pages orchestration branch. Runtime ROS
+driver changes belong on the active distro branches, not directly here.
 
-## Branch Roles
+## Start Here
 
-- `main`: project landing page and GitHub Pages orchestration.
-- `humble-dev`: ROS2 Humble runtime code and docs.
-- `jazzy-dev`: ROS2 Jazzy runtime code and docs.
-- `lyrical-dev`: ROS2 Lyrical runtime code and docs.
-- `noetic-dev`, `galactic-dev`, `melodic-dev`: legacy branches; do not modify
+- Repository overview and public docs links: `README.md`
+- Future/deferred work list: `TODO.md`
+- Pages build script: `scripts/build-pages.sh`
+- Active runtime branches: `humble-dev`, `jazzy-dev`, `lyrical-dev`
+- Legacy branches: `noetic-dev`, `galactic-dev`, `melodic-dev`; do not modify
   unless explicitly requested.
 
-## Documentation Publishing
+## Development Rules
 
-The Pages workflow on `main` builds a Chinese Sphinx landing page with the Read
-the Docs theme, checks out each active distro branch, copies that branch's
-generated Sphinx output under its distro path, adds redirects for legacy clean
-URLs, and publishes the final `site/` directory to the `gh-pages` branch:
+- Always make changes through pull requests.
+- Use conventional commit messages, for example `docs: update agent guide`.
+- Unless a request is explicitly branch-specific, apply concrete feature, fix,
+  and process changes to all active runtime branches: `humble-dev`, `jazzy-dev`,
+  and `lyrical-dev`.
+- Keep generated `site/` output and local planning scratch files out of git.
 
-```text
-site/
-  index.html
-  humble/
-  jazzy/
-  lyrical/
-```
+## Main Branch Verification
 
-Legacy documentation is preserved from the existing `gh-pages` archive when the
-workflow can check it out.
-
-## Verification
-
-Run local checks from this branch root:
+Run from the repository root:
 
 ```bash
 bash scripts/build-pages.sh /tmp/lebai-pages-site /tmp/lebai-doc-branches
 ```
 
-For that command to work, `/tmp/lebai-doc-branches` must contain `humble`,
-`jazzy`, and `lyrical` checkouts with each branch's `scripts/build-docs.sh`.
+That command expects `/tmp/lebai-doc-branches` to contain `humble`, `jazzy`, and
+`lyrical` checkouts with each branch's `scripts/build-docs.sh`.
