@@ -56,3 +56,5 @@ qtcreator-*
 CATKIN_IGNORE
 .rosinstall
 .catkin
+__pycache__/
+.pytest_cache/
