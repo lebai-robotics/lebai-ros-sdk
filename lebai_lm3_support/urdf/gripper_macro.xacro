@@ -53,6 +53,7 @@
 		</geometry>
 	</collision>
 </link>
+<link name="${prefix}gripper_r_link1_end_connection" />
 <link name="${prefix}gripper_r_link2">
 	<visual>
 		<geometry>
@@ -94,6 +95,7 @@
 		</geometry>
 	</collision>
 </link>
+<link name="${prefix}gripper_l_link1_end_connection" />
 
 <link name="${prefix}gripper_l_link2">
 	<visual>
@@ -124,6 +126,8 @@
 	</collision>
 </link>
 
+<link name="${prefix}gripper_tip_midpoint_arm" />
+<link name="${prefix}gripper_tip_midpoint_counterarm" />
 <link name="${prefix}gripper_tip" />
 
 
@@ -138,6 +142,11 @@
 	<origin xyz="0.025 0.0 0.0856" rpy="${PI_2} 0.0 ${PI}"/>
 	<axis xyz="0 0 1" />
 	<limit lower="0.0" upper="${PI/3.0}" effort="100" velocity="1" />
+</joint>
+<joint name="${prefix}gripper_r_link1_end_connection_joint" type="fixed">
+	<parent link="${prefix}gripper_r_link1"/>
+	<child link="${prefix}gripper_r_link1_end_connection"/>
+	<origin xyz="0.0 0.053 0.0" rpy="0.0 0.0 0.0"/>
 </joint>
 <joint name="${prefix}gripper_r_joint2" type="revolute">
 	<parent link="${prefix}gripper_base_link"/>
@@ -163,6 +172,11 @@
 	<limit lower="0.0" upper="${PI/3.0}" effort="100" velocity="1" />
 	<mimic joint="${prefix}gripper_r_joint1" multiplier="1.0" offset="0.0" />
 </joint>
+<joint name="${prefix}gripper_l_link1_end_connection_joint" type="fixed">
+	<parent link="${prefix}gripper_l_link1"/>
+	<child link="${prefix}gripper_l_link1_end_connection"/>
+	<origin xyz="0.0 0.053 0.0" rpy="0.0 0.0 0.0"/>
+</joint>
 <joint name="${prefix}gripper_l_joint2" type="revolute">
 	<parent link="${prefix}gripper_base_link"/>
 	<child link="${prefix}gripper_l_link2"/>
@@ -181,10 +195,29 @@
 	<mimic joint="${prefix}gripper_r_joint1" multiplier="-1.0" offset="0.0" />
 </joint>
 
-<joint name="${prefix}gripper_joint_tip" type="fixed">
-      <parent link="${prefix}gripper_l_link_finger"/>
-      <child link="${prefix}gripper_tip"/>
-      <origin xyz="0.0115 0.0 0.0" rpy="0.0 0.0 0.0"/>
+<joint name="${prefix}gripper_tip_midpoint_arm_joint" type="revolute">
+	<parent link="${prefix}gripper_base_link"/>
+	<child link="${prefix}gripper_tip_midpoint_arm"/>
+	<origin xyz="0.0 0.0 0.1056" rpy="0.0 0.0 0.0"/>
+	<axis xyz="0 1 0" />
+	<limit lower="${-PI}" upper="${PI}" effort="100" velocity="1" />
+	<mimic joint="${prefix}gripper_r_joint1" multiplier="1.0" offset="0.0" />
+</joint>
+<joint name="${prefix}gripper_tip_midpoint_counterarm_joint" type="revolute">
+	<parent link="${prefix}gripper_tip_midpoint_arm"/>
+	<child link="${prefix}gripper_tip_midpoint_counterarm"/>
+	<origin xyz="0.0 0.0 0.0265" rpy="0.0 0.0 0.0"/>
+	<axis xyz="0 1 0" />
+	<limit lower="${-PI}" upper="${PI}" effort="100" velocity="1" />
+	<mimic joint="${prefix}gripper_r_joint1" multiplier="-2.0" offset="0.0" />
+</joint>
+<joint name="${prefix}gripper_joint_tip" type="revolute">
+	<parent link="${prefix}gripper_tip_midpoint_counterarm"/>
+	<child link="${prefix}gripper_tip"/>
+	<origin xyz="0.0 0.0 0.0265" rpy="0.0 0.0 0.0"/>
+	<axis xyz="0 1 0" />
+	<limit lower="${-PI}" upper="${PI}" effort="100" velocity="1" />
+	<mimic joint="${prefix}gripper_r_joint1" multiplier="1.0" offset="0.0" />
 </joint>
 
 </xacro:macro>
