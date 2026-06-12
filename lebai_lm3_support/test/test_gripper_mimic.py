@@ -6,13 +6,27 @@ PACKAGE_DIR = Path(__file__).resolve().parents[1]
 GRIPPER_MACRO = PACKAGE_DIR / "urdf" / "gripper_macro.xacro"
 
 
-def test_gripper_has_one_independent_joint_and_five_mimic_joints():
-    root = ET.parse(GRIPPER_MACRO).getroot()
-    joints = {
+def _gripper_joints(root):
+    return {
         joint.attrib["name"]: joint
         for joint in root.findall(".//joint")
         if "gripper_" in joint.attrib["name"]
     }
+
+
+def _assert_mimic(joint, source_joint, multiplier):
+    mimic = joint.find("mimic")
+    assert mimic is not None
+    assert mimic.attrib == {
+        "joint": source_joint,
+        "multiplier": multiplier,
+        "offset": "0.0",
+    }
+
+
+def test_gripper_physical_joints_mimic_single_source_joint():
+    root = ET.parse(GRIPPER_MACRO).getroot()
+    joints = _gripper_joints(root)
 
     source_joint = "${prefix}gripper_r_joint1"
     expected_mimic_multipliers = {
@@ -26,22 +40,12 @@ def test_gripper_has_one_independent_joint_and_five_mimic_joints():
     assert joints[source_joint].find("mimic") is None
 
     for joint_name, multiplier in expected_mimic_multipliers.items():
-        mimic = joints[joint_name].find("mimic")
-        assert mimic is not None
-        assert mimic.attrib == {
-            "joint": source_joint,
-            "multiplier": multiplier,
-            "offset": "0.0",
-        }
+        _assert_mimic(joints[joint_name], source_joint, multiplier)
 
 
 def test_gripper_joint_limits_match_zero_to_sixty_degree_motion():
     root = ET.parse(GRIPPER_MACRO).getroot()
-    joints = {
-        joint.attrib["name"]: joint
-        for joint in root.findall(".//joint")
-        if "gripper_" in joint.attrib["name"]
-    }
+    joints = _gripper_joints(root)
 
     expected_limits = {
         "${prefix}gripper_r_joint1": ("0.0", "${PI/3.0}"),
@@ -56,3 +60,45 @@ def test_gripper_joint_limits_match_zero_to_sixty_degree_motion():
         limit = joints[joint_name].find("limit")
         assert limit.attrib["lower"] == lower
         assert limit.attrib["upper"] == upper
+
+
+def test_gripper_tip_uses_virtual_midpoint_chain():
+    root = ET.parse(GRIPPER_MACRO).getroot()
+    links = {link.attrib["name"] for link in root.findall(".//link")}
+    joints = _gripper_joints(root)
+
+    assert "${prefix}gripper_tip_midpoint_arm" in links
+    assert "${prefix}gripper_tip_midpoint_counterarm" in links
+    assert "${prefix}gripper_tip" in links
+
+    source_joint = "${prefix}gripper_r_joint1"
+    arm_joint = joints["${prefix}gripper_tip_midpoint_arm_joint"]
+    counterarm_joint = joints["${prefix}gripper_tip_midpoint_counterarm_joint"]
+    tip_joint = joints["${prefix}gripper_joint_tip"]
+
+    assert arm_joint.find("parent").attrib["link"] == "${prefix}gripper_base_link"
+    assert arm_joint.find("child").attrib["link"] == "${prefix}gripper_tip_midpoint_arm"
+    assert arm_joint.find("origin").attrib == {
+        "xyz": "0.0 0.0 0.1056",
+        "rpy": "0.0 0.0 0.0",
+    }
+    assert arm_joint.find("axis").attrib["xyz"] == "0 1 0"
+    _assert_mimic(arm_joint, source_joint, "1.0")
+
+    assert counterarm_joint.find("parent").attrib["link"] == "${prefix}gripper_tip_midpoint_arm"
+    assert counterarm_joint.find("child").attrib["link"] == "${prefix}gripper_tip_midpoint_counterarm"
+    assert counterarm_joint.find("origin").attrib == {
+        "xyz": "0.0 0.0 0.0265",
+        "rpy": "0.0 0.0 0.0",
+    }
+    assert counterarm_joint.find("axis").attrib["xyz"] == "0 1 0"
+    _assert_mimic(counterarm_joint, source_joint, "-2.0")
+
+    assert tip_joint.find("parent").attrib["link"] == "${prefix}gripper_tip_midpoint_counterarm"
+    assert tip_joint.find("child").attrib["link"] == "${prefix}gripper_tip"
+    assert tip_joint.find("origin").attrib == {
+        "xyz": "0.0 0.0 0.0265",
+        "rpy": "0.0 0.0 0.0",
+    }
+    assert tip_joint.find("axis").attrib["xyz"] == "0 1 0"
+    _assert_mimic(tip_joint, source_joint, "1.0")
