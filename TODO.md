@@ -16,3 +16,48 @@ Later phases should cover:
 - robotics SDK areas beyond current runtime scope
 - LED and signal APIs
 - other released SDK areas not yet mapped into ROS
+
+## Planned Version System
+
+Do not implement this in the current API expansion branch.
+
+Use a distro-scoped release version model for runtime branches:
+
+- Package versions are tracked per active distro branch.
+- Tags use distro prefixes: `humble-vX.Y.Z`, `jazzy-vX.Y.Z`, and
+  `lyrical-vX.Y.Z`.
+- Keep versions aligned across active distro branches when the same feature or
+  fix applies to all of them.
+- Allow distro-specific patch releases when only one distro branch needs a fix,
+  for example `humble-v0.2.1`.
+- `main` does not own the runtime package version; it coordinates docs and
+  GitHub Pages orchestration.
+
+## API Expansion Order
+
+Expand APIs one coherent PR at a time instead of putting every deferred API area
+into one branch.
+
+Recommended order:
+
+1. LED and signal services:
+   - `set_led`
+   - `get_signals`
+   - `set_signals`
+2. Batch IO services:
+   - `get_dis`
+   - `get_dos`
+   - `get_ais`
+   - `get_aos`
+   - `set_dos`
+   - `set_aos`
+   - optionally `get_box_devices`
+3. Resource list services:
+   - `load_tcp_list`
+   - `load_pose_list`
+   - `load_frame_list`
+   - `load_trajectory_list`
+
+Start with LED and signal because the methods are directly exposed by released
+`pylebai`, the ROS surface is small, and the mapping is easy to test with the
+existing fake robot test pattern.
