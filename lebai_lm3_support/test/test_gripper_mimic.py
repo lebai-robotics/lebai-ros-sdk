@@ -43,6 +43,62 @@ def test_gripper_physical_joints_mimic_single_source_joint():
         _assert_mimic(joints[joint_name], source_joint, multiplier)
 
 
+def test_gripper_link1_end_connections_remain_fixed():
+    root = ET.parse(GRIPPER_MACRO).getroot()
+    joints = _gripper_joints(root)
+
+    expected_joints = {
+        "${prefix}gripper_l_link1_end_connection_joint": (
+            "${prefix}gripper_l_link1",
+            "${prefix}gripper_l_link1_end_connection",
+        ),
+        "${prefix}gripper_r_link1_end_connection_joint": (
+            "${prefix}gripper_r_link1",
+            "${prefix}gripper_r_link1_end_connection",
+        ),
+    }
+
+    for joint_name, (parent, child) in expected_joints.items():
+        joint = joints[joint_name]
+        assert joint.attrib["type"] == "fixed"
+        assert joint.find("parent").attrib["link"] == parent
+        assert joint.find("child").attrib["link"] == child
+
+
+def test_gripper_finger_end_connection_joints_mimic_link1_end_connections():
+    root = ET.parse(GRIPPER_MACRO).getroot()
+    links = {link.attrib["name"] for link in root.findall(".//link")}
+    joints = _gripper_joints(root)
+
+    source_joint = "${prefix}gripper_r_joint1"
+    expected_joints = {
+        "${prefix}gripper_l_link_finger_end_connection_joint": (
+            "${prefix}gripper_l_link_finger",
+            "${prefix}gripper_l_link_finger_end_connection",
+        ),
+        "${prefix}gripper_r_link_finger_end_connection_joint": (
+            "${prefix}gripper_r_link_finger",
+            "${prefix}gripper_r_link_finger_end_connection",
+        ),
+    }
+
+    for joint_name, (parent, child) in expected_joints.items():
+        assert child in links
+        joint = joints[joint_name]
+        assert joint.attrib["type"] == "revolute"
+        assert joint.find("parent").attrib["link"] == parent
+        assert joint.find("child").attrib["link"] == child
+        assert joint.find("origin").attrib == {
+            "xyz": "-0.0135 -0.02 0.0",
+            "rpy": "0.0 0.0 0.0",
+        }
+        assert joint.find("axis").attrib["xyz"] == "0 0 1"
+        limit = joint.find("limit")
+        assert limit.attrib["lower"] == "0.0"
+        assert limit.attrib["upper"] == "${PI/3.0}"
+        _assert_mimic(joint, source_joint, "1.0")
+
+
 def test_gripper_joint_limits_match_zero_to_sixty_degree_motion():
     root = ET.parse(GRIPPER_MACRO).getroot()
     joints = _gripper_joints(root)
