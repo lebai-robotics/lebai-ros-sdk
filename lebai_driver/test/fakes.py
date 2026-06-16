@@ -12,6 +12,8 @@ class FakeRobot:
         self.analog_inputs = {}
         self.analog_outputs = {}
         self.dio_modes = {}
+        self.led = None
+        self.signals = {}
         self.claw = FakeClawData()
         self.next_motion_id = 100
         self.running_motion_id = 0
@@ -195,6 +197,26 @@ class FakeRobot:
     def get_dio_mode(self, device, pin):
         self._record('get_dio_mode', device, pin)
         return self.dio_modes.get((device, pin), False)
+
+    def set_led(self, mode, speed, color):
+        self._record('set_led', mode, speed, color)
+        self.led = {
+            'mode': mode,
+            'speed': speed,
+            'color': list(color),
+        }
+
+    def get_signals(self, index, length):
+        self._record('get_signals', index, length)
+        return [
+            self.signals.get(signal_index, 0)
+            for signal_index in range(index, index + length)
+        ]
+
+    def set_signals(self, index, values):
+        self._record('set_signals', index, values)
+        for offset, value in enumerate(values):
+            self.signals[index + offset] = int(value)
 
     def init_claw(self, force_initialization=False):
         self._record('init_claw', force_initialization)
