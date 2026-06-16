@@ -14,7 +14,6 @@ Later phases should cover:
 - config/files/modbus/serial/storage APIs
 - programs and scenes
 - robotics SDK areas beyond current runtime scope
-- LED and signal APIs
 - other released SDK areas not yet mapped into ROS
 
 ## Planned Version System
@@ -40,11 +39,7 @@ into one branch.
 
 Recommended order:
 
-1. LED and signal services:
-   - `set_led`
-   - `get_signals`
-   - `set_signals`
-2. Batch IO services:
+1. Batch IO services:
    - `get_dis`
    - `get_dos`
    - `get_ais`
@@ -52,12 +47,11 @@ Recommended order:
    - `set_dos`
    - `set_aos`
    - optionally `get_box_devices`
-3. Resource list services:
+2. Resource list services:
    - `load_tcp_list`
    - `load_pose_list`
    - `load_frame_list`
    - `load_trajectory_list`
 
-Start with LED and signal because the methods are directly exposed by released
-`pylebai`, the ROS surface is small, and the mapping is easy to test with the
-existing fake robot test pattern.
+Start with batch IO because the methods are directly exposed by released
+`pylebai` and extend the existing single-channel IO service pattern.
