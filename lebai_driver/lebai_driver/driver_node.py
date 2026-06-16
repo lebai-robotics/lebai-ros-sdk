@@ -5,6 +5,7 @@ from lebai_driver.connection import RobotConnection
 from lebai_driver.parameters import DEFAULT_PARAMETERS
 from lebai_driver.claw_services import register_claw_services
 from lebai_driver.io_services import register_io_services
+from lebai_driver.led_signal_services import register_led_signal_services
 from lebai_driver.motion_services import register_motion_services
 from lebai_driver.start_stop_services import register_start_stop_services
 from lebai_driver.status import register_status_publishers
@@ -29,6 +30,7 @@ class LebaiDriverNode(Node):
         register_start_stop_services(self, self.connection)
         register_motion_services(self, self.connection)
         register_io_services(self, self.connection)
+        register_led_signal_services(self, self.connection)
         register_claw_services(self, self.connection)
 
 
