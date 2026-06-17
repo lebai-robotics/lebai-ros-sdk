@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.10.2)
 project(lebai_lm3_moveit_config)
 find_package(ament_cmake REQUIRED)
 
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+  add_test(
+    NAME test_gripper_group
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_gripper_group.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+endif()
+
 ament_package()
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})

@@ -38,3 +38,8 @@ joint_limits:
     max_velocity: 10
     has_acceleration_limits: false
     max_acceleration: 10
+  gripper_r_joint1:
+    has_velocity_limits: true
+    max_velocity: 1.0
+    has_acceleration_limits: false
+    max_acceleration: 1.0
