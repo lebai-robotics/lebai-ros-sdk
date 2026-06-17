@@ -85,6 +85,18 @@ def test_moveit_launches_load_gripper_robot_models():
     assert "'robot_model': \"lm3_l1_with_gripper.xacro\"" in lm3_l1_launch
 
 
+def test_moveit_launches_forward_simulator_and_use_driver_model_joint_states():
+    lm3_launch = (PACKAGE_DIR / "launch" / "lm3.launch.py").read_text()
+    lm3_l1_launch = (PACKAGE_DIR / "launch" / "lm3_l1.launch.py").read_text()
+
+    for launch_file in (lm3_launch, lm3_l1_launch):
+        assert "name='simulator'" in launch_file
+        assert "simulator = LaunchConfiguration('simulator')" in launch_file
+        assert "'simulator': simulator" in launch_file
+        assert "'joint_states', '/lebai/model/joint_states'" in launch_file
+        assert launch_file.count("remappings=joint_state_remappings") == 3
+
+
 def test_moveit_config_declares_driver_launch_dependency():
     package_manifest = ET.parse(PACKAGE_DIR / "package.xml").getroot()
     exec_dependencies = [
