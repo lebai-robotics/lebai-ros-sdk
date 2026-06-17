@@ -5,7 +5,8 @@ This file tracks future work that is not part of the current active scope.
 ## Deferred Runtime Areas
 
 The active runtime branches currently prioritize released `pylebai` APIs for
-start/stop, motion, status, IO, claw, discovery, and standalone gripper support.
+start/stop, motion, status, IO, resource lists, claw, discovery, and standalone
+gripper support.
 
 Later phases should cover:
 
@@ -38,14 +39,5 @@ Use a distro-scoped release version model for runtime branches:
 Expand APIs one coherent PR at a time instead of putting every deferred API area
 into one branch.
 
-Recommended order:
-
-1. Resource list services:
-   - `load_tcp_list`
-   - `load_pose_list`
-   - `load_frame_list`
-   - `load_trajectory_list`
-
-Start with resource list services because the methods are directly exposed by
-released `pylebai` and provide read-only access to configured controller
-resources.
+No concrete API expansion item is currently queued. Pick the next coherent area
+from Deferred Runtime Areas and add it here before implementation.
