@@ -12,6 +12,7 @@ Later phases should cover:
 - actions
 - MoveIt configuration
 - config/files/modbus/serial/storage APIs
+- box device discovery APIs
 - programs and scenes
 - robotics SDK areas beyond current runtime scope
 - other released SDK areas not yet mapped into ROS
@@ -39,19 +40,12 @@ into one branch.
 
 Recommended order:
 
-1. Batch IO services:
-   - `get_dis`
-   - `get_dos`
-   - `get_ais`
-   - `get_aos`
-   - `set_dos`
-   - `set_aos`
-   - optionally `get_box_devices`
-2. Resource list services:
+1. Resource list services:
    - `load_tcp_list`
    - `load_pose_list`
    - `load_frame_list`
    - `load_trajectory_list`
 
-Start with batch IO because the methods are directly exposed by released
-`pylebai` and extend the existing single-channel IO service pattern.
+Start with resource list services because the methods are directly exposed by
+released `pylebai` and provide read-only access to configured controller
+resources.
