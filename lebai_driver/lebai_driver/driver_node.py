@@ -7,6 +7,7 @@ from lebai_driver.claw_services import register_claw_services
 from lebai_driver.io_services import register_io_services
 from lebai_driver.led_signal_services import register_led_signal_services
 from lebai_driver.motion_services import register_motion_services
+from lebai_driver.resource_services import register_resource_services
 from lebai_driver.start_stop_services import register_start_stop_services
 from lebai_driver.status import register_status_publishers
 
@@ -31,6 +32,7 @@ class LebaiDriverNode(Node):
         register_motion_services(self, self.connection)
         register_io_services(self, self.connection)
         register_led_signal_services(self, self.connection)
+        register_resource_services(self, self.connection)
         register_claw_services(self, self.connection)
 
 
