@@ -48,7 +48,16 @@ def generate_launch_description():
     # )
     robot_ip_arg = DeclareLaunchArgument(name='robot_ip',
                                         description='IP of L-Master controller.')
+    simulator_arg = DeclareLaunchArgument(
+        name='simulator',
+        default_value='false',
+        description='Use pylebai simulator mode.',
+    )
     robot_ip = LaunchConfiguration('robot_ip')
+    simulator = LaunchConfiguration('simulator')
+    joint_state_remappings = [
+        ('joint_states', '/lebai/model/joint_states'),
+    ]
     robot_interface_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
@@ -60,6 +69,7 @@ def generate_launch_description():
         launch_arguments={
             'publish_robot_description': "false",
             'robot_ip': robot_ip,
+            'simulator': simulator,
             'robot_model': "lm3_l1_with_gripper.xacro",
         }.items()
     )
@@ -134,6 +144,7 @@ def generate_launch_description():
             moveit_controllers,
             planning_scene_monitor_parameters,
         ],
+        remappings=joint_state_remappings,
     )
 
     # # RViz
@@ -167,6 +178,7 @@ def generate_launch_description():
             ompl_planning_pipeline_config,
             kinematics_yaml,
         ],
+        remappings=joint_state_remappings,
         # condition=UnlessCondition(tutorial_mode),
     )
 
@@ -186,11 +198,13 @@ def generate_launch_description():
         name="robot_state_publisher",
         output="both",
         parameters=[robot_description],
+        remappings=joint_state_remappings,
     )
 
     return LaunchDescription(
         [
             robot_ip_arg,
+            simulator_arg,
             robot_interface_node,
             static_tf,
             robot_state_publisher,
