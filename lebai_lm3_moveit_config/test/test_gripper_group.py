@@ -74,8 +74,8 @@ def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path, 
         return
 
     assert set(states) == {"open", "closed"}
-    assert _single_joint_value(states["open"]) == ("gripper_r_joint1", "0.0")
-    assert _single_joint_value(states["closed"]) == ("gripper_r_joint1", "1.0471975512")
+    assert _single_joint_value(states["open"]) == ("gripper_r_joint1", "1.0471975512")
+    assert _single_joint_value(states["closed"]) == ("gripper_r_joint1", "0.0")
 
 
 @pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
