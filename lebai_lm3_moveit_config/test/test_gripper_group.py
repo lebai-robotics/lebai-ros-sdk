@@ -124,28 +124,18 @@ def test_gripper_mount_self_collisions_are_disabled_only_when_gripper_is_loaded(
         )
 
 
-@pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
-def test_gripper_internal_adjacent_collisions_are_disabled_only_when_gripper_is_loaded(
+@pytest.mark.parametrize(("srdf_path", "xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_gripper_internal_collisions_are_disabled_only_when_gripper_is_loaded(
     srdf_path,
-    _xacro_path,
+    xacro_path,
     has_gripper,
+    tmp_path,
 ):
     srdf = ET.parse(srdf_path).getroot()
     disabled_pairs = _disabled_collision_pairs(srdf)
-    gripper_pairs = {
-        frozenset(("gripper_base_link", "gripper_r_link1")),
-        frozenset(("gripper_base_link", "gripper_r_link2")),
-        frozenset(("gripper_r_link1", "gripper_r_link1_end_connection")),
-        frozenset(("gripper_r_link2", "gripper_r_link_finger")),
-        frozenset(("gripper_r_link_finger", "gripper_r_link_finger_end_connection")),
-        frozenset(("gripper_base_link", "gripper_l_link1")),
-        frozenset(("gripper_base_link", "gripper_l_link2")),
-        frozenset(("gripper_l_link1", "gripper_l_link1_end_connection")),
-        frozenset(("gripper_l_link2", "gripper_l_link_finger")),
-        frozenset(("gripper_l_link_finger", "gripper_l_link_finger_end_connection")),
-    }
 
     if has_gripper:
+        gripper_pairs = _all_pairs(_gripper_collision_links(xacro_path, tmp_path))
         assert gripper_pairs.issubset(disabled_pairs)
     else:
         assert not any(
@@ -287,6 +277,24 @@ def _single_joint_value(group_state):
 
 
 def _robot_joint_names(xacro_path, tmp_path):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+    return {
+        joint.attrib["name"]
+        for joint in robot.findall("joint")
+    }
+
+
+def _gripper_collision_links(xacro_path, tmp_path):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+    return {
+        link.attrib["name"]
+        for link in robot.findall("link")
+        if link.attrib["name"].startswith("gripper_")
+        and link.find("collision") is not None
+    }
+
+
+def _robot_from_xacro(xacro_path, tmp_path):
     _write_package_index(tmp_path)
     previous_prefix_path = os.environ.get("AMENT_PREFIX_PATH")
     os.environ["AMENT_PREFIX_PATH"] = str(tmp_path)
@@ -297,10 +305,15 @@ def _robot_joint_names(xacro_path, tmp_path):
             os.environ.pop("AMENT_PREFIX_PATH", None)
         else:
             os.environ["AMENT_PREFIX_PATH"] = previous_prefix_path
-    robot = ET.fromstring(document.toxml())
+    return ET.fromstring(document.toxml())
+
+
+def _all_pairs(values):
+    ordered_values = sorted(values)
     return {
-        joint.attrib["name"]
-        for joint in robot.findall("joint")
+        frozenset((first, second))
+        for first_index, first in enumerate(ordered_values)
+        for second in ordered_values[first_index + 1:]
     }
 
 
