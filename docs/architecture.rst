@@ -10,7 +10,22 @@
 
    ros2 launch lebai_driver driver.launch.py robot_ip:=127.0.0.1 simulator:=true
 
-该节点提供机器人状态 topic 和机器人控制 service。
+该节点提供机器人状态 topic、机器人控制 service，以及给 MoveIt 使用的机械臂
+轨迹 action。
+
+MoveIt 轨迹执行
+----------------
+
+主驱动节点提供 ``/lebai_trajectory_controller``：
+
+.. code-block:: text
+
+   control_msgs/action/FollowJointTrajectory
+
+MoveIt 配置中的 ``lebai_trajectory_controller`` 会连接到该 action。驱动会校验
+轨迹关节名和 ``joint_names`` 参数一致，然后把相邻 trajectory point 转换为
+``pylebai.move_pvat(positions, velocities, accelerations, duration)`` 调用。
+该 action 当前只覆盖机械臂关节；gripper 轨迹执行仍是后续工作。
 
 常用参数
 --------
