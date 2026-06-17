@@ -177,6 +177,36 @@ def test_moveit_config_declares_driver_launch_dependency():
     assert "lebai_driver" in exec_dependencies
 
 
+def test_moveit_controller_config_declares_arm_and_gripper_action_servers():
+    controllers = yaml.safe_load(
+        (PACKAGE_DIR / "config" / "lm3_controllers.yaml").read_text()
+    )
+
+    assert controllers["controller_names"] == [
+        "lebai_trajectory_controller",
+        "lebai_gripper_controller",
+    ]
+    assert controllers["lebai_trajectory_controller"] == {
+        "action_ns": "",
+        "type": "FollowJointTrajectory",
+        "default": True,
+        "joints": [
+            "joint_1",
+            "joint_2",
+            "joint_3",
+            "joint_4",
+            "joint_5",
+            "joint_6",
+        ],
+    }
+    assert controllers["lebai_gripper_controller"] == {
+        "action_ns": "gripper_cmd",
+        "type": "GripperCommand",
+        "default": True,
+        "joints": ["gripper_r_joint1"],
+    }
+
+
 def test_joint_limits_include_active_gripper_joint():
     joint_limits = yaml.safe_load(
         (PACKAGE_DIR / "config" / "joint_limits.yaml").read_text()

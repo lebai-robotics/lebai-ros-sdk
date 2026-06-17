@@ -42,6 +42,7 @@ def test_driver_node_declares_runtime_parameters():
         ]
         assert node.get_name() == 'lebai_driver'
         assert node.trajectory_action is not None
+        assert node.gripper_action is not None
     finally:
         if node is not None:
             node.destroy_node()
