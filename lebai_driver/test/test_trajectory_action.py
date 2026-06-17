@@ -73,6 +73,25 @@ class FakeGoalHandle:
         self.cancel_complete = True
 
 
+class MovingFakeRobot(FakeRobot):
+    def __init__(self, states, positions):
+        super().__init__()
+        self._states = list(states)
+        self._positions = [list(position) for position in positions]
+
+    def get_robot_state(self):
+        self._record('get_robot_state')
+        if len(self._states) > 1:
+            return self._states.pop(0)
+        return self._states[0]
+
+    def get_actual_joint_positions(self):
+        self._record('get_actual_joint_positions')
+        if len(self._positions) > 1:
+            return self._positions.pop(0)
+        return self._positions[0]
+
+
 def test_trajectory_action_registers_follow_joint_trajectory_server():
     _server, action_type, name, callbacks = _register(FakeRobot())
 
@@ -106,17 +125,54 @@ def test_trajectory_action_rejects_empty_or_wrong_joint_goals():
 
 def test_trajectory_action_streams_segments_to_move_pvat():
     robot = FakeRobot()
+    robot.robot_state = 5
+    robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
     _server, _action_type, _name, callbacks = _register(robot)
     goal_handle = FakeGoalHandle(_trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
-    assert robot.calls == [
+    assert robot.calls[:2] == [
         ('move_pvat', ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [0.1] * 6, [0.2] * 6, 0.5), {}),
         ('move_pvat', ([2.0, 3.0, 4.0, 5.0, 6.0, 7.0], [0.1] * 6, [0.2] * 6, 0.75), {}),
     ]
+    assert robot.calls[2:] == [
+        ('get_robot_state', (), {}),
+        ('get_actual_joint_positions', (), {}),
+    ]
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.succeeded is True
+
+
+def test_trajectory_action_waits_for_sdk_motion_state_and_final_positions(monkeypatch):
+    from lebai_driver import trajectory_action
+
+    monkeypatch.setattr(trajectory_action.time, 'sleep', lambda _duration: None)
+    robot = MovingFakeRobot(
+        states=[7, 7, 5],
+        positions=[
+            [0, 0, 0, 0, 0, 0],
+            [1, 2, 3, 4, 5, 6],
+            [2, 3, 4, 5, 6, 7],
+        ],
+    )
+    _server, _action_type, _name, callbacks = _register(robot)
+    goal_handle = FakeGoalHandle(_trajectory())
+
+    result = callbacks['execute_callback'](goal_handle)
+
+    assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
+    assert goal_handle.succeeded is True
+    assert [call[0] for call in robot.calls] == [
+        'move_pvat',
+        'move_pvat',
+        'get_robot_state',
+        'get_robot_state',
+        'get_robot_state',
+        'get_actual_joint_positions',
+        'get_actual_joint_positions',
+        'get_actual_joint_positions',
+    ]
 
 
 def test_trajectory_action_rejects_invalid_point_shapes_during_execution():
