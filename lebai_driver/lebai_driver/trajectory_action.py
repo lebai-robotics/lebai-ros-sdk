@@ -1,9 +1,20 @@
+import time
+
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 
 ACTION_NAME = '/lebai_trajectory_controller'
+GOAL_TOLERANCE = 0.01
+POLL_INTERVAL_SEC = 0.05
+RUNNING_ROBOT_STATES = {6, 7}
+TIMEOUT_MARGIN_SEC = 5.0
+TIMEOUT_SCALE = 1.25
+
+_COMPLETED = 'completed'
+_CANCELED = 'canceled'
+_TIMEOUT = 'timeout'
 
 
 def register_trajectory_action(node, connection):
@@ -65,6 +76,7 @@ class TrajectoryActionBridge:
 
         try:
             robot = self.connection.robot
+            execution_start_time = time.monotonic()
             previous_time = self._time_from_start(trajectory.points[0])
             for point in trajectory.points[1:]:
                 if goal_handle.is_cancel_requested:
@@ -81,6 +93,23 @@ class TrajectoryActionBridge:
                     current_time - previous_time,
                 )
                 previous_time = current_time
+
+            completion = self._wait_for_completion(
+                robot,
+                goal_handle,
+                list(trajectory.points[-1].positions),
+                execution_start_time,
+                self._time_from_start(trajectory.points[-1]),
+            )
+            if completion == _CANCELED:
+                result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
+                goal_handle.canceled()
+                return result
+            if completion == _TIMEOUT:
+                result.error_code = FollowJointTrajectory.Result.GOAL_TOLERANCE_VIOLATED
+                result.error_string = 'trajectory did not reach final joint state'
+                goal_handle.abort()
+                return result
         except Exception as exc:
             result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
             result.error_string = str(exc)
@@ -117,3 +146,52 @@ class TrajectoryActionBridge:
     @staticmethod
     def _time_from_start(point):
         return point.time_from_start.sec + point.time_from_start.nanosec / 1_000_000_000
+
+    def _wait_for_completion(
+        self,
+        robot,
+        goal_handle,
+        final_positions,
+        execution_start_time,
+        final_time_from_start,
+    ):
+        deadline = execution_start_time + max(
+            TIMEOUT_MARGIN_SEC,
+            final_time_from_start * TIMEOUT_SCALE + TIMEOUT_MARGIN_SEC,
+        )
+        sdk_motion_finished = False
+
+        while time.monotonic() <= deadline:
+            if goal_handle.is_cancel_requested:
+                robot.stop_move()
+                return _CANCELED
+
+            if not sdk_motion_finished:
+                robot_state = int(robot.get_robot_state())
+                if robot_state in RUNNING_ROBOT_STATES:
+                    self._sleep_until_next_poll(deadline)
+                    continue
+                sdk_motion_finished = True
+
+            if self._final_positions_reached(robot, final_positions):
+                return _COMPLETED
+
+            self._sleep_until_next_poll(deadline)
+
+        return _TIMEOUT
+
+    def _final_positions_reached(self, robot, final_positions):
+        actual_positions = list(robot.get_actual_joint_positions())
+        if len(actual_positions) != len(final_positions):
+            return False
+
+        return all(
+            abs(actual - expected) <= GOAL_TOLERANCE
+            for actual, expected in zip(actual_positions, final_positions)
+        )
+
+    @staticmethod
+    def _sleep_until_next_poll(deadline):
+        remaining = deadline - time.monotonic()
+        if remaining > 0.0:
+            time.sleep(min(POLL_INTERVAL_SEC, remaining))
