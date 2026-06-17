@@ -50,6 +50,7 @@ set(srv_files
   "srv/SetLed.srv"
   "srv/GetSignals.srv"
   "srv/SetSignals.srv"
+  "srv/LoadResourceList.srv"
   "srv/SetClaw.srv"
   "srv/GetClaw.srv"
   "srv/SetGripperPosition.srv"
