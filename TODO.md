@@ -12,8 +12,10 @@ Later phases should cover:
 
 - actions
 - MoveIt configuration
-  - gripper group semantics are configured; trajectory execution/controller
-    integration remains deferred
+  - gripper group semantics are configured.
+  - arm trajectory execution is available through the
+    `/lebai_trajectory_controller` FollowJointTrajectory action bridge.
+  - gripper trajectory/controller execution remains deferred.
 - config/files/modbus/serial/storage APIs
 - box device discovery APIs
 - programs and scenes
