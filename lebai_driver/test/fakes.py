@@ -178,6 +178,26 @@ class FakeRobot:
         self._record('get_do', device, pin)
         return self.digital_outputs.get((device, pin), False)
 
+    def set_dos(self, device, pin, values):
+        values = list(values)
+        self._record('set_dos', device, pin, values)
+        for offset, value in enumerate(values):
+            self.digital_outputs[(device, pin + offset)] = bool(value)
+
+    def get_dis(self, device, pin, num):
+        self._record('get_dis', device, pin, num)
+        return [
+            self.digital_inputs.get((device, index), False)
+            for index in range(pin, pin + num)
+        ]
+
+    def get_dos(self, device, pin, num):
+        self._record('get_dos', device, pin, num)
+        return [
+            self.digital_outputs.get((device, index), False)
+            for index in range(pin, pin + num)
+        ]
+
     def set_ao(self, device, pin, value):
         self._record('set_ao', device, pin, value)
         self.analog_outputs[(device, pin)] = value
@@ -189,6 +209,26 @@ class FakeRobot:
     def get_ao(self, device, pin):
         self._record('get_ao', device, pin)
         return self.analog_outputs.get((device, pin), 0.0)
+
+    def set_aos(self, device, pin, values):
+        values = list(values)
+        self._record('set_aos', device, pin, values)
+        for offset, value in enumerate(values):
+            self.analog_outputs[(device, pin + offset)] = float(value)
+
+    def get_ais(self, device, pin, num):
+        self._record('get_ais', device, pin, num)
+        return [
+            self.analog_inputs.get((device, index), 0.0)
+            for index in range(pin, pin + num)
+        ]
+
+    def get_aos(self, device, pin, num):
+        self._record('get_aos', device, pin, num)
+        return [
+            self.analog_outputs.get((device, index), 0.0)
+            for index in range(pin, pin + num)
+        ]
 
     def set_dio_mode(self, device, pin, is_output):
         self._record('set_dio_mode', device, pin, is_output)
