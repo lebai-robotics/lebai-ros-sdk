@@ -14,6 +14,12 @@ class FakeRobot:
         self.dio_modes = {}
         self.led = None
         self.signals = {}
+        self.resource_lists = {
+            'tcp': {'': []},
+            'pose': {'': []},
+            'frame': {'': []},
+            'trajectory': {'': []},
+        }
         self.claw = FakeClawData()
         self.next_motion_id = 100
         self.running_motion_id = 0
@@ -257,6 +263,22 @@ class FakeRobot:
         self._record('set_signals', index, values)
         for offset, value in enumerate(values):
             self.signals[index + offset] = int(value)
+
+    def load_tcp_list(self, directory=''):
+        self._record('load_tcp_list', directory)
+        return self.resource_lists['tcp'].get(directory, [])
+
+    def load_pose_list(self, directory=''):
+        self._record('load_pose_list', directory)
+        return self.resource_lists['pose'].get(directory, [])
+
+    def load_frame_list(self, directory=''):
+        self._record('load_frame_list', directory)
+        return self.resource_lists['frame'].get(directory, [])
+
+    def load_trajectory_list(self, directory=''):
+        self._record('load_trajectory_list', directory)
+        return self.resource_lists['trajectory'].get(directory, [])
 
     def init_claw(self, force_initialization=False):
         self._record('init_claw', force_initialization)
