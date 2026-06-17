@@ -1,11 +1,17 @@
 from lebai_interfaces.srv import (
     GetAnalogInput,
+    GetAnalogInputs,
     GetAnalogOutput,
+    GetAnalogOutputs,
     GetDigitalInput,
+    GetDigitalInputs,
     GetDigitalOutput,
+    GetDigitalOutputs,
     GetDioMode,
     SetAnalogOutput,
+    SetAnalogOutputs,
     SetDigitalOutput,
+    SetDigitalOutputs,
     SetDioMode,
 )
 
@@ -35,13 +41,19 @@ def test_io_services_register_sdk_category_names():
         (SetDigitalOutput, 'io/set_do'),
         (GetDigitalInput, 'io/get_di'),
         (GetDigitalOutput, 'io/get_do'),
+        (SetDigitalOutputs, 'io/set_dos'),
+        (GetDigitalInputs, 'io/get_dis'),
+        (GetDigitalOutputs, 'io/get_dos'),
         (SetAnalogOutput, 'io/set_ao'),
         (GetAnalogInput, 'io/get_ai'),
         (GetAnalogOutput, 'io/get_ao'),
+        (SetAnalogOutputs, 'io/set_aos'),
+        (GetAnalogInputs, 'io/get_ais'),
+        (GetAnalogOutputs, 'io/get_aos'),
         (SetDioMode, 'io/set_dio_mode'),
         (GetDioMode, 'io/get_dio_mode'),
     ]
-    assert len(services) == 8
+    assert len(services) == 14
 
 
 def test_set_do_maps_request_to_sdk_call():
