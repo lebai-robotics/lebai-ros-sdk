@@ -15,18 +15,39 @@ ROBOT_CONFIGS = [
     (
         PACKAGE_DIR / "config" / "lebai_lm3.srdf",
         SUPPORT_DIR / "urdf" / "lm3_with_gripper.xacro",
+        True,
     ),
     (
         PACKAGE_DIR / "config" / "lebai_lm3_l1.srdf",
         SUPPORT_DIR / "urdf" / "lm3_l1_with_gripper.xacro",
+        True,
+    ),
+    (
+        PACKAGE_DIR / "config" / "lebai_lm3_no_gripper.srdf",
+        SUPPORT_DIR / "urdf" / "lm3.xacro",
+        False,
+    ),
+    (
+        PACKAGE_DIR / "config" / "lebai_lm3_l1_no_gripper.srdf",
+        SUPPORT_DIR / "urdf" / "lm3_l1.xacro",
+        False,
     ),
 ]
 
 
-@pytest.mark.parametrize(("srdf_path", "xacro_path"), ROBOT_CONFIGS)
-def test_gripper_group_references_existing_active_joint(srdf_path, xacro_path, tmp_path):
+@pytest.mark.parametrize(("srdf_path", "xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_srdf_groups_reference_existing_active_joints(srdf_path, xacro_path, has_gripper, tmp_path):
     srdf = ET.parse(srdf_path).getroot()
     robot_joints = _robot_joint_names(xacro_path, tmp_path)
+
+    manipulator_group = _required_group(srdf, "manipulator")
+    chain = manipulator_group.find("chain")
+    assert chain is not None
+    assert chain.attrib == {"base_link": "base_link", "tip_link": "tool0"}
+
+    if not has_gripper:
+        assert _find_group(srdf, "gripper") is None
+        return
 
     gripper_group = _required_group(srdf, "gripper")
     group_joints = [
@@ -38,8 +59,8 @@ def test_gripper_group_references_existing_active_joint(srdf_path, xacro_path, t
     assert set(group_joints).issubset(robot_joints)
 
 
-@pytest.mark.parametrize(("srdf_path", "_xacro_path"), ROBOT_CONFIGS)
-def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path):
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path, has_gripper):
     srdf = ET.parse(srdf_path).getroot()
 
     states = {
@@ -48,13 +69,17 @@ def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path):
         if state.attrib.get("group") == "gripper"
     }
 
+    if not has_gripper:
+        assert states == {}
+        return
+
     assert set(states) == {"open", "closed"}
     assert _single_joint_value(states["open"]) == ("gripper_r_joint1", "0.0")
     assert _single_joint_value(states["closed"]) == ("gripper_r_joint1", "1.0471975512")
 
 
-@pytest.mark.parametrize(("srdf_path", "_xacro_path"), ROBOT_CONFIGS)
-def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xacro_path):
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xacro_path, has_gripper):
     srdf = ET.parse(srdf_path).getroot()
 
     end_effectors = [
@@ -62,6 +87,10 @@ def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xac
         for end_effector in srdf.findall("end_effector")
         if end_effector.attrib.get("name") == "gripper"
     ]
+
+    if not has_gripper:
+        assert end_effectors == []
+        return
 
     assert end_effectors == [{
         "name": "gripper",
@@ -71,18 +100,50 @@ def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xac
     }]
 
 
-def test_moveit_launches_load_gripper_robot_models():
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_gripper_mount_self_collisions_are_disabled_only_when_gripper_is_loaded(
+    srdf_path,
+    _xacro_path,
+    has_gripper,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    disabled_pairs = _disabled_collision_pairs(srdf)
+    gripper_pairs = {
+        frozenset(("link_6", "tool0")),
+        frozenset(("tool0", "gripper_base_link")),
+        frozenset(("link_6", "gripper_base_link")),
+    }
+
+    if has_gripper:
+        assert gripper_pairs.issubset(disabled_pairs)
+    else:
+        assert not any(
+            "gripper" in link
+            for pair in disabled_pairs
+            for link in pair
+        )
+
+
+def test_moveit_launches_select_robot_models_by_has_gripper_argument():
     lm3_launch = (PACKAGE_DIR / "launch" / "lm3.launch.py").read_text()
     lm3_l1_launch = (PACKAGE_DIR / "launch" / "lm3_l1.launch.py").read_text()
 
+    assert "name='has_gripper'" in lm3_launch
+    assert "name='has_gripper'" in lm3_l1_launch
+    assert "IfCondition(has_gripper)" in lm3_launch
+    assert "IfCondition(has_gripper)" in lm3_l1_launch
+    assert "UnlessCondition(has_gripper)" in lm3_launch
+    assert "UnlessCondition(has_gripper)" in lm3_l1_launch
     assert "lm3_with_gripper.xacro" in lm3_launch
     assert "lm3_l1_with_gripper.xacro" in lm3_l1_launch
+    assert "lm3.xacro" in lm3_launch
+    assert "lm3_l1.xacro" in lm3_l1_launch
+    assert "lebai_lm3_no_gripper.srdf" in lm3_launch
+    assert "lebai_lm3_l1_no_gripper.srdf" in lm3_l1_launch
     assert "driver.launch.py" in lm3_launch
     assert "driver.launch.py" in lm3_l1_launch
     assert "'publish_robot_description': \"false\"" in lm3_launch
     assert "'publish_robot_description': \"false\"" in lm3_l1_launch
-    assert "'robot_model': \"lm3_with_gripper.xacro\"" in lm3_launch
-    assert "'robot_model': \"lm3_l1_with_gripper.xacro\"" in lm3_l1_launch
 
 
 def test_moveit_launches_forward_simulator_and_use_driver_model_joint_states():
@@ -121,13 +182,31 @@ def test_joint_limits_include_active_gripper_joint():
 
 
 def _required_group(srdf, name):
+    group = _find_group(srdf, name)
+    assert group is not None
+    return group
+
+
+def _find_group(srdf, name):
     groups = [
         group
         for group in srdf.findall("group")
         if group.attrib.get("name") == name
     ]
+    if not groups:
+        return None
     assert len(groups) == 1
     return groups[0]
+
+
+def _disabled_collision_pairs(srdf):
+    return {
+        frozenset((
+            entry.attrib["link1"],
+            entry.attrib["link2"],
+        ))
+        for entry in srdf.findall("disable_collisions")
+    }
 
 
 def _single_joint_value(group_state):
