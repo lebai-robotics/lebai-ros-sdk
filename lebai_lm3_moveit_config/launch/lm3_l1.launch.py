@@ -54,12 +54,13 @@ def generate_launch_description():
             PathJoinSubstitution([
                 FindPackageShare('lebai_driver'),
                 'launch',
-                'robot_interface.launch.py'
+                'driver.launch.py'
             ])
         ]),
         launch_arguments={
-            'has_gripper': "false",
-            'robot_ip': robot_ip
+            'publish_robot_description': "false",
+            'robot_ip': robot_ip,
+            'robot_model': "lm3_l1_with_gripper.xacro",
         }.items()
     )
     # planning_context
@@ -67,7 +68,7 @@ def generate_launch_description():
         os.path.join(
             get_package_share_directory("lebai_lm3_support"),
             "urdf",
-            "lm3_l1.xacro",
+            "lm3_l1_with_gripper.xacro",
         )
     )
     robot_description = {"robot_description": robot_description_config.toxml()}

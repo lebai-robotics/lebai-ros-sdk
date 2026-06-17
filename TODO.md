@@ -12,6 +12,8 @@ Later phases should cover:
 
 - actions
 - MoveIt configuration
+  - gripper group semantics are configured; trajectory execution/controller
+    integration remains deferred
 - config/files/modbus/serial/storage APIs
 - box device discovery APIs
 - programs and scenes
