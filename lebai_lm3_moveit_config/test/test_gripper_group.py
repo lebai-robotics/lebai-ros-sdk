@@ -124,6 +124,37 @@ def test_gripper_mount_self_collisions_are_disabled_only_when_gripper_is_loaded(
         )
 
 
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
+def test_gripper_internal_adjacent_collisions_are_disabled_only_when_gripper_is_loaded(
+    srdf_path,
+    _xacro_path,
+    has_gripper,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    disabled_pairs = _disabled_collision_pairs(srdf)
+    gripper_pairs = {
+        frozenset(("gripper_base_link", "gripper_r_link1")),
+        frozenset(("gripper_base_link", "gripper_r_link2")),
+        frozenset(("gripper_r_link1", "gripper_r_link1_end_connection")),
+        frozenset(("gripper_r_link2", "gripper_r_link_finger")),
+        frozenset(("gripper_r_link_finger", "gripper_r_link_finger_end_connection")),
+        frozenset(("gripper_base_link", "gripper_l_link1")),
+        frozenset(("gripper_base_link", "gripper_l_link2")),
+        frozenset(("gripper_l_link1", "gripper_l_link1_end_connection")),
+        frozenset(("gripper_l_link2", "gripper_l_link_finger")),
+        frozenset(("gripper_l_link_finger", "gripper_l_link_finger_end_connection")),
+    }
+
+    if has_gripper:
+        assert gripper_pairs.issubset(disabled_pairs)
+    else:
+        assert not any(
+            "gripper" in link
+            for pair in disabled_pairs
+            for link in pair
+        )
+
+
 def test_moveit_launches_select_robot_models_by_has_gripper_argument():
     lm3_launch = (PACKAGE_DIR / "launch" / "lm3.launch.py").read_text()
     lm3_l1_launch = (PACKAGE_DIR / "launch" / "lm3_l1.launch.py").read_text()

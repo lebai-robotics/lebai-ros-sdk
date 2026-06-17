@@ -47,4 +47,14 @@
     <disable_collisions link1="link_6" link2="tool0" reason="Adjacent"/>
     <disable_collisions link1="tool0" link2="gripper_base_link" reason="Adjacent"/>
     <disable_collisions link1="link_6" link2="gripper_base_link" reason="Never"/>
+    <disable_collisions link1="gripper_base_link" link2="gripper_r_link1" reason="Adjacent"/>
+    <disable_collisions link1="gripper_base_link" link2="gripper_r_link2" reason="Adjacent"/>
+    <disable_collisions link1="gripper_r_link1" link2="gripper_r_link1_end_connection" reason="Adjacent"/>
+    <disable_collisions link1="gripper_r_link2" link2="gripper_r_link_finger" reason="Adjacent"/>
+    <disable_collisions link1="gripper_r_link_finger" link2="gripper_r_link_finger_end_connection" reason="Adjacent"/>
+    <disable_collisions link1="gripper_base_link" link2="gripper_l_link1" reason="Adjacent"/>
+    <disable_collisions link1="gripper_base_link" link2="gripper_l_link2" reason="Adjacent"/>
+    <disable_collisions link1="gripper_l_link1" link2="gripper_l_link1_end_connection" reason="Adjacent"/>
+    <disable_collisions link1="gripper_l_link2" link2="gripper_l_link_finger" reason="Adjacent"/>
+    <disable_collisions link1="gripper_l_link_finger" link2="gripper_l_link_finger_end_connection" reason="Adjacent"/>
 </robot>
