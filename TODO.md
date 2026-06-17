@@ -15,7 +15,8 @@ Later phases should cover:
   - gripper group semantics are configured.
   - arm trajectory execution is available through the
     `/lebai_trajectory_controller` FollowJointTrajectory action bridge.
-  - gripper trajectory/controller execution remains deferred.
+  - gripper execution is available through the
+    `/lebai_gripper_controller/gripper_cmd` GripperCommand action bridge.
 - config/files/modbus/serial/storage APIs
 - box device discovery APIs
 - programs and scenes
