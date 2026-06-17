@@ -146,7 +146,7 @@ def test_moveit_launches_select_robot_models_by_has_gripper_argument():
     assert "'publish_robot_description': \"false\"" in lm3_l1_launch
 
 
-def test_moveit_launches_forward_simulator_and_use_driver_model_joint_states():
+def test_moveit_launches_forward_simulator_and_selects_joint_state_topic_by_gripper_mode():
     lm3_launch = (PACKAGE_DIR / "launch" / "lm3.launch.py").read_text()
     lm3_l1_launch = (PACKAGE_DIR / "launch" / "lm3_l1.launch.py").read_text()
 
@@ -154,7 +154,16 @@ def test_moveit_launches_forward_simulator_and_use_driver_model_joint_states():
         assert "name='simulator'" in launch_file
         assert "simulator = LaunchConfiguration('simulator')" in launch_file
         assert "'simulator': simulator" in launch_file
-        assert "'joint_states', '/lebai/model/joint_states'" in launch_file
+        assert (
+            "gripper_joint_state_remappings = [\n"
+            "        ('joint_states', '/lebai/model/joint_states'),\n"
+            "    ]"
+        ) in launch_file
+        assert (
+            "arm_joint_state_remappings = [\n"
+            "        ('joint_states', '/lebai/status/joint_states'),\n"
+            "    ]"
+        ) in launch_file
         assert launch_file.count("remappings=joint_state_remappings") == 3
 
 

@@ -164,8 +164,11 @@ def generate_launch_description():
     robot_ip = LaunchConfiguration('robot_ip')
     simulator = LaunchConfiguration('simulator')
     has_gripper = LaunchConfiguration('has_gripper')
-    joint_state_remappings = [
+    gripper_joint_state_remappings = [
         ('joint_states', '/lebai/model/joint_states'),
+    ]
+    arm_joint_state_remappings = [
+        ('joint_states', '/lebai/status/joint_states'),
     ]
     # planning_context
     gripper_robot_description, gripper_robot_description_semantic = (
@@ -241,7 +244,7 @@ def generate_launch_description():
         simulator,
         "lm3_l1_with_gripper.xacro",
         IfCondition(has_gripper),
-        joint_state_remappings,
+        gripper_joint_state_remappings,
         kinematics_yaml,
         ompl_planning_pipeline_config,
         trajectory_execution,
@@ -256,7 +259,7 @@ def generate_launch_description():
         simulator,
         "lm3_l1.xacro",
         UnlessCondition(has_gripper),
-        joint_state_remappings,
+        arm_joint_state_remappings,
         kinematics_yaml,
         ompl_planning_pipeline_config,
         trajectory_execution,
