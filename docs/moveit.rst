@@ -6,29 +6,20 @@ MoveIt
 准备工作
 --------
 
-先在工作空间根目录构建驱动、资源和 MoveIt 配置：
+先在工作空间根目录构建源码包：
 
 .. code-block:: bash
 
    cd ~/lebai/lebai_ws
    source /opt/ros/humble/setup.bash
-   PYTHONNOUSERSITE=1 colcon build --packages-select \
-     lebai_interfaces \
-     lebai_driver \
-     lebai_resources \
-     lebai_lm3_support \
-     lebai_lm3_moveit_config \
-     --symlink-install
+   colcon build --symlink-install
    source install/setup.bash
-
-如果系统的用户目录 Python 包覆盖了 ROS Humble 期望的打包工具链，构建
-``lebai_driver`` 时可能出现 ``option --editable not recognized``。这种情况下，
-只在构建命令前加 ``PYTHONNOUSERSITE=1``，不要长期修改 shell 环境。
 
 启动 LM3 MoveIt
 ---------------
 
-连接本机仿真控制器：
+连接仿真控制器时，将 ``robot_ip`` 指向仿真控制器所在主机。下面示例使用本机
+``127.0.0.1``：
 
 .. code-block:: bash
 
