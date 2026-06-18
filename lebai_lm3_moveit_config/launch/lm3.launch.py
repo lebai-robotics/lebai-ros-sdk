@@ -6,9 +6,8 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
-from launch.actions import ExecuteProcess
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution, TextSubstitution
+from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 import xacro
@@ -36,6 +35,109 @@ def load_yaml(package_name, file_path):
         return None
 
 
+def moveit_robot_description(robot_model, srdf_file):
+    robot_description_config = xacro.process_file(
+        os.path.join(
+            get_package_share_directory("lebai_lm3_support"),
+            "urdf",
+            robot_model,
+        )
+    )
+    robot_description = {"robot_description": robot_description_config.toxml()}
+
+    robot_description_semantic_config = load_file(
+        "lebai_lm3_moveit_config", f"config/{srdf_file}"
+    )
+    robot_description_semantic = {
+        "robot_description_semantic": robot_description_semantic_config
+    }
+
+    return robot_description, robot_description_semantic
+
+
+def moveit_nodes(
+    robot_description,
+    robot_description_semantic,
+    robot_ip,
+    simulator,
+    robot_model,
+    condition,
+    joint_state_remappings,
+    kinematics_yaml,
+    ompl_planning_pipeline_config,
+    trajectory_execution,
+    moveit_controllers,
+    planning_scene_monitor_parameters,
+    rviz_full_config,
+):
+    robot_interface_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('lebai_driver'),
+                'launch',
+                'driver.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'publish_robot_description': "false",
+            'robot_ip': robot_ip,
+            'simulator': simulator,
+            'robot_model': robot_model,
+        }.items(),
+        condition=condition,
+    )
+
+    run_move_group_node = Node(
+        package="moveit_ros_move_group",
+        executable="move_group",
+        output="screen",
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            kinematics_yaml,
+            ompl_planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+        ],
+        remappings=joint_state_remappings,
+        condition=condition,
+    )
+
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="log",
+        arguments=["-d", rviz_full_config],
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            ompl_planning_pipeline_config,
+            kinematics_yaml,
+        ],
+        remappings=joint_state_remappings,
+        condition=condition,
+    )
+
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        output="both",
+        parameters=[robot_description],
+        remappings=joint_state_remappings,
+        condition=condition,
+    )
+
+    return [
+        robot_interface_node,
+        run_move_group_node,
+        rviz_node,
+        robot_state_publisher,
+    ]
+
+
 def generate_launch_description():
 
     # Command-line arguments
@@ -48,36 +150,33 @@ def generate_launch_description():
     # )
     robot_ip_arg = DeclareLaunchArgument(name='robot_ip',
                                         description='IP of L-Master controller.')
+    simulator_arg = DeclareLaunchArgument(
+        name='simulator',
+        default_value='false',
+        description='Use pylebai simulator mode.',
+    )
+    has_gripper_arg = DeclareLaunchArgument(
+        name='has_gripper',
+        default_value='true',
+        choices=['true', 'false'],
+        description='Load the robot model and MoveIt config with a mounted gripper.',
+    )
     robot_ip = LaunchConfiguration('robot_ip')
-    robot_interface_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('lebai_driver'),
-                'launch',
-                'robot_interface.launch.py'
-            ])
-        ]),
-        launch_arguments={
-            'has_gripper': "false",
-            'robot_ip': robot_ip
-        }.items()
-    )
+    simulator = LaunchConfiguration('simulator')
+    has_gripper = LaunchConfiguration('has_gripper')
+    gripper_joint_state_remappings = [
+        ('joint_states', '/lebai/model/joint_states'),
+    ]
+    arm_joint_state_remappings = [
+        ('joint_states', '/lebai/status/joint_states'),
+    ]
     # planning_context
-    robot_description_config = xacro.process_file(
-        os.path.join(
-            get_package_share_directory("lebai_lm3_support"),
-            "urdf",
-            "lm3.xacro",
-        )
+    gripper_robot_description, gripper_robot_description_semantic = (
+        moveit_robot_description("lm3_with_gripper.xacro", "lebai_lm3.srdf")
     )
-    robot_description = {"robot_description": robot_description_config.toxml()}
-    
-    robot_description_semantic_config = load_file(
-        "lebai_lm3_moveit_config", "config/lebai_lm3.srdf"
+    arm_robot_description, arm_robot_description_semantic = (
+        moveit_robot_description("lm3.xacro", "lebai_lm3_no_gripper.srdf")
     )
-    robot_description_semantic = {
-        "robot_description_semantic": robot_description_semantic_config
-    }
 
     kinematics_yaml = load_yaml(
         "lebai_lm3_moveit_config", "config/kinematics.yaml"
@@ -119,22 +218,6 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-    # Start the actual move_group node/action server
-    run_move_group_node = Node(
-        package="moveit_ros_move_group",
-        executable="move_group",
-        output="screen",
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            kinematics_yaml,
-            ompl_planning_pipeline_config,
-            trajectory_execution,
-            moveit_controllers,
-            planning_scene_monitor_parameters,
-        ],
-    )
-
     # # RViz
     # tutorial_mode = LaunchConfiguration("rviz_tutorial")
     rviz_base = os.path.join(get_package_share_directory("lebai_lm3_moveit_config"), "launch")
@@ -154,19 +237,35 @@ def generate_launch_description():
     #     ],
     #     condition=IfCondition(tutorial_mode),
     # )
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_full_config],
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            ompl_planning_pipeline_config,
-            kinematics_yaml,
-        ],
-        # condition=UnlessCondition(tutorial_mode),
+    gripper_nodes = moveit_nodes(
+        gripper_robot_description,
+        gripper_robot_description_semantic,
+        robot_ip,
+        simulator,
+        "lm3_with_gripper.xacro",
+        IfCondition(has_gripper),
+        gripper_joint_state_remappings,
+        kinematics_yaml,
+        ompl_planning_pipeline_config,
+        trajectory_execution,
+        moveit_controllers,
+        planning_scene_monitor_parameters,
+        rviz_full_config,
+    )
+    arm_nodes = moveit_nodes(
+        arm_robot_description,
+        arm_robot_description_semantic,
+        robot_ip,
+        simulator,
+        "lm3.xacro",
+        UnlessCondition(has_gripper),
+        arm_joint_state_remappings,
+        kinematics_yaml,
+        ompl_planning_pipeline_config,
+        trajectory_execution,
+        moveit_controllers,
+        planning_scene_monitor_parameters,
+        rviz_full_config,
     )
 
     # Static TF
@@ -178,22 +277,13 @@ def generate_launch_description():
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
     )
 
-    # Publish TF
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher",
-        output="both",
-        parameters=[robot_description],
-    )
-
     return LaunchDescription(
         [
             robot_ip_arg,
-            robot_interface_node,
+            simulator_arg,
+            has_gripper_arg,
             static_tf,
-            robot_state_publisher,
-            run_move_group_node,
-            rviz_node,
+            *gripper_nodes,
+            *arm_nodes,
         ]
     )

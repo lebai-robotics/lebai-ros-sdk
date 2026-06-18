@@ -100,6 +100,23 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         ]
         _spin_until(executor, lambda: all(client.service_is_ready() for client in clients))
 
+        from rclpy.action import ActionClient
+        from control_msgs.action import FollowJointTrajectory, GripperCommand
+
+        trajectory_client = ActionClient(
+            probe,
+            FollowJointTrajectory,
+            '/lebai_trajectory_controller',
+        )
+        _spin_until(executor, trajectory_client.server_is_ready)
+
+        gripper_client = ActionClient(
+            probe,
+            GripperCommand,
+            '/lebai_gripper_controller/gripper_cmd',
+        )
+        _spin_until(executor, gripper_client.server_is_ready)
+
         running = _call_service(
             executor,
             probe,
