@@ -11,6 +11,8 @@
 
   <depend>rclpy</depend>
   <depend>lebai_interfaces</depend>
+  <depend>control_msgs</depend>
+  <depend>moveit_msgs</depend>
   <depend>sensor_msgs</depend>
 
   <export>

@@ -28,6 +28,9 @@ devel_isolated/
 *.wikidoc
 site/
 docs/_build/
+docs/design/
+docs/superpower/
+docs/superpowers/
 
 # eclipse stuff
 .project
