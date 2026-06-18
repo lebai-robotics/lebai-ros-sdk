@@ -59,7 +59,7 @@ RViz 中的操作
 启动后，在 RViz 的 MotionPlanning 面板中选择 planning group：
 
 - ``manipulator``：拖动末端交互 marker，点击 ``Plan`` 做机械臂规划，点击
-  ``Execute`` 执行轨迹。
+  ``Execute`` 执行轨迹。执行前需要先启动机械臂。
 - ``gripper``：选择 ``open`` 或 ``closed`` 命名状态，再执行 gripper action。
 
 点击 ``Execute`` 后，MoveIt 会通过驱动执行机械臂轨迹或 claw 开合命令。
