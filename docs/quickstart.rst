@@ -170,8 +170,4 @@ RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
 运行示例
 --------
 
-.. code-block:: bash
-
-   ros2 run lebai_tutorials move_example.py
-   ros2 run lebai_tutorials io_example.py
-   ros2 run lebai_tutorials joint_state_subscriber.py
+基础驱动和 MoveIt 示例见 :doc:`examples`。
