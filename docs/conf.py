@@ -13,6 +13,7 @@ exclude_patterns = ['_build', 'superpowers']
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'display_version': True,
+    'titles_only': True,
 }
 html_title = 'Lebai ROS2 SDK 文档'
 html_static_path = ['_static']

@@ -1,0 +1,82 @@
+MoveIt
+======
+
+本页说明如何启动 LM3/LM3-L1 的 MoveIt 配置，并通过 RViz 做规划和执行。
+
+准备工作
+--------
+
+先在工作空间根目录构建源码包：
+
+.. code-block:: bash
+
+   cd ~/lebai/lebai_ws
+   source /opt/ros/humble/setup.bash
+   colcon build --symlink-install
+   source install/setup.bash
+
+启动 MoveIt
+-----------
+
+连接仿真控制器时，将 ``robot_ip`` 指向仿真控制器所在主机。下面示例使用本机
+``127.0.0.1``：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_moveit_config lm3.launch.py \
+     robot_ip:=127.0.0.1 \
+     simulator:=true
+
+连接真实控制器时，将 ``robot_ip`` 改成控制器 IP，并省略
+``simulator:=true``：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_moveit_config lm3.launch.py \
+     robot_ip:=192.168.1.100
+
+启动 LM3-L1 MoveIt：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_moveit_config lm3_l1.launch.py \
+     robot_ip:=127.0.0.1 \
+     simulator:=true
+
+默认会加载带 gripper 的配置。只使用机械臂本体时，设置
+``has_gripper:=false``：
+
+.. code-block:: bash
+
+   ros2 launch lebai_lm3_moveit_config lm3.launch.py \
+     robot_ip:=127.0.0.1 \
+     simulator:=true \
+     has_gripper:=false
+
+RViz 中的操作
+-------------
+
+启动后，在 RViz 的 MotionPlanning 面板中选择 planning group：
+
+- ``manipulator``：拖动末端交互 marker，点击 ``Plan`` 做机械臂规划，点击
+  ``Execute`` 执行轨迹。执行前需要先启动机械臂。
+- ``gripper``：选择 ``open`` 或 ``closed`` 命名状态，再执行 gripper action。
+
+点击 ``Execute`` 后，MoveIt 会通过驱动执行机械臂轨迹或 claw 开合命令。
+
+检查连接
+--------
+
+启动后可以检查 joint states、MoveIt 控制 action 和 TF：
+
+.. code-block:: bash
+
+   ros2 topic echo /lebai/status/joint_states --once
+   ros2 topic echo /lebai/model/joint_states --once
+   ros2 action info /lebai_trajectory_controller
+   ros2 action info /lebai_gripper_controller/gripper_cmd
+   ros2 topic echo /tf --once
+
+``ros2 action info`` 应该显示 MoveIt action client 和驱动 action server 都存在。
+如果只有 client、没有 server，通常说明 ``lebai_driver`` 没有正常启动或工作空间
+没有重新构建并 source。
