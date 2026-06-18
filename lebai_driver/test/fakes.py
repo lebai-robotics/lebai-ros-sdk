@@ -317,6 +317,7 @@ class FakeRobotFactory:
 class FakeNode:
     def __init__(self):
         self.services = []
+        self.actions = []
         self.publishers = []
         self.timers = []
         self._now = Time(sec=12, nanosec=34)
@@ -324,6 +325,10 @@ class FakeNode:
     def create_service(self, srv_type, name, callback):
         self.services.append((srv_type, name, callback))
         return callback
+
+    def create_action_server(self, action_type, name, **kwargs):
+        self.actions.append((action_type, name, kwargs))
+        return kwargs
 
     def create_publisher(self, msg_type, name, depth):
         publisher = FakePublisher(msg_type, name, depth)
@@ -337,6 +342,9 @@ class FakeNode:
 
     def get_clock(self):
         return FakeClock(self._now)
+
+    def get_logger(self):
+        return FakeLogger()
 
     def get_parameter(self, name):
         from lebai_driver.parameters import DEFAULT_JOINT_NAMES
@@ -390,6 +398,14 @@ class FakeClock:
 
     def to_msg(self):
         return self.message
+
+
+class FakeLogger:
+    def info(self, *_args, **_kwargs):
+        pass
+
+    def error(self, *_args, **_kwargs):
+        pass
 
 
 class FakeDiscovery:
