@@ -43,7 +43,7 @@ MoveIt
      robot_ip:=127.0.0.1 \
      simulator:=true
 
-默认会加载带 gripper 的模型和 MoveIt 语义配置。只使用机械臂本体时，设置
+默认会加载带 gripper 的配置。只使用机械臂本体时，设置
 ``has_gripper:=false``：
 
 .. code-block:: bash
@@ -53,51 +53,6 @@ MoveIt
      simulator:=true \
      has_gripper:=false
 
-launch 会启动：
-
-- ``lebai_driver``，并关闭驱动内部的 ``robot_state_publisher``。
-- ``robot_state_publisher``，使用 MoveIt 选择的机器人模型。
-- ``move_group``。
-- RViz，加载 ``lebai_lm3_moveit_config/launch/moveit.rviz``。
-- ``world`` 到 ``base_link`` 的静态 TF。
-
-gripper 模式
-------------
-
-``has_gripper`` 控制机器人模型、SRDF 和 joint states 来源：
-
-.. list-table::
-   :header-rows: 1
-
-   * - ``has_gripper``
-     - 模型
-     - joint states
-     - MoveIt group
-   * - ``true``
-     - ``lm3_with_gripper.xacro`` 或 ``lm3_l1_with_gripper.xacro``
-     - ``/lebai/model/joint_states``
-     - ``manipulator`` 和 ``gripper``
-   * - ``false``
-     - ``lm3.xacro`` 或 ``lm3_l1.xacro``
-     - ``/lebai/status/joint_states``
-     - ``manipulator``
-
-带 gripper 时，MoveIt 只控制主动关节 ``gripper_r_joint1``。URDF 中其它 gripper
-关节是 mimic 关节。gripper 命名状态为：
-
-.. list-table::
-   :header-rows: 1
-
-   * - 状态
-     - ``gripper_r_joint1``
-     - claw 幅度
-   * - ``open``
-     - ``1.0471975512``
-     - ``100``
-   * - ``closed``
-     - ``0.0``
-     - ``0``
-
 RViz 中的操作
 -------------
 
@@ -105,22 +60,9 @@ RViz 中的操作
 
 - ``manipulator``：拖动末端交互 marker，点击 ``Plan`` 做机械臂规划，点击
   ``Execute`` 执行轨迹。
-- ``gripper``：选择 ``open`` 或 ``closed`` 命名状态，或设置
-  ``gripper_r_joint1`` 目标角度，再执行 gripper action。
+- ``gripper``：选择 ``open`` 或 ``closed`` 命名状态，再执行 gripper action。
 
-机械臂执行使用 MoveIt Simple Controller Manager 连接
-``/lebai_trajectory_controller``。驱动会把轨迹点转换为
-``pylebai.move_pvat(positions, velocities, accelerations, duration)`` 调用，并等待
-控制器回到非运动状态。
-
-gripper 执行使用 ``/lebai_gripper_controller/gripper_cmd``。驱动将
-``gripper_r_joint1`` 映射为 claw 幅度：
-
-.. code-block:: text
-
-   amplitude = position / (pi / 3) * 100
-
-然后调用 ``pylebai.set_claw(force, amplitude)``。
+点击 ``Execute`` 后，MoveIt 会通过驱动执行机械臂轨迹或 claw 开合命令。
 
 检查连接
 --------
