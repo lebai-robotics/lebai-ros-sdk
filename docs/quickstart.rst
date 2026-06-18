@@ -55,8 +55,7 @@
    rviz2 -d "$(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/view.rviz"
 
 RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
-``/tf``。Phase 1 驱动不发布 MoveIt 的 ``display_robot_state``，因此实时查看
-机器人状态时不要使用 MoveIt 的 ``RobotState`` display。
+``/tf``。
 
 如果只想启动驱动，不发布机器人模型：
 
@@ -96,16 +95,6 @@ RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
 .. code-block:: bash
 
    ros2 launch lebai_lm3_support display_gripper.launch
-
-启动 MoveIt
------------
-
-如果需要在 RViz 中规划并执行机械臂或 gripper 轨迹，请使用
-``lebai_lm3_moveit_config``。完整说明见 :doc:`moveit`。
-
-.. code-block:: bash
-
-   ros2 launch lebai_lm3_moveit_config lm3.launch.py robot_ip:=127.0.0.1 simulator:=true
 
 调用启停服务
 ------------
