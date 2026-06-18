@@ -13,8 +13,14 @@ install(PROGRAMS
   scripts/move_example.py
   scripts/io_example.py
   scripts/joint_state_subscriber.py
+  scripts/moveit_manipulator_example.py
+  scripts/moveit_gripper_amplitude_example.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(FILES
+  scripts/lebai_tutorials_common.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_package()
