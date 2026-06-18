@@ -6,7 +6,9 @@ This file tracks future work that is not part of the current active scope.
 
 The active runtime branches currently prioritize released `pylebai` APIs for
 start/stop, motion, status, IO, resource lists, claw, discovery, and standalone
-gripper support.
+gripper support. Public documentation should focus on currently usable flows;
+future support notes belong in this file unless they are part of a concrete
+release.
 
 Later phases should cover:
 
@@ -16,6 +18,7 @@ Later phases should cover:
 - programs and scenes
 - robotics SDK areas beyond current runtime scope
 - other released SDK areas not yet mapped into ROS
+- distro-scoped release documentation for active runtime branches beyond Humble
 
 ## Planned Version System
 

@@ -24,5 +24,3 @@ Lebai ROS2 SDK
    architecture
    interfaces/topics
    interfaces/services
-   migration
-   roadmap
