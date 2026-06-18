@@ -80,23 +80,3 @@ RViz 中的操作
 ``ros2 action info`` 应该显示 MoveIt action client 和驱动 action server 都存在。
 如果只有 client、没有 server，通常说明 ``lebai_driver`` 没有正常启动或工作空间
 没有重新构建并 source。
-
-常见问题
---------
-
-``robot_interface.launch.py`` 找不到
-   旧构建缓存可能仍引用已经删除的 launch 文件。清理相关包的 build/install 后重新
-   构建，或重新构建整个工作空间。
-
-``LoadResourceList`` 等接口导入失败
-   工作空间中安装的 ``lebai_interfaces`` 不是当前源码版本。重新构建
-   ``lebai_interfaces`` 和 ``lebai_driver``，然后重新 ``source install/setup.bash``。
-
-规划开始状态碰撞
-   如果使用 ``has_gripper:=true``，确认当前安装的是包含 gripper SRDF 碰撞忽略配置
-   的版本。gripper 内部碰撞应由 SRDF 忽略。
-
-执行时报 ``start point deviates from current robot state``
-   MoveIt 规划的起点和控制器当前关节状态差异超过
-   ``trajectory_execution.allowed_start_tolerance``。等上一段轨迹完全结束后再规划，
-   或在 RViz 中先同步当前状态后重新规划。
