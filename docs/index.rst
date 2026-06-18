@@ -20,7 +20,7 @@ Lebai ROS2 SDK
 
    install
    quickstart
-   moveit
    architecture
    interfaces/topics
    interfaces/services
+   moveit
