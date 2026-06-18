@@ -23,4 +23,5 @@ Lebai ROS2 SDK
    architecture
    interfaces/topics
    interfaces/services
+   examples
    moveit

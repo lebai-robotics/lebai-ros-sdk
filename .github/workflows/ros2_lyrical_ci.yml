@@ -79,6 +79,7 @@ jobs:
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
           python3 -m pytest lebai_lm3_support/test -q
+          PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test -q
 
       - name: Run simulator smoke tests
         shell: bash
