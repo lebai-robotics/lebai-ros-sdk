@@ -15,8 +15,8 @@ MoveIt
    colcon build --symlink-install
    source install/setup.bash
 
-启动 LM3 MoveIt
----------------
+启动 MoveIt
+-----------
 
 连接仿真控制器时，将 ``robot_ip`` 指向仿真控制器所在主机。下面示例使用本机
 ``127.0.0.1``：
