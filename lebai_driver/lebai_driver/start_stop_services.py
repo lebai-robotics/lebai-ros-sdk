@@ -36,7 +36,8 @@ def _make_command_callback(connection, method_name):
     def callback(request, response):
         del request
         try:
-            getattr(connection.robot, method_name)()
+            with connection.sdk_access() as robot:
+                getattr(robot, method_name)()
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

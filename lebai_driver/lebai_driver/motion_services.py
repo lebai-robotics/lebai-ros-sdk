@@ -49,7 +49,8 @@ def register_motion_services(node, connection, callback_group=None):
 def _make_motion_callback(connection, handler):
     def callback(request, response):
         try:
-            handler(connection.robot, request, response)
+            with connection.sdk_access() as robot:
+                handler(robot, request, response)
         except _UnsupportedMethod:
             response.result = fail(_UNSUPPORTED_MESSAGE, code=UNSUPPORTED)
         except Exception as exc:
