@@ -46,7 +46,7 @@
    ros2 topic echo /lebai/model/joint_states
    ros2 topic echo /tf
 
-在 RViz 中查看实时模型：
+仅启动 ``lebai_driver`` 时，可以在 RViz 中查看实时模型：
 
 .. code-block:: bash
 
@@ -54,8 +54,9 @@
    source install/setup.bash
    rviz2 -d "$(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/view.rviz"
 
-RViz 配置中的 ``RobotModel`` display 使用 ``/lebai/robot_description`` 和
-``/tf``。
+该 RViz 配置使用 ``RobotModel`` display，从 ``/lebai/robot_description`` 读取
+机器人模型，并通过 ``/tf`` 显示实时姿态。MoveIt 规划和执行请使用
+``lebai_lm3_moveit_config`` 的启动文件和 RViz ``MotionPlanning`` 面板。
 
 如果只想启动驱动，不发布机器人模型：
 

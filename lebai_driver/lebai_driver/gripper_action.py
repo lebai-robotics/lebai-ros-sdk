@@ -64,9 +64,9 @@ class GripperActionBridge:
         target_amplitude = _position_to_amplitude(target_position)
 
         try:
-            robot = self.connection.robot
-            robot.set_claw(force, target_amplitude)
-            result = self._wait_for_completion(robot, goal_handle, target_position)
+            with self.connection.sdk_access() as robot:
+                robot.set_claw(force, target_amplitude)
+            result = self._wait_for_completion(goal_handle, target_position)
         except Exception:
             result.stalled = True
             result.reached_goal = False
@@ -84,7 +84,7 @@ class GripperActionBridge:
         goal_handle.succeed()
         return result
 
-    def _wait_for_completion(self, robot, goal_handle, target_position):
+    def _wait_for_completion(self, goal_handle, target_position):
         deadline = time.monotonic() + TIMEOUT_SEC
         result = GripperCommand.Result()
 
@@ -92,7 +92,8 @@ class GripperActionBridge:
             if goal_handle.is_cancel_requested:
                 return result
 
-            result = _result_from_claw(robot.get_claw(), target_position)
+            with self.connection.sdk_access() as robot:
+                result = _result_from_claw(robot.get_claw(), target_position)
             if result.reached_goal:
                 return result
 

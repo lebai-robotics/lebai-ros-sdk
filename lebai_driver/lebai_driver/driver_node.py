@@ -32,12 +32,14 @@ class LebaiDriverNode(Node):
         )
 
         self.status_callback_group = MutuallyExclusiveCallbackGroup()
+        self.model_state_callback_group = MutuallyExclusiveCallbackGroup()
         self.service_callback_group = MutuallyExclusiveCallbackGroup()
 
         register_status_publishers(
             self,
             self.connection,
             callback_group=self.status_callback_group,
+            model_state_callback_group=self.model_state_callback_group,
         )
         register_start_stop_services(
             self,

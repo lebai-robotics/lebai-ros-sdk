@@ -28,7 +28,8 @@ def register_resource_services(node, connection, callback_group=None):
 def _make_resource_callback(connection, handler):
     def callback(request, response):
         try:
-            handler(connection.robot, request, response)
+            with connection.sdk_access() as robot:
+                handler(robot, request, response)
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:
