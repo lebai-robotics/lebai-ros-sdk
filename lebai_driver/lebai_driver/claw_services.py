@@ -5,7 +5,7 @@ from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
 
 
-def register_claw_services(node, connection):
+def register_claw_services(node, connection, callback_group=None):
     definitions = [
         (Command, 'claw/init_claw', _init_claw),
         (SetClaw, 'claw/set_claw', _set_claw),
@@ -19,6 +19,7 @@ def register_claw_services(node, connection):
                 srv_type,
                 service_name,
                 _make_claw_callback(connection, handler),
+                callback_group=callback_group,
             )
         )
     return services
