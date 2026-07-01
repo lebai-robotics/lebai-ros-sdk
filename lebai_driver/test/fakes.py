@@ -317,13 +317,15 @@ class FakeRobotFactory:
 class FakeNode:
     def __init__(self):
         self.services = []
+        self.service_callback_groups = {}
         self.actions = []
         self.publishers = []
         self.timers = []
         self._now = Time(sec=12, nanosec=34)
 
-    def create_service(self, srv_type, name, callback):
+    def create_service(self, srv_type, name, callback, callback_group=None):
         self.services.append((srv_type, name, callback))
+        self.service_callback_groups[name] = callback_group
         return callback
 
     def create_action_server(self, action_type, name, **kwargs):
@@ -335,8 +337,8 @@ class FakeNode:
         self.publishers.append(publisher)
         return publisher
 
-    def create_timer(self, period, callback):
-        timer = FakeTimer(period, callback)
+    def create_timer(self, period, callback, callback_group=None):
+        timer = FakeTimer(period, callback, callback_group)
         self.timers.append(timer)
         return timer
 
@@ -379,9 +381,10 @@ class FakePublisher:
 
 
 class FakeTimer:
-    def __init__(self, period, callback):
+    def __init__(self, period, callback, callback_group=None):
         self.period = period
         self.callback = callback
+        self.callback_group = callback_group
 
 
 class FakeParameter:

@@ -31,6 +31,21 @@ def test_start_stop_services_register_sdk_category_names():
     assert all(service[0] is Command for service in node.services)
 
 
+def test_start_stop_services_use_provided_callback_group():
+    from lebai_driver.connection import RobotConnection
+    from lebai_driver.start_stop_services import register_start_stop_services
+
+    node = FakeNode()
+    robot = FakeRobot()
+    callback_group = object()
+    connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
+
+    register_start_stop_services(node, connection, callback_group=callback_group)
+
+    assert node.service_callback_groups
+    assert set(node.service_callback_groups.values()) == {callback_group}
+
+
 def test_start_stop_service_calls_sdk_method_and_returns_success():
     from lebai_driver.connection import RobotConnection
     from lebai_driver.start_stop_services import register_start_stop_services
