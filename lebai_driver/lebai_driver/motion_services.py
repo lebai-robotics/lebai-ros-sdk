@@ -18,7 +18,7 @@ from lebai_driver.result import fail, ok
 _UNSUPPORTED_MESSAGE = 'unsupported by installed pylebai'
 
 
-def register_motion_services(node, connection):
+def register_motion_services(node, connection, callback_group=None):
     definitions = [
         (MoveJoint, 'motion/movej', _movej),
         (MoveLinear, 'motion/movel', _movel),
@@ -40,6 +40,7 @@ def register_motion_services(node, connection):
                 srv_type,
                 service_name,
                 _make_motion_callback(connection, handler),
+                callback_group=callback_group,
             )
         )
     return services
