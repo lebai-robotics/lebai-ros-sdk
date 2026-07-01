@@ -4,7 +4,7 @@ from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
 
 
-def register_led_signal_services(node, connection):
+def register_led_signal_services(node, connection, callback_group=None):
     definitions = [
         (SetLed, 'led/set_led', _set_led),
         (GetSignals, 'signal/get_signals', _get_signals),
@@ -18,6 +18,7 @@ def register_led_signal_services(node, connection):
                 srv_type,
                 service_name,
                 _make_led_signal_callback(connection, handler),
+                callback_group=callback_group,
             )
         )
     return services

@@ -23,7 +23,7 @@ from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 _DEPTH = 10
 
 
-def register_status_publishers(node, connection):
+def register_status_publishers(node, connection, callback_group=None):
     joint_names = _parameter_value(
         node,
         'joint_names',
@@ -105,6 +105,7 @@ def register_status_publishers(node, connection):
         timer = node.create_timer(
             _period(registration.rate),
             _make_publish_callback(node, connection, publisher, registration),
+            callback_group=callback_group,
         )
         handles.append((publisher, timer))
     return handles
