@@ -68,6 +68,28 @@ def test_driver_node_separates_status_and_service_callback_groups():
         rclpy.shutdown()
 
 
+def test_driver_node_prioritizes_model_joint_state_callback_group():
+    from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+
+    from lebai_driver.driver_node import LebaiDriverNode
+
+    rclpy.init()
+    node = None
+    try:
+        node = LebaiDriverNode(robot_factory=FakeRobotFactory())
+
+        assert isinstance(
+            node.model_state_callback_group,
+            MutuallyExclusiveCallbackGroup,
+        )
+        assert node.model_state_callback_group is not node.status_callback_group
+        assert node.model_state_callback_group is not node.service_callback_group
+    finally:
+        if node is not None:
+            node.destroy_node()
+        rclpy.shutdown()
+
+
 def test_driver_main_uses_multithreaded_executor_for_actions():
     from rclpy.executors import MultiThreadedExecutor
 
