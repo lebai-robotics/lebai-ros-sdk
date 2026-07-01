@@ -18,7 +18,7 @@ _COMMANDS = [
 ]
 
 
-def register_start_stop_services(node, connection):
+def register_start_stop_services(node, connection, callback_group=None):
     services = []
     for service_name, method_name in _COMMANDS:
         services.append(
@@ -26,6 +26,7 @@ def register_start_stop_services(node, connection):
                 Command,
                 service_name,
                 _make_command_callback(connection, method_name),
+                callback_group=callback_group,
             )
         )
     return services

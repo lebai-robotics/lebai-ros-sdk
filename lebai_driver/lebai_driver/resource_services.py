@@ -4,7 +4,7 @@ from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
 
 
-def register_resource_services(node, connection):
+def register_resource_services(node, connection, callback_group=None):
     definitions = [
         (LoadResourceList, 'resource/load_tcp_list', _load_tcp_list),
         (LoadResourceList, 'resource/load_pose_list', _load_pose_list),
@@ -19,6 +19,7 @@ def register_resource_services(node, connection):
                 srv_type,
                 service_name,
                 _make_resource_callback(connection, handler),
+                callback_group=callback_group,
             )
         )
     return services

@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
@@ -30,13 +31,44 @@ class LebaiDriverNode(Node):
             robot_factory=robot_factory,
         )
 
-        register_status_publishers(self, self.connection)
-        register_start_stop_services(self, self.connection)
-        register_motion_services(self, self.connection)
-        register_io_services(self, self.connection)
-        register_led_signal_services(self, self.connection)
-        register_resource_services(self, self.connection)
-        register_claw_services(self, self.connection)
+        self.status_callback_group = MutuallyExclusiveCallbackGroup()
+        self.service_callback_group = MutuallyExclusiveCallbackGroup()
+
+        register_status_publishers(
+            self,
+            self.connection,
+            callback_group=self.status_callback_group,
+        )
+        register_start_stop_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
+        register_motion_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
+        register_io_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
+        register_led_signal_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
+        register_resource_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
+        register_claw_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+        )
         self.trajectory_action = register_trajectory_action(self, self.connection)
         self.gripper_action = register_gripper_action(self, self.connection)
 
