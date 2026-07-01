@@ -23,7 +23,12 @@ from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 _DEPTH = 10
 
 
-def register_status_publishers(node, connection, callback_group=None):
+def register_status_publishers(
+    node,
+    connection,
+    callback_group=None,
+    model_state_callback_group=None,
+):
     joint_names = _parameter_value(
         node,
         'joint_names',
@@ -105,16 +110,29 @@ def register_status_publishers(node, connection, callback_group=None):
         timer = node.create_timer(
             _period(registration.rate),
             _make_publish_callback(node, connection, publisher, registration),
-            callback_group=callback_group,
+            callback_group=_callback_group_for(
+                registration.topic,
+                callback_group,
+                model_state_callback_group,
+            ),
         )
         handles.append((publisher, timer))
     return handles
 
 
+def _callback_group_for(topic, callback_group, model_state_callback_group):
+    if model_state_callback_group is None:
+        return callback_group
+    if topic in {'status/joint_states', 'model/joint_states'}:
+        return model_state_callback_group
+    return callback_group
+
+
 def _make_publish_callback(node, connection, publisher, registration):
     def callback():
         try:
-            message = registration.build_message(connection.robot)
+            with connection.sdk_access() as robot:
+                message = registration.build_message(robot)
         except Exception as exc:
             message = registration.build_error_message(exc)
         message.header.stamp = node.get_clock().now().to_msg()
