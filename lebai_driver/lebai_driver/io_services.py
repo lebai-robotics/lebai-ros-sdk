@@ -19,7 +19,7 @@ from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
 
 
-def register_io_services(node, connection):
+def register_io_services(node, connection, callback_group=None):
     definitions = [
         (SetDigitalOutput, 'io/set_do', _set_do),
         (GetDigitalInput, 'io/get_di', _get_di),
@@ -44,6 +44,7 @@ def register_io_services(node, connection):
                 srv_type,
                 service_name,
                 _make_io_callback(connection, handler),
+                callback_group=callback_group,
             )
         )
     return services
