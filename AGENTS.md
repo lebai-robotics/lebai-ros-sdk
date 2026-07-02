@@ -16,7 +16,8 @@ controller access goes through released `pylebai`.
 ## Development Rules
 
 - Always make changes through pull requests.
-- Use conventional commit messages, for example `fix: align gripper frame`.
+- Use Conventional Commits for branch names, pull request titles, and commit
+  messages, for example `fix: align gripper frame`.
 - Unless a request is explicitly branch-specific, apply concrete feature, fix,
   and process changes to all active runtime branches: `humble-dev`, `jazzy-dev`,
   and `lyrical-dev`.
