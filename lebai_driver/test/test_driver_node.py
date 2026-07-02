@@ -90,6 +90,33 @@ def test_driver_node_prioritizes_model_joint_state_callback_group():
         rclpy.shutdown()
 
 
+def test_driver_node_uses_separate_status_connection():
+    from lebai_driver.driver_node import LebaiDriverNode
+
+    rclpy.init()
+    node = None
+    robot_factory = FakeRobotFactory()
+    try:
+        node = LebaiDriverNode(robot_factory=robot_factory)
+
+        assert node.status_connection is not node.connection
+        assert node.status_connection.robot_ip == node.connection.robot_ip
+        assert node.status_connection.simulator == node.connection.simulator
+
+        _status_robot = node.status_connection.robot
+        _command_robot = node.connection.robot
+
+        assert _status_robot is not _command_robot
+        assert robot_factory.calls == [
+            ('127.0.0.1', False),
+            ('127.0.0.1', False),
+        ]
+    finally:
+        if node is not None:
+            node.destroy_node()
+        rclpy.shutdown()
+
+
 def test_driver_main_uses_multithreaded_executor_for_actions():
     from rclpy.executors import MultiThreadedExecutor
 
