@@ -65,6 +65,30 @@ def test_start_stop_service_calls_sdk_method_and_returns_success():
     assert response.result.code == 0
 
 
+def test_start_stop_service_calls_robot_directly_without_sdk_access_lock():
+    from lebai_driver.start_stop_services import register_start_stop_services
+
+    class DirectOnlyConnection:
+        def __init__(self):
+            self.robot = FakeRobot()
+
+        def sdk_access(self):
+            raise AssertionError('start/stop services should not use sdk_access')
+
+    node = FakeNode()
+    connection = DirectOnlyConnection()
+    register_start_stop_services(node, connection)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'start_stop/start_sys'
+    ]
+
+    response = callback(Command.Request(), Command.Response())
+
+    assert connection.robot.calls == [('start_sys', (), {})]
+    assert response.result.success is True
+    assert response.result.code == 0
+
+
 def test_start_stop_service_maps_sdk_exception_to_result():
     from lebai_driver.connection import RobotConnection
     from lebai_driver.start_stop_services import register_start_stop_services

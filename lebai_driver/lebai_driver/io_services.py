@@ -53,8 +53,7 @@ def register_io_services(node, connection, callback_group=None):
 def _make_io_callback(connection, handler):
     def callback(request, response):
         try:
-            with connection.sdk_access() as robot:
-                handler(robot, request, response)
+            handler(connection.robot, request, response)
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

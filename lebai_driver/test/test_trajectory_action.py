@@ -92,17 +92,11 @@ class MovingFakeRobot(FakeRobot):
         return self._positions[0]
 
 
-class RecordingLock:
-    def __init__(self, robot):
-        self.robot = robot
-        self.events = []
-
+class FailingLock:
     def __enter__(self):
-        self.events.append(('enter', len(self.robot.calls)))
-        return self.robot
+        raise AssertionError('trajectory action should not use sdk_access')
 
     def __exit__(self, *_exc_info):
-        self.events.append(('exit', len(self.robot.calls)))
         return False
 
 
@@ -151,57 +145,25 @@ def test_trajectory_action_streams_segments_to_move_pvat():
         ('move_pvat', ([2.0, 3.0, 4.0, 5.0, 6.0, 7.0], [0.1] * 6, [0.2] * 6, 0.75), {}),
     ]
     assert robot.calls[2:] == [
+        ('get_robot_state', (), {}),
         ('get_actual_joint_positions', (), {}),
     ]
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.succeeded is True
 
 
-def test_trajectory_action_holds_sdk_lock_while_streaming_pvat_segments():
+def test_trajectory_action_streams_pvat_without_sdk_access_lock():
     robot = FakeRobot()
     robot.robot_state = 5
     robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
     _server, _action_type, _name, callbacks = _register(robot)
     bridge = callbacks['execute_callback'].__self__
-    bridge.sdk_lock = RecordingLock(robot)
+    bridge.sdk_lock = FailingLock()
     goal_handle = FakeGoalHandle(_trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
-    assert bridge.sdk_lock.events[:2] == [('enter', 0), ('exit', 2)]
-
-
-def test_trajectory_action_waits_planned_duration_before_polling_completion(monkeypatch):
-    from lebai_driver import trajectory_action
-
-    sleeps = []
-    times = iter([10.0, 10.0, 11.25, 11.25, 11.25])
-    monkeypatch.setattr(
-        trajectory_action.time,
-        'monotonic',
-        lambda: next(times),
-    )
-    monkeypatch.setattr(
-        trajectory_action.time,
-        'sleep',
-        lambda duration: sleeps.append(duration),
-    )
-    robot = FakeRobot()
-    robot.robot_state = 5
-    robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
-    _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
-
-    result = callbacks['execute_callback'](goal_handle)
-
-    assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
-    assert sleeps == [1.25]
-    assert [call[0] for call in robot.calls] == [
-        'move_pvat',
-        'move_pvat',
-        'get_actual_joint_positions',
-    ]
 
 
 def test_trajectory_action_waits_for_sdk_motion_state_and_final_positions(monkeypatch):
@@ -226,10 +188,11 @@ def test_trajectory_action_waits_for_sdk_motion_state_and_final_positions(monkey
     assert [call[0] for call in robot.calls] == [
         'move_pvat',
         'move_pvat',
-        'get_actual_joint_positions',
+        'get_robot_state',
+        'get_robot_state',
         'get_robot_state',
         'get_actual_joint_positions',
-        'get_robot_state',
+        'get_actual_joint_positions',
         'get_actual_joint_positions',
     ]
 
