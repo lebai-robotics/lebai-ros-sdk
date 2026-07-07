@@ -49,7 +49,7 @@ def test_driver_node_declares_runtime_parameters():
         rclpy.shutdown()
 
 
-def test_driver_node_separates_status_and_service_callback_groups():
+def test_driver_node_isolates_start_stop_services_from_default_group():
     from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 
     from lebai_driver.driver_node import LebaiDriverNode
@@ -59,16 +59,16 @@ def test_driver_node_separates_status_and_service_callback_groups():
     try:
         node = LebaiDriverNode(robot_factory=FakeRobotFactory())
 
-        assert isinstance(node.status_callback_group, MutuallyExclusiveCallbackGroup)
-        assert isinstance(node.service_callback_group, MutuallyExclusiveCallbackGroup)
-        assert node.status_callback_group is not node.service_callback_group
+        assert isinstance(node.start_stop_callback_group, MutuallyExclusiveCallbackGroup)
+        assert not hasattr(node, 'status_callback_group')
+        assert not hasattr(node, 'service_callback_group')
     finally:
         if node is not None:
             node.destroy_node()
         rclpy.shutdown()
 
 
-def test_driver_node_uses_separate_status_connection():
+def test_driver_node_preserves_single_sdk_connection_for_status_and_motion():
     from lebai_driver.driver_node import LebaiDriverNode
 
     rclpy.init()
@@ -78,18 +78,12 @@ def test_driver_node_uses_separate_status_connection():
         node = LebaiDriverNode(robot_factory=robot_factory)
 
         assert not hasattr(node, 'model_state_callback_group')
-        assert node.status_connection is not node.connection
-        assert node.status_connection.robot_ip == node.connection.robot_ip
-        assert node.status_connection.simulator == node.connection.simulator
+        assert not hasattr(node, 'status_connection')
 
-        _status_robot = node.status_connection.robot
-        _command_robot = node.connection.robot
+        _robot = node.connection.robot
 
-        assert _status_robot is not _command_robot
-        assert robot_factory.calls == [
-            ('127.0.0.1', False),
-            ('127.0.0.1', False),
-        ]
+        assert _robot.robot_ip == '127.0.0.1'
+        assert robot_factory.calls == [('127.0.0.1', False)]
     finally:
         if node is not None:
             node.destroy_node()

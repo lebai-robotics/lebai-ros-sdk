@@ -30,50 +30,20 @@ class LebaiDriverNode(Node):
             simulator=simulator,
             robot_factory=robot_factory,
         )
-        self.status_connection = RobotConnection(
-            robot_ip=robot_ip,
-            simulator=simulator,
-            robot_factory=robot_factory,
-        )
 
-        self.status_callback_group = MutuallyExclusiveCallbackGroup()
-        self.service_callback_group = MutuallyExclusiveCallbackGroup()
+        self.start_stop_callback_group = MutuallyExclusiveCallbackGroup()
 
-        register_status_publishers(
-            self,
-            self.status_connection,
-            callback_group=self.status_callback_group,
-        )
+        register_status_publishers(self, self.connection)
         register_start_stop_services(
             self,
             self.connection,
-            callback_group=self.service_callback_group,
+            callback_group=self.start_stop_callback_group,
         )
-        register_motion_services(
-            self,
-            self.connection,
-            callback_group=self.service_callback_group,
-        )
-        register_io_services(
-            self,
-            self.connection,
-            callback_group=self.service_callback_group,
-        )
-        register_led_signal_services(
-            self,
-            self.connection,
-            callback_group=self.service_callback_group,
-        )
-        register_resource_services(
-            self,
-            self.connection,
-            callback_group=self.service_callback_group,
-        )
-        register_claw_services(
-            self,
-            self.connection,
-            callback_group=self.service_callback_group,
-        )
+        register_motion_services(self, self.connection)
+        register_io_services(self, self.connection)
+        register_led_signal_services(self, self.connection)
+        register_resource_services(self, self.connection)
+        register_claw_services(self, self.connection)
         self.trajectory_action = register_trajectory_action(self, self.connection)
         self.gripper_action = register_gripper_action(self, self.connection)
 
