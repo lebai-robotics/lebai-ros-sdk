@@ -68,7 +68,7 @@ def test_driver_node_separates_status_and_service_callback_groups():
         rclpy.shutdown()
 
 
-def test_driver_node_uses_one_connection_for_status_services_and_actions():
+def test_driver_node_uses_separate_status_connection():
     from lebai_driver.driver_node import LebaiDriverNode
 
     rclpy.init()
@@ -77,13 +77,19 @@ def test_driver_node_uses_one_connection_for_status_services_and_actions():
     try:
         node = LebaiDriverNode(robot_factory=robot_factory)
 
-        assert not hasattr(node, 'status_connection')
         assert not hasattr(node, 'model_state_callback_group')
+        assert node.status_connection is not node.connection
+        assert node.status_connection.robot_ip == node.connection.robot_ip
+        assert node.status_connection.simulator == node.connection.simulator
 
-        _robot = node.connection.robot
+        _status_robot = node.status_connection.robot
+        _command_robot = node.connection.robot
 
-        assert _robot.robot_ip == '127.0.0.1'
-        assert robot_factory.calls == [('127.0.0.1', False)]
+        assert _status_robot is not _command_robot
+        assert robot_factory.calls == [
+            ('127.0.0.1', False),
+            ('127.0.0.1', False),
+        ]
     finally:
         if node is not None:
             node.destroy_node()

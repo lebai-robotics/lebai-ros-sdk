@@ -30,13 +30,18 @@ class LebaiDriverNode(Node):
             simulator=simulator,
             robot_factory=robot_factory,
         )
+        self.status_connection = RobotConnection(
+            robot_ip=robot_ip,
+            simulator=simulator,
+            robot_factory=robot_factory,
+        )
 
         self.status_callback_group = MutuallyExclusiveCallbackGroup()
         self.service_callback_group = MutuallyExclusiveCallbackGroup()
 
         register_status_publishers(
             self,
-            self.connection,
+            self.status_connection,
             callback_group=self.status_callback_group,
         )
         register_start_stop_services(
