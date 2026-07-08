@@ -2,9 +2,10 @@ from lebai_interfaces.srv import LoadResourceList
 
 from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
+from lebai_driver.sdk_gate import exclusive_access
 
 
-def register_resource_services(node, connection, callback_group=None):
+def register_resource_services(node, connection, callback_group=None, sdk_gate=None):
     definitions = [
         (LoadResourceList, 'resource/load_tcp_list', _load_tcp_list),
         (LoadResourceList, 'resource/load_pose_list', _load_pose_list),
@@ -18,17 +19,18 @@ def register_resource_services(node, connection, callback_group=None):
             node.create_service(
                 srv_type,
                 service_name,
-                _make_resource_callback(connection, handler),
+                _make_resource_callback(connection, handler, sdk_gate),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_resource_callback(connection, handler):
+def _make_resource_callback(connection, handler, sdk_gate=None):
     def callback(request, response):
         try:
-            handler(connection.robot, request, response)
+            with exclusive_access(sdk_gate):
+                handler(connection.robot, request, response)
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from lebai_interfaces.srv import GetSignals, SetLed, SetSignals
 
 from fakes import FakeNode, FakeRobot
@@ -37,6 +39,48 @@ def test_set_led_maps_request_to_sdk_call():
 
     response = callbacks['led/set_led'](request, SetLed.Response())
 
+    assert robot.calls == [('set_led', (3, 2, [1, 2, 3, 4]), {})]
+    assert response.result.success is True
+
+
+def test_led_signal_service_wraps_sdk_call_with_exclusive_gate():
+    from lebai_driver.connection import RobotConnection
+    from lebai_driver.led_signal_services import register_led_signal_services
+
+    class RecordingGate:
+        def __init__(self):
+            self.events = []
+
+        @contextmanager
+        def exclusive_access(self):
+            self.events.append('enter')
+            yield
+            self.events.append('exit')
+
+    class GuardedRobot(FakeRobot):
+        def __init__(self, gate):
+            super().__init__()
+            self._gate = gate
+
+        def set_led(self, mode, speed, color):
+            assert self._gate.events == ['enter']
+            super().set_led(mode, speed, color)
+
+    node = FakeNode()
+    gate = RecordingGate()
+    robot = GuardedRobot(gate)
+    connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
+    register_led_signal_services(node, connection, sdk_gate=gate)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'led/set_led'
+    ]
+
+    response = callback(
+        SetLed.Request(mode=3, speed=2, color=[1, 2, 3, 4]),
+        SetLed.Response(),
+    )
+
+    assert gate.events == ['enter', 'exit']
     assert robot.calls == [('set_led', (3, 2, [1, 2, 3, 4]), {})]
     assert response.result.success is True
 

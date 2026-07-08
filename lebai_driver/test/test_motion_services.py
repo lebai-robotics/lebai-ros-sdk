@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from lebai_interfaces.msg import CartesianPose, MotionParams, MotionTarget
 from lebai_interfaces.srv import (
     Command,
@@ -82,6 +84,47 @@ def test_movej_maps_joint_target_to_sdk_call_and_motion_id():
     assert robot.calls == [('movej', ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2.0, 0.5, 3.0, 0.2), {})]
     assert response.result.success is True
     assert response.motion_id == 100
+
+
+def test_motion_service_wraps_sdk_call_with_exclusive_gate():
+    from lebai_driver.motion_services import register_motion_services
+
+    class RecordingGate:
+        def __init__(self):
+            self.events = []
+
+        @contextmanager
+        def exclusive_access(self):
+            self.events.append('enter')
+            yield
+            self.events.append('exit')
+
+    class GuardedRobot(FakeRobot):
+        def __init__(self, gate):
+            super().__init__()
+            self._gate = gate
+
+        def movej(self, target, acceleration, velocity, time, blend_radius):
+            assert self._gate.events == ['enter']
+            return super().movej(target, acceleration, velocity, time, blend_radius)
+
+    node = FakeNode()
+    gate = RecordingGate()
+    robot = GuardedRobot(gate)
+    connection = type('Connection', (), {'robot': robot})()
+    register_motion_services(node, connection, sdk_gate=gate)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'motion/movej'
+    ]
+
+    response = callback(
+        MoveJoint.Request(target=_joint_target(1, 2, 3, 4, 5, 6), params=_params()),
+        MoveJoint.Response(),
+    )
+
+    assert gate.events == ['enter', 'exit']
+    assert robot.calls[0][0] == 'movej'
+    assert response.result.success is True
 
 
 def test_movel_maps_cartesian_target_to_sdk_pose_dict():

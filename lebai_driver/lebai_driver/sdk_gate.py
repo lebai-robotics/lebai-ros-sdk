@@ -1,5 +1,11 @@
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from threading import Lock
+
+
+def exclusive_access(sdk_gate):
+    if sdk_gate is None:
+        return nullcontext()
+    return sdk_gate.exclusive_access()
 
 
 class StatusServiceGate:

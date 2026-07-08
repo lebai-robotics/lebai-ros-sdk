@@ -1,9 +1,8 @@
-from contextlib import nullcontext
-
 from lebai_interfaces.srv import Command
 
 from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
+from lebai_driver.sdk_gate import exclusive_access
 
 
 _COMMANDS = [
@@ -38,7 +37,7 @@ def _make_command_callback(connection, method_name, sdk_gate=None):
     def callback(request, response):
         del request
         try:
-            with _exclusive_access(sdk_gate):
+            with exclusive_access(sdk_gate):
                 getattr(connection.robot, method_name)()
         except Exception as exc:
             response.result = fail(exception_message(exc))
@@ -47,9 +46,3 @@ def _make_command_callback(connection, method_name, sdk_gate=None):
         return response
 
     return callback
-
-
-def _exclusive_access(sdk_gate):
-    if sdk_gate is None:
-        return nullcontext()
-    return sdk_gate.exclusive_access()

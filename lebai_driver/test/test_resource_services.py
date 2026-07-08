@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from lebai_interfaces.srv import LoadResourceList
 
 from fakes import FakeNode, FakeRobot
@@ -70,6 +72,50 @@ def test_resource_list_services_forward_directory_and_return_names():
     assert list(frame_response.names) == ['table', 'conveyor']
     assert trajectory_response.result.success is True
     assert list(trajectory_response.names) == ['cycle_a', 'cycle_b']
+
+
+def test_resource_service_wraps_sdk_call_with_exclusive_gate():
+    from lebai_driver.connection import RobotConnection
+    from lebai_driver.resource_services import register_resource_services
+
+    class RecordingGate:
+        def __init__(self):
+            self.events = []
+
+        @contextmanager
+        def exclusive_access(self):
+            self.events.append('enter')
+            yield
+            self.events.append('exit')
+
+    class GuardedRobot(FakeRobot):
+        def __init__(self, gate):
+            super().__init__()
+            self._gate = gate
+
+        def load_tcp_list(self, directory):
+            assert self._gate.events == ['enter']
+            return super().load_tcp_list(directory)
+
+    node = FakeNode()
+    gate = RecordingGate()
+    robot = GuardedRobot(gate)
+    robot.resource_lists['tcp']['tools'] = ['flange_tcp']
+    connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
+    register_resource_services(node, connection, sdk_gate=gate)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'resource/load_tcp_list'
+    ]
+
+    response = callback(
+        LoadResourceList.Request(directory='tools'),
+        LoadResourceList.Response(),
+    )
+
+    assert gate.events == ['enter', 'exit']
+    assert robot.calls == [('load_tcp_list', ('tools',), {})]
+    assert response.result.success is True
+    assert list(response.names) == ['flange_tcp']
 
 
 def test_resource_list_services_convert_entries_to_strings():

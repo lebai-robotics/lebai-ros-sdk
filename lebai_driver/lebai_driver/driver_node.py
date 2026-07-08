@@ -32,25 +32,50 @@ class LebaiDriverNode(Node):
             robot_factory=robot_factory,
         )
 
-        self.start_stop_callback_group = MutuallyExclusiveCallbackGroup()
-        self.start_stop_sdk_gate = StatusServiceGate()
+        self.service_callback_group = MutuallyExclusiveCallbackGroup()
+        self.service_sdk_gate = StatusServiceGate()
 
         register_status_publishers(
             self,
             self.connection,
-            sdk_gate=self.start_stop_sdk_gate,
+            sdk_gate=self.service_sdk_gate,
         )
         register_start_stop_services(
             self,
             self.connection,
-            callback_group=self.start_stop_callback_group,
-            sdk_gate=self.start_stop_sdk_gate,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
-        register_motion_services(self, self.connection)
-        register_io_services(self, self.connection)
-        register_led_signal_services(self, self.connection)
-        register_resource_services(self, self.connection)
-        register_claw_services(self, self.connection)
+        register_motion_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
+        )
+        register_io_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
+        )
+        register_led_signal_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
+        )
+        register_resource_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
+        )
+        register_claw_services(
+            self,
+            self.connection,
+            callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
+        )
         self.trajectory_action = register_trajectory_action(self, self.connection)
         self.gripper_action = register_gripper_action(self, self.connection)
 
