@@ -23,7 +23,7 @@ from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 _DEPTH = 10
 
 
-def register_status_publishers(node, connection, callback_group=None):
+def register_status_publishers(node, connection, callback_group=None, sdk_gate=None):
     joint_names = _parameter_value(
         node,
         'joint_names',
@@ -104,23 +104,34 @@ def register_status_publishers(node, connection, callback_group=None):
         publisher = node.create_publisher(registration.msg_type, registration.topic, _DEPTH)
         timer = node.create_timer(
             _period(registration.rate),
-            _make_publish_callback(node, connection, publisher, registration),
+            _make_publish_callback(node, connection, publisher, registration, sdk_gate),
             callback_group=callback_group,
         )
         handles.append((publisher, timer))
     return handles
 
 
-def _make_publish_callback(node, connection, publisher, registration):
+def _make_publish_callback(node, connection, publisher, registration, sdk_gate=None):
     def callback():
-        try:
-            message = registration.build_message(connection.robot)
-        except Exception as exc:
-            message = registration.build_error_message(exc)
-        message.header.stamp = node.get_clock().now().to_msg()
-        publisher.publish(message)
+        if sdk_gate is not None:
+            with sdk_gate.status_access() as enabled:
+                if not enabled:
+                    return
+                _publish_status(node, connection, publisher, registration)
+            return
+
+        _publish_status(node, connection, publisher, registration)
 
     return callback
+
+
+def _publish_status(node, connection, publisher, registration):
+    try:
+        message = registration.build_message(connection.robot)
+    except Exception as exc:
+        message = registration.build_error_message(exc)
+    message.header.stamp = node.get_clock().now().to_msg()
+    publisher.publish(message)
 
 
 def _parameter_value(node, name, default):

@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from lebai_interfaces.srv import Command
 
 from fakes import FakeNode, FakeRobot
@@ -87,6 +89,44 @@ def test_start_stop_service_calls_robot_directly_without_sdk_access_lock():
     assert connection.robot.calls == [('start_sys', (), {})]
     assert response.result.success is True
     assert response.result.code == 0
+
+
+def test_start_stop_service_wraps_sdk_call_with_exclusive_gate():
+    from lebai_driver.start_stop_services import register_start_stop_services
+
+    class RecordingGate:
+        def __init__(self):
+            self.events = []
+
+        @contextmanager
+        def exclusive_access(self):
+            self.events.append('enter')
+            yield
+            self.events.append('exit')
+
+    class GuardedRobot(FakeRobot):
+        def __init__(self, gate):
+            super().__init__()
+            self._gate = gate
+
+        def stop_sys(self):
+            assert self._gate.events == ['enter']
+            super().stop_sys()
+
+    node = FakeNode()
+    gate = RecordingGate()
+    robot = GuardedRobot(gate)
+    connection = type('Connection', (), {'robot': robot})()
+    register_start_stop_services(node, connection, sdk_gate=gate)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'start_stop/stop_sys'
+    ]
+
+    response = callback(Command.Request(), Command.Response())
+
+    assert gate.events == ['enter', 'exit']
+    assert robot.calls == [('stop_sys', (), {})]
+    assert response.result.success is True
 
 
 def test_start_stop_service_maps_sdk_exception_to_result():

@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+
 from lebai_interfaces.srv import Command
 
 from lebai_driver.errors import exception_message
@@ -18,25 +20,26 @@ _COMMANDS = [
 ]
 
 
-def register_start_stop_services(node, connection, callback_group=None):
+def register_start_stop_services(node, connection, callback_group=None, sdk_gate=None):
     services = []
     for service_name, method_name in _COMMANDS:
         services.append(
             node.create_service(
                 Command,
                 service_name,
-                _make_command_callback(connection, method_name),
+                _make_command_callback(connection, method_name, sdk_gate),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_command_callback(connection, method_name):
+def _make_command_callback(connection, method_name, sdk_gate=None):
     def callback(request, response):
         del request
         try:
-            getattr(connection.robot, method_name)()
+            with _exclusive_access(sdk_gate):
+                getattr(connection.robot, method_name)()
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:
@@ -44,3 +47,9 @@ def _make_command_callback(connection, method_name):
         return response
 
     return callback
+
+
+def _exclusive_access(sdk_gate):
+    if sdk_gate is None:
+        return nullcontext()
+    return sdk_gate.exclusive_access()

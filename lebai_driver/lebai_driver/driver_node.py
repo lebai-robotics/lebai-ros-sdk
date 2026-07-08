@@ -11,6 +11,7 @@ from lebai_driver.io_services import register_io_services
 from lebai_driver.led_signal_services import register_led_signal_services
 from lebai_driver.motion_services import register_motion_services
 from lebai_driver.resource_services import register_resource_services
+from lebai_driver.sdk_gate import StatusServiceGate
 from lebai_driver.start_stop_services import register_start_stop_services
 from lebai_driver.status import register_status_publishers
 from lebai_driver.trajectory_action import register_trajectory_action
@@ -32,12 +33,18 @@ class LebaiDriverNode(Node):
         )
 
         self.start_stop_callback_group = MutuallyExclusiveCallbackGroup()
+        self.start_stop_sdk_gate = StatusServiceGate()
 
-        register_status_publishers(self, self.connection)
+        register_status_publishers(
+            self,
+            self.connection,
+            sdk_gate=self.start_stop_sdk_gate,
+        )
         register_start_stop_services(
             self,
             self.connection,
             callback_group=self.start_stop_callback_group,
+            sdk_gate=self.start_stop_sdk_gate,
         )
         register_motion_services(self, self.connection)
         register_io_services(self, self.connection)

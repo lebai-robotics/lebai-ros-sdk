@@ -53,6 +53,7 @@ def test_driver_node_isolates_start_stop_services_from_default_group():
     from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 
     from lebai_driver.driver_node import LebaiDriverNode
+    from lebai_driver.sdk_gate import StatusServiceGate
 
     rclpy.init()
     node = None
@@ -60,6 +61,7 @@ def test_driver_node_isolates_start_stop_services_from_default_group():
         node = LebaiDriverNode(robot_factory=FakeRobotFactory())
 
         assert isinstance(node.start_stop_callback_group, MutuallyExclusiveCallbackGroup)
+        assert isinstance(node.start_stop_sdk_gate, StatusServiceGate)
         assert not hasattr(node, 'status_callback_group')
         assert not hasattr(node, 'service_callback_group')
     finally:
