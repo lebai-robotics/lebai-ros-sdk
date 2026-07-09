@@ -188,6 +188,15 @@ def test_moveit_launches_forward_simulator_and_selects_joint_state_topic_by_grip
         assert launch_file.count("remappings=joint_state_remappings") == 3
 
 
+def test_moveit_execution_timeout_matches_driver_completion_window():
+    lm3_launch = (PACKAGE_DIR / "launch" / "lm3.launch.py").read_text()
+    lm3_l1_launch = (PACKAGE_DIR / "launch" / "lm3_l1.launch.py").read_text()
+
+    for launch_file in (lm3_launch, lm3_l1_launch):
+        assert '"trajectory_execution.allowed_execution_duration_scaling": 1.25' in launch_file
+        assert '"trajectory_execution.allowed_goal_duration_margin": 5.0' in launch_file
+
+
 def test_moveit_config_declares_driver_launch_dependency():
     package_manifest = ET.parse(PACKAGE_DIR / "package.xml").getroot()
     exec_dependencies = [

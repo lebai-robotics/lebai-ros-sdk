@@ -17,9 +17,10 @@ from lebai_interfaces.srv import (
 
 from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
+from lebai_driver.sdk_gate import exclusive_access
 
 
-def register_io_services(node, connection, callback_group=None):
+def register_io_services(node, connection, callback_group=None, sdk_gate=None):
     definitions = [
         (SetDigitalOutput, 'io/set_do', _set_do),
         (GetDigitalInput, 'io/get_di', _get_di),
@@ -43,18 +44,18 @@ def register_io_services(node, connection, callback_group=None):
             node.create_service(
                 srv_type,
                 service_name,
-                _make_io_callback(connection, handler),
+                _make_io_callback(connection, handler, sdk_gate),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_io_callback(connection, handler):
+def _make_io_callback(connection, handler, sdk_gate=None):
     def callback(request, response):
         try:
-            with connection.sdk_access() as robot:
-                handler(robot, request, response)
+            with exclusive_access(sdk_gate):
+                handler(connection.robot, request, response)
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

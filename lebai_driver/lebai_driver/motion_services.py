@@ -13,12 +13,13 @@ from lebai_interfaces.srv import (
 
 from lebai_driver.errors import UNSUPPORTED, exception_message
 from lebai_driver.result import fail, ok
+from lebai_driver.sdk_gate import exclusive_access
 
 
 _UNSUPPORTED_MESSAGE = 'unsupported by installed pylebai'
 
 
-def register_motion_services(node, connection, callback_group=None):
+def register_motion_services(node, connection, callback_group=None, sdk_gate=None):
     definitions = [
         (MoveJoint, 'motion/movej', _movej),
         (MoveLinear, 'motion/movel', _movel),
@@ -39,18 +40,18 @@ def register_motion_services(node, connection, callback_group=None):
             node.create_service(
                 srv_type,
                 service_name,
-                _make_motion_callback(connection, handler),
+                _make_motion_callback(connection, handler, sdk_gate),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_motion_callback(connection, handler):
+def _make_motion_callback(connection, handler, sdk_gate=None):
     def callback(request, response):
         try:
-            with connection.sdk_access() as robot:
-                handler(robot, request, response)
+            with exclusive_access(sdk_gate):
+                handler(connection.robot, request, response)
         except _UnsupportedMethod:
             response.result = fail(_UNSUPPORTED_MESSAGE, code=UNSUPPORTED)
         except Exception as exc:

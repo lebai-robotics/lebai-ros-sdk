@@ -28,7 +28,6 @@ class TrajectoryActionBridge:
         self.connection = connection
         self.joint_names = list(node.get_parameter('joint_names').value)
         self.callback_group = ReentrantCallbackGroup()
-        self.sdk_lock = connection.sdk_access
 
     def register(self):
         if hasattr(self.node, 'create_action_server'):
@@ -62,8 +61,7 @@ class TrajectoryActionBridge:
 
     def cancel_callback(self, _goal_handle):
         self.node.get_logger().info('Lebai trajectory received cancel request')
-        with self._sdk_access() as robot:
-            robot.stop_move()
+        self.connection.robot.stop_move()
         return CancelResponse.ACCEPT
 
     def execute_callback(self, goal_handle):
@@ -77,43 +75,31 @@ class TrajectoryActionBridge:
             return result
 
         try:
+            robot = self.connection.robot
             execution_start_time = time.monotonic()
-            final_time_from_start = self._time_from_start(trajectory.points[-1])
-            with self._sdk_access() as robot:
-                previous_time = self._time_from_start(trajectory.points[0])
-                for point in trajectory.points[1:]:
-                    if goal_handle.is_cancel_requested:
-                        robot.stop_move()
-                        result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
-                        goal_handle.canceled()
-                        return result
-
-                    current_time = self._time_from_start(point)
-                    robot.move_pvat(
-                        list(point.positions),
-                        list(point.velocities),
-                        list(point.accelerations),
-                        current_time - previous_time,
-                    )
-                    previous_time = current_time
-
-            self._wait_for_planned_duration(
-                goal_handle,
-                execution_start_time,
-                final_time_from_start,
-            )
-            if goal_handle.is_cancel_requested:
-                with self._sdk_access() as robot:
+            previous_time = self._time_from_start(trajectory.points[0])
+            for point in trajectory.points[1:]:
+                if goal_handle.is_cancel_requested:
                     robot.stop_move()
-                result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
-                goal_handle.canceled()
-                return result
+                    result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
+                    goal_handle.canceled()
+                    return result
+
+                current_time = self._time_from_start(point)
+                robot.move_pvat(
+                    list(point.positions),
+                    list(point.velocities),
+                    list(point.accelerations),
+                    current_time - previous_time,
+                )
+                previous_time = current_time
 
             completion = self._wait_for_completion(
+                robot,
                 goal_handle,
                 list(trajectory.points[-1].positions),
                 execution_start_time,
-                final_time_from_start,
+                self._time_from_start(trajectory.points[-1]),
             )
             if completion == _CANCELED:
                 result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
@@ -157,31 +143,13 @@ class TrajectoryActionBridge:
 
         return True
 
-    def _sdk_access(self):
-        if hasattr(self.sdk_lock, '__enter__'):
-            return self.sdk_lock
-        return self.sdk_lock()
-
     @staticmethod
     def _time_from_start(point):
         return point.time_from_start.sec + point.time_from_start.nanosec / 1_000_000_000
 
-    def _wait_for_planned_duration(
-        self,
-        goal_handle,
-        execution_start_time,
-        final_time_from_start,
-    ):
-        wakeup_time = execution_start_time + final_time_from_start
-        now = time.monotonic()
-        while now < wakeup_time:
-            if goal_handle.is_cancel_requested:
-                return
-            time.sleep(wakeup_time - now)
-            now = time.monotonic()
-
     def _wait_for_completion(
         self,
+        robot,
         goal_handle,
         final_positions,
         execution_start_time,
@@ -195,28 +163,25 @@ class TrajectoryActionBridge:
 
         while time.monotonic() <= deadline:
             if goal_handle.is_cancel_requested:
-                with self._sdk_access() as robot:
-                    robot.stop_move()
+                robot.stop_move()
                 return _CANCELED
 
-            if self._final_positions_reached(final_positions):
-                return _COMPLETED
-
             if not sdk_motion_finished:
-                with self._sdk_access() as robot:
-                    robot_state = int(robot.get_robot_state())
+                robot_state = int(robot.get_robot_state())
                 if robot_state in RUNNING_ROBOT_STATES:
                     self._sleep_until_next_poll(deadline)
                     continue
                 sdk_motion_finished = True
 
+            if self._final_positions_reached(robot, final_positions):
+                return _COMPLETED
+
             self._sleep_until_next_poll(deadline)
 
         return _TIMEOUT
 
-    def _final_positions_reached(self, final_positions):
-        with self._sdk_access() as robot:
-            actual_positions = list(robot.get_actual_joint_positions())
+    def _final_positions_reached(self, robot, final_positions):
+        actual_positions = list(robot.get_actual_joint_positions())
         if len(actual_positions) != len(final_positions):
             return False
 

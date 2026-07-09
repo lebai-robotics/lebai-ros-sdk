@@ -11,6 +11,7 @@ from lebai_driver.io_services import register_io_services
 from lebai_driver.led_signal_services import register_led_signal_services
 from lebai_driver.motion_services import register_motion_services
 from lebai_driver.resource_services import register_resource_services
+from lebai_driver.sdk_gate import StatusServiceGate
 from lebai_driver.start_stop_services import register_start_stop_services
 from lebai_driver.status import register_status_publishers
 from lebai_driver.trajectory_action import register_trajectory_action
@@ -30,51 +31,50 @@ class LebaiDriverNode(Node):
             simulator=simulator,
             robot_factory=robot_factory,
         )
-        self.status_connection = RobotConnection(
-            robot_ip=robot_ip,
-            simulator=simulator,
-            robot_factory=robot_factory,
-        )
 
-        self.status_callback_group = MutuallyExclusiveCallbackGroup()
-        self.model_state_callback_group = MutuallyExclusiveCallbackGroup()
         self.service_callback_group = MutuallyExclusiveCallbackGroup()
+        self.service_sdk_gate = StatusServiceGate()
 
         register_status_publishers(
             self,
-            self.status_connection,
-            callback_group=self.status_callback_group,
-            model_state_callback_group=self.model_state_callback_group,
+            self.connection,
+            sdk_gate=self.service_sdk_gate,
         )
         register_start_stop_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         register_motion_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         register_io_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         register_led_signal_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         register_resource_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         register_claw_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            sdk_gate=self.service_sdk_gate,
         )
         self.trajectory_action = register_trajectory_action(self, self.connection)
         self.gripper_action = register_gripper_action(self, self.connection)
