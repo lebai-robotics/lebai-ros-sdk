@@ -96,6 +96,14 @@ class FakeRobot:
     def move_pvat(self, positions, velocities, accelerations, duration):
         self._record('move_pvat', positions, velocities, accelerations, duration)
 
+    def call(self, method, params):
+        self._record('call', method, params)
+        return 0, ''
+
+    def move_trajectory(self, name, directory=''):
+        self._record('move_trajectory', name, directory)
+        return self._next_motion_id()
+
     def wait_move(self, motion_id=0):
         self._record('wait_move', motion_id)
 
