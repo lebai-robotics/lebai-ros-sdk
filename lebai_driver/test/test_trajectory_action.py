@@ -1,3 +1,5 @@
+import json
+
 from builtin_interfaces.msg import Duration
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import GoalResponse
@@ -92,6 +94,18 @@ class MovingFakeRobot(FakeRobot):
         return self._positions[0]
 
 
+class CancelOnSaveFakeRobot(FakeRobot):
+    def __init__(self):
+        super().__init__()
+        self.goal_handle = None
+
+    def call(self, method, params):
+        result = super().call(method, params)
+        if 'data' in json.loads(params):
+            self.goal_handle.is_cancel_requested = True
+        return result
+
+
 class FailingLock:
     def __enter__(self):
         raise AssertionError('trajectory action should not use sdk_access')
@@ -131,7 +145,7 @@ def test_trajectory_action_rejects_empty_or_wrong_joint_goals():
     assert wrong_joint_response == GoalResponse.REJECT
 
 
-def test_trajectory_action_streams_segments_to_move_pvat():
+def test_trajectory_action_runs_controller_managed_pvat_trajectory():
     robot = FakeRobot()
     robot.robot_state = 5
     robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
@@ -140,19 +154,72 @@ def test_trajectory_action_streams_segments_to_move_pvat():
 
     result = callbacks['execute_callback'](goal_handle)
 
-    assert robot.calls[:2] == [
-        ('move_pvat', ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [0.1] * 6, [0.2] * 6, 0.5), {}),
-        ('move_pvat', ([2.0, 3.0, 4.0, 5.0, 6.0, 7.0], [0.1] * 6, [0.2] * 6, 0.75), {}),
-    ]
-    assert robot.calls[2:] == [
+    assert robot.calls[0][0] == 'call'
+    assert robot.calls[0][1][0] == 'save_trajectory'
+    save_request = json.loads(robot.calls[0][1][1])
+    resource_name = save_request['name']
+    assert resource_name.startswith('ros2_pvat_')
+    assert save_request == {
+        'name': resource_name,
+        'data': {
+            'kind': 'PVAT',
+            'data': [
+                {
+                    'duration': 0.5,
+                    'joints': [
+                        {'pose': float(index), 'velocity': 0.1, 'acc': 0.2}
+                        for index in range(1, 7)
+                    ],
+                },
+                {
+                    'duration': 0.75,
+                    'joints': [
+                        {'pose': float(index), 'velocity': 0.1, 'acc': 0.2}
+                        for index in range(2, 8)
+                    ],
+                },
+            ],
+        },
+        'dir': '',
+    }
+    assert robot.calls[1] == (
+        'move_trajectory',
+        (resource_name, ''),
+        {},
+    )
+    assert robot.calls[2:4] == [
         ('get_robot_state', (), {}),
         ('get_actual_joint_positions', (), {}),
     ]
+    assert robot.calls[4][0] == 'call'
+    assert robot.calls[4][1][0] == 'save_trajectory'
+    assert json.loads(robot.calls[4][1][1]) == {
+        'name': resource_name,
+        'dir': '',
+    }
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.succeeded is True
 
 
-def test_trajectory_action_streams_pvat_without_sdk_access_lock():
+def test_trajectory_action_does_not_start_saved_trajectory_after_cancel():
+    robot = CancelOnSaveFakeRobot()
+    _server, _action_type, _name, callbacks = _register(robot)
+    goal_handle = FakeGoalHandle(_trajectory())
+    robot.goal_handle = goal_handle
+
+    result = callbacks['execute_callback'](goal_handle)
+
+    assert [call[0] for call in robot.calls] == ['call', 'stop_move', 'call']
+    save_request = json.loads(robot.calls[0][1][1])
+    assert json.loads(robot.calls[2][1][1]) == {
+        'name': save_request['name'],
+        'dir': '',
+    }
+    assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
+    assert goal_handle.cancel_complete is True
+
+
+def test_trajectory_action_uses_controller_playback_without_sdk_access_lock():
     robot = FakeRobot()
     robot.robot_state = 5
     robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
@@ -186,14 +253,15 @@ def test_trajectory_action_waits_for_sdk_motion_state_and_final_positions(monkey
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.succeeded is True
     assert [call[0] for call in robot.calls] == [
-        'move_pvat',
-        'move_pvat',
+        'call',
+        'move_trajectory',
         'get_robot_state',
         'get_robot_state',
         'get_robot_state',
         'get_actual_joint_positions',
         'get_actual_joint_positions',
         'get_actual_joint_positions',
+        'call',
     ]
 
 
@@ -235,17 +303,41 @@ def test_trajectory_action_cancel_callback_stops_robot_immediately():
     assert robot.calls == [('stop_move', (), {})]
 
 
-def test_trajectory_action_aborts_when_sdk_rejects_pvat():
+def test_trajectory_action_aborts_when_sdk_rejects_saved_trajectory():
     robot = FakeRobot()
-    robot.exceptions['move_pvat'] = RuntimeError('controller rejected trajectory')
+    error = RuntimeError('controller rejected trajectory')
+    robot.exceptions['call'] = error
     _server, _action_type, _name, callbacks = _register(robot)
     goal_handle = FakeGoalHandle(_trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
-    assert robot.calls == [
-        ('move_pvat', ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [0.1] * 6, [0.2] * 6, 0.5), {})
-    ]
+    assert robot.calls[0][0] == 'call'
+    assert robot.calls[0][1][0] == 'save_trajectory'
     assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
     assert result.error_string == 'controller rejected trajectory'
+    assert goal_handle.aborted is True
+
+
+def test_trajectory_action_stops_and_cleans_up_when_playback_fails():
+    robot = FakeRobot()
+    robot.exceptions['move_trajectory'] = RuntimeError('playback failed')
+    _server, _action_type, _name, callbacks = _register(robot)
+    goal_handle = FakeGoalHandle(_trajectory())
+
+    result = callbacks['execute_callback'](goal_handle)
+
+    assert [call[0] for call in robot.calls] == [
+        'call',
+        'move_trajectory',
+        'stop_move',
+        'call',
+    ]
+    save_request = json.loads(robot.calls[0][1][1])
+    assert json.loads(robot.calls[-1][1][1]) == {
+        'name': save_request['name'],
+        'dir': '',
+    }
+    assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
+    assert result.error_string == 'playback failed'
     assert goal_handle.aborted is True
