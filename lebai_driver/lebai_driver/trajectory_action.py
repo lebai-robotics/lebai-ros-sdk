@@ -1,4 +1,6 @@
+import json
 import time
+import uuid
 
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
@@ -11,6 +13,8 @@ POLL_INTERVAL_SEC = 0.05
 RUNNING_ROBOT_STATES = {6, 7}
 TIMEOUT_MARGIN_SEC = 5.0
 TIMEOUT_SCALE = 1.25
+TRAJECTORY_RESOURCE_DIR = ''
+TRAJECTORY_RESOURCE_PREFIX = 'ros2_pvat_'
 
 _COMPLETED = 'completed'
 _CANCELED = 'canceled'
@@ -76,26 +80,38 @@ class TrajectoryActionBridge:
             goal_handle.abort()
             return result
 
+        resource_name = None
+        trajectory_saved = False
+        motion_started = False
         try:
-            execution_start_time = time.monotonic()
             final_time_from_start = self._time_from_start(trajectory.points[-1])
-            with self._sdk_access() as robot:
-                previous_time = self._time_from_start(trajectory.points[0])
-                for point in trajectory.points[1:]:
-                    if goal_handle.is_cancel_requested:
-                        robot.stop_move()
-                        result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
-                        goal_handle.canceled()
-                        return result
+            if goal_handle.is_cancel_requested:
+                with self._sdk_access() as robot:
+                    robot.stop_move()
+                result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
+                goal_handle.canceled()
+                return result
 
-                    current_time = self._time_from_start(point)
-                    robot.move_pvat(
-                        list(point.positions),
-                        list(point.velocities),
-                        list(point.accelerations),
-                        current_time - previous_time,
-                    )
-                    previous_time = current_time
+            resource_name = self._new_trajectory_resource_name()
+            # Controller-side playback owns PVAT queue backpressure and lookahead.
+            with self._sdk_access() as robot:
+                self._save_controller_trajectory(robot, trajectory, resource_name)
+            trajectory_saved = True
+
+            if goal_handle.is_cancel_requested:
+                with self._sdk_access() as robot:
+                    robot.stop_move()
+                result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
+                goal_handle.canceled()
+                return result
+
+            with self._sdk_access() as robot:
+                execution_start_time = time.monotonic()
+                motion_started = True
+                robot.move_trajectory(
+                    resource_name,
+                    TRAJECTORY_RESOURCE_DIR,
+                )
 
             self._wait_for_planned_duration(
                 goal_handle,
@@ -120,19 +136,96 @@ class TrajectoryActionBridge:
                 goal_handle.canceled()
                 return result
             if completion == _TIMEOUT:
+                with self._sdk_access() as robot:
+                    robot.stop_move()
                 result.error_code = FollowJointTrajectory.Result.GOAL_TOLERANCE_VIOLATED
                 result.error_string = 'trajectory did not reach final joint state'
                 goal_handle.abort()
                 return result
         except Exception as exc:
+            if motion_started:
+                try:
+                    with self._sdk_access() as robot:
+                        robot.stop_move()
+                except Exception as stop_exc:
+                    self.node.get_logger().error(
+                        'Lebai trajectory stop failed: %s' % stop_exc
+                    )
             result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
             result.error_string = str(exc)
             goal_handle.abort()
             return result
+        finally:
+            if trajectory_saved:
+                try:
+                    with self._sdk_access() as robot:
+                        self._delete_controller_trajectory(robot, resource_name)
+                except Exception as exc:
+                    self.node.get_logger().error(
+                        'Lebai temporary trajectory cleanup failed: %s' % exc
+                    )
 
         result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
         goal_handle.succeed()
         return result
+
+    def _save_controller_trajectory(self, robot, trajectory, resource_name):
+        previous_time = self._time_from_start(trajectory.points[0])
+        segments = []
+        for point in trajectory.points[1:]:
+            current_time = self._time_from_start(point)
+            segments.append({
+                'duration': current_time - previous_time,
+                'joints': [
+                    {
+                        'pose': float(position),
+                        'velocity': float(velocity),
+                        'acc': float(acceleration),
+                    }
+                    for position, velocity, acceleration in zip(
+                        point.positions,
+                        point.velocities,
+                        point.accelerations,
+                    )
+                ],
+            })
+            previous_time = current_time
+
+        request = {
+            'name': resource_name,
+            'data': {
+                'kind': 'PVAT',
+                'data': segments,
+            },
+            'dir': TRAJECTORY_RESOURCE_DIR,
+        }
+        error_code, error_message = robot.call(
+            'save_trajectory',
+            json.dumps(request, separators=(',', ':'), allow_nan=False),
+        )
+        if error_code != 0:
+            raise RuntimeError(error_message)
+
+    def _delete_controller_trajectory(self, robot, resource_name):
+        request = {
+            'name': resource_name,
+            'dir': TRAJECTORY_RESOURCE_DIR,
+        }
+        try:
+            error_code, error_message = robot.call(
+                'save_trajectory',
+                json.dumps(request, separators=(',', ':')),
+            )
+            if error_code != 0:
+                raise RuntimeError(error_message)
+        except Exception as exc:
+            self.node.get_logger().error(
+                'Lebai temporary trajectory cleanup failed: %s' % exc
+            )
+
+    @staticmethod
+    def _new_trajectory_resource_name():
+        return TRAJECTORY_RESOURCE_PREFIX + uuid.uuid4().hex[:16]
 
     def _is_valid_trajectory(self, trajectory):
         if list(trajectory.joint_names) != self.joint_names:
