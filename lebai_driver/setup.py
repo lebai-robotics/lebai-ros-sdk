@@ -18,7 +18,7 @@ setup(
         (os.path.join('share', package_name, 'config'),
          glob(os.path.join('config', '*.yaml'))),
     ],
-    install_requires=['setuptools', 'pylebai'],
+    install_requires=['setuptools', 'pylebai>=2.0.0,<3.0.0'],
     zip_safe=True,
     maintainer='liufang',
     maintainer_email='liufang_robot@outlook.com',
