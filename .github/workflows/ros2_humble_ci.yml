@@ -16,6 +16,12 @@ jobs:
   humble:
     name: Humble unit and simulator tests
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        pylebai:
+          - 'pylebai==2.0.0'
+          - 'pylebai>=2.0.0,<3.0.0'
     container:
       image: ros:humble-ros-base
       options: --user 0
@@ -49,7 +55,7 @@ jobs:
             rosdep init
           fi
           rosdep update
-          python3 -m pip install pylebai
+          python3 -m pip install "${{ matrix.pylebai }}"
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
             --ignore-src \
