@@ -39,7 +39,7 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 
    python3 -m venv .venv --system-site-packages
    source .venv/bin/activate
-   python3 -m pip install pylebai
+   python3 -m pip install "pylebai>=2.0.0,<3.0.0"
 
 安装 ROS 包依赖：
 
