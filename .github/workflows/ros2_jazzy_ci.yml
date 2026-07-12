@@ -60,9 +60,9 @@ jobs:
           . .venv/bin/activate
           python3 -m pip install "${{ matrix.pylebai }}"
           rosdep install \
-            --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --from-paths . \
             --ignore-src \
-            --rosdistro jazzy \
+            --rosdistro "$ROS_DISTRO" \
             --skip-keys pylebai \
             -y
 
@@ -72,9 +72,7 @@ jobs:
           set -eo pipefail
           source /opt/ros/jazzy/setup.bash
           source .venv/bin/activate
-          colcon build \
-            --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
-            --symlink-install
+          colcon build --symlink-install
 
       - name: Run unit tests
         shell: bash
@@ -83,8 +81,12 @@ jobs:
           source .venv/bin/activate
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
+          python3 -m pytest lebai_lm3_support/test/test_package_dependencies.py -q
           python3 -m pytest lebai_lm3_support/test -q
+          PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test/test_package_dependencies.py -q
           PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test -q
+          python3 -m pytest lebai_lm3_moveit_config/test/test_package_dependencies.py -q
+          python3 -m pytest lebai_lm3_moveit_config/test -q
 
       - name: Run simulator smoke tests
         shell: bash

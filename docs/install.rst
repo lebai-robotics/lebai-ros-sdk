@@ -54,7 +54,7 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 .. code-block:: bash
 
    source .venv/bin/activate
-   colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
+   colcon build --symlink-install
    source install/setup.bash
 
 检查安装
