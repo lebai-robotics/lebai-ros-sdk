@@ -49,7 +49,7 @@
 
 .. code-block:: bash
 
-   colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
+   colcon build --symlink-install
    source install/setup.bash
 
 检查安装

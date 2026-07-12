@@ -9,6 +9,16 @@ find_package(ament_cmake REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(lebai_interfaces REQUIRED)
 
+if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+  add_test(
+    NAME test_package_dependencies
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_package_dependencies.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+endif()
+
 install(PROGRAMS
   scripts/move_example.py
   scripts/io_example.py
