@@ -1,4 +1,6 @@
 import math
+from threading import Lock
+from time import monotonic, sleep
 
 from lebai_interfaces.srv import (
     Command,
@@ -20,9 +22,16 @@ from lebai_driver.result import fail, ok
 
 
 _UNSUPPORTED_MESSAGE = 'unsupported by installed pylebai'
+_WAIT_POLL_INTERVAL_SEC = 0.05
+_WAIT_PENDING_STATES = {'WAIT', 'RUNNING'}
 
 
-def register_motion_services(node, connection, callback_group=None):
+def register_motion_services(
+    node,
+    connection,
+    callback_group=None,
+    wait_callback_group=None,
+):
     definitions = [
         (MoveJoint, 'motion/movej', _movej),
         (MoveLinear, 'motion/movel', _movel),
@@ -39,12 +48,22 @@ def register_motion_services(node, connection, callback_group=None):
 
     services = []
     for srv_type, service_name, handler in definitions:
+        if handler is _wait_move:
+            callback = _make_wait_move_callback(connection)
+            service_callback_group = (
+                wait_callback_group
+                if wait_callback_group is not None
+                else callback_group
+            )
+        else:
+            callback = _make_motion_callback(connection, handler)
+            service_callback_group = callback_group
         services.append(
             node.create_service(
                 srv_type,
                 service_name,
-                _make_motion_callback(connection, handler),
-                callback_group=callback_group,
+                callback,
+                callback_group=service_callback_group,
             )
         )
     return services
@@ -61,6 +80,33 @@ def _make_motion_callback(connection, handler):
             response.result = fail(exception_message(exc))
         else:
             response.result = ok()
+        return response
+
+    return callback
+
+
+def _make_wait_move_callback(connection):
+    active_wait = Lock()
+
+    def callback(request, response):
+        if not active_wait.acquire(blocking=False):
+            response.result = fail('another wait_move request is active')
+            return response
+        try:
+            try:
+                _wait_move(
+                    lambda motion_id: _poll_motion_state(connection, motion_id),
+                    request,
+                    response,
+                )
+            except _UnsupportedMethod:
+                response.result = fail(_UNSUPPORTED_MESSAGE, code=UNSUPPORTED)
+            except Exception as exc:
+                response.result = fail(exception_message(exc))
+            else:
+                response.result = ok()
+        finally:
+            active_wait.release()
         return response
 
     return callback
@@ -144,9 +190,40 @@ def _move_pvat(robot, request, response):
     )
 
 
-def _wait_move(robot, request, response):
+def _wait_move(poll_motion_state, request, response):
     del response
-    _sdk_method(robot, 'wait_move')(request.motion_id)
+    motion_id = int(request.motion_id)
+    timeout_sec = float(request.timeout_sec)
+    if motion_id == 0:
+        raise ValueError('motion_id must be greater than zero')
+    if not math.isfinite(timeout_sec) or timeout_sec < 0.0:
+        raise ValueError('timeout_sec must be finite and non-negative')
+
+    deadline = None if timeout_sec == 0.0 else monotonic() + timeout_sec
+    while True:
+        if deadline is not None and monotonic() >= deadline:
+            raise TimeoutError('wait_move timed out')
+
+        state = poll_motion_state(motion_id)
+        if deadline is not None and monotonic() >= deadline:
+            raise TimeoutError('wait_move timed out')
+        if state == 'FINISHED':
+            return
+        if state not in _WAIT_PENDING_STATES:
+            raise RuntimeError('unknown motion state: %s' % state)
+
+        sleep_sec = _WAIT_POLL_INTERVAL_SEC
+        if deadline is not None:
+            remaining_sec = deadline - monotonic()
+            if remaining_sec <= 0.0:
+                raise TimeoutError('wait_move timed out')
+            sleep_sec = min(sleep_sec, remaining_sec)
+        sleep(sleep_sec)
+
+
+def _poll_motion_state(connection, motion_id):
+    with connection.sdk_access() as robot:
+        return str(_sdk_method(robot, 'get_motion_state')(motion_id))
 
 
 def _stop_move(robot, request, response):

@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import math
 
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
@@ -18,6 +19,31 @@ from lebai_interfaces.srv import (
 )
 
 from fakes import FakeNode, FakeRobot
+
+
+class _SequencedMotionRobot(FakeRobot):
+    def __init__(self, states):
+        super().__init__()
+        self._states = list(states)
+
+    def get_motion_state(self, motion_id):
+        self._record('get_motion_state', motion_id)
+        if len(self._states) > 1:
+            return self._states.pop(0)
+        return self._states[0]
+
+
+class _AdvancingClock:
+    def __init__(self):
+        self.now = 10.0
+        self.sleeps = []
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, duration):
+        self.sleeps.append(duration)
+        self.now += duration
 
 
 def _register(robot):
@@ -96,6 +122,13 @@ def test_motion_interfaces_use_standard_geometry_messages_only():
     assert not hasattr(interface_messages, 'CartesianPose')
 
 
+def test_wait_move_interface_supports_optional_timeout():
+    request = WaitMove.Request()
+
+    assert hasattr(request, 'timeout_sec')
+    assert request.timeout_sec == 0.0
+
+
 def test_motion_services_register_sdk_category_names():
     node, services, _callbacks = _register(FakeRobot())
 
@@ -113,6 +146,34 @@ def test_motion_services_register_sdk_category_names():
         (GetMotionState, 'motion/get_motion_state'),
     ]
     assert len(services) == 11
+
+
+def test_wait_move_service_uses_dedicated_callback_group():
+    from lebai_driver.connection import RobotConnection
+    from lebai_driver.motion_services import register_motion_services
+
+    node = FakeNode()
+    regular_group = object()
+    wait_group = object()
+    robot = FakeRobot()
+    connection = RobotConnection(
+        '127.0.0.1',
+        robot_factory=lambda *_args, **_kwargs: robot,
+    )
+
+    register_motion_services(
+        node,
+        connection,
+        callback_group=regular_group,
+        wait_callback_group=wait_group,
+    )
+
+    assert node.service_callback_groups['motion/wait_move'] is wait_group
+    assert {
+        group
+        for name, group in node.service_callback_groups.items()
+        if name != 'motion/wait_move'
+    } == {regular_group}
 
 
 def test_movej_maps_joint_target_to_sdk_call_and_motion_id():
@@ -403,16 +464,206 @@ def test_speed_linear_rejects_nonfinite_twist_without_sdk_call():
     assert robot.calls == []
 
 
-def test_wait_stop_skip_and_motion_queries_map_to_sdk():
-    robot = FakeRobot()
-    robot.running_motion_id = 123
-    robot.motion_states[123] = 'finished'
+def test_wait_move_polls_until_finished_without_calling_blocking_sdk_wait(monkeypatch):
+    from lebai_driver import motion_services
+
+    clock = _AdvancingClock()
+    monkeypatch.setattr(motion_services, 'monotonic', clock.monotonic, raising=False)
+    monkeypatch.setattr(motion_services, 'sleep', clock.sleep, raising=False)
+    robot = _SequencedMotionRobot(['WAIT', 'RUNNING', 'FINISHED'])
     _node, _services, callbacks = _register(robot)
 
-    wait_response = callbacks['motion/wait_move'](
-        WaitMove.Request(motion_id=123),
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=0.0),
         WaitMove.Response(),
     )
+
+    assert response.result.success is True
+    assert robot.calls == [
+        ('get_motion_state', (123,), {}),
+        ('get_motion_state', (123,), {}),
+        ('get_motion_state', (123,), {}),
+    ]
+    assert clock.sleeps == pytest.approx([0.05, 0.05])
+
+
+def test_wait_move_times_out_using_monotonic_deadline(monkeypatch):
+    from lebai_driver import motion_services
+
+    clock = _AdvancingClock()
+    monkeypatch.setattr(motion_services, 'monotonic', clock.monotonic, raising=False)
+    monkeypatch.setattr(motion_services, 'sleep', clock.sleep, raising=False)
+    robot = _SequencedMotionRobot(['RUNNING'])
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=0.1),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'timed out' in response.result.message
+    assert clock.now == pytest.approx(10.1)
+    assert clock.sleeps == pytest.approx([0.05, 0.05])
+    assert robot.calls
+    assert {name for name, _args, _kwargs in robot.calls} == {'get_motion_state'}
+
+
+def test_wait_move_rejects_finished_state_observed_after_deadline(monkeypatch):
+    from lebai_driver import motion_services
+
+    clock = _AdvancingClock()
+
+    class SlowFinishedRobot(_SequencedMotionRobot):
+        def get_motion_state(self, motion_id):
+            clock.now += 0.2
+            return super().get_motion_state(motion_id)
+
+    monkeypatch.setattr(motion_services, 'monotonic', clock.monotonic)
+    monkeypatch.setattr(motion_services, 'sleep', clock.sleep)
+    robot = SlowFinishedRobot(['FINISHED'])
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=0.1),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'timed out' in response.result.message
+    assert robot.calls == [('get_motion_state', (123,), {})]
+
+
+@pytest.mark.parametrize(
+    'timeout_sec',
+    [-0.1, float('nan'), float('inf'), float('-inf')],
+)
+def test_wait_move_rejects_invalid_timeout_without_sdk_call(timeout_sec):
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=timeout_sec),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'timeout_sec' in response.result.message
+    assert robot.calls == []
+
+
+def test_wait_move_rejects_zero_motion_id_without_sdk_call():
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=0, timeout_sec=0.0),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'motion_id' in response.result.message
+    assert robot.calls == []
+
+
+def test_wait_move_maps_backend_error_to_failure():
+    robot = FakeRobot()
+    robot.exceptions['get_motion_state'] = RuntimeError('state unavailable')
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=1.0),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert response.result.message == 'state unavailable'
+    assert robot.calls == [('get_motion_state', (123,), {})]
+
+
+def test_wait_move_rejects_unknown_backend_state():
+    robot = _SequencedMotionRobot(['PAUSED'])
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/wait_move'](
+        WaitMove.Request(motion_id=123, timeout_sec=1.0),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert response.result.message == 'unknown motion state: PAUSED'
+    assert robot.calls == [('get_motion_state', (123,), {})]
+
+
+def test_wait_move_releases_sdk_access_between_state_polls(monkeypatch):
+    from lebai_driver import motion_services
+    from lebai_driver.motion_services import register_motion_services
+
+    class RecordingConnection:
+        def __init__(self, robot):
+            self.robot = robot
+            self.active = False
+            self.events = []
+
+        @contextmanager
+        def sdk_access(self):
+            assert self.active is False
+            self.active = True
+            self.events.append('enter')
+            try:
+                yield self.robot
+            finally:
+                self.events.append('exit')
+                self.active = False
+
+    class GuardedRobot(_SequencedMotionRobot):
+        def get_motion_state(self, motion_id):
+            assert connection.active is True
+            return super().get_motion_state(motion_id)
+
+    clock = _AdvancingClock()
+    robot = GuardedRobot(['WAIT', 'RUNNING', 'FINISHED'])
+    connection = RecordingConnection(robot)
+
+    def sleep_outside_sdk_access(duration):
+        assert connection.active is False
+        clock.sleep(duration)
+
+    monkeypatch.setattr(motion_services, 'monotonic', clock.monotonic, raising=False)
+    monkeypatch.setattr(
+        motion_services,
+        'sleep',
+        sleep_outside_sdk_access,
+        raising=False,
+    )
+    node = FakeNode()
+    register_motion_services(node, connection)
+    callback = dict((name, callback) for _srv_type, name, callback in node.services)[
+        'motion/wait_move'
+    ]
+
+    response = callback(
+        WaitMove.Request(motion_id=123, timeout_sec=0.0),
+        WaitMove.Response(),
+    )
+
+    assert response.result.success is True
+    assert connection.events == ['enter', 'exit'] * 3
+    assert clock.sleeps == pytest.approx([0.05, 0.05])
+
+
+def test_stop_skip_and_motion_queries_map_to_sdk():
+    robot = FakeRobot()
+    robot.running_motion_id = 123
+    robot.motion_states[123] = 'FINISHED'
+    _node, _services, callbacks = _register(robot)
+
     stop_response = callbacks['motion/stop_move'](Command.Request(), Command.Response())
     skip_response = callbacks['motion/skip_move'](Command.Request(), Command.Response())
     running_response = callbacks['motion/get_running_motion'](
@@ -425,19 +676,17 @@ def test_wait_stop_skip_and_motion_queries_map_to_sdk():
     )
 
     assert robot.calls == [
-        ('wait_move', (123,), {}),
         ('stop_move', (), {}),
         ('skip_move', (), {}),
         ('get_running_motion', (), {}),
         ('get_motion_state', (123,), {}),
     ]
-    assert wait_response.result.success is True
     assert stop_response.result.success is True
     assert skip_response.result.success is True
     assert running_response.result.success is True
     assert running_response.motion_id == 123
     assert state_response.result.success is True
-    assert state_response.state == 'finished'
+    assert state_response.state == 'FINISHED'
 
 
 def test_motion_service_maps_sdk_exception_to_result():
