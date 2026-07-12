@@ -3,12 +3,7 @@
   <name>lebai_lm3_moveit_config</name>
   <version>0.0.1</version>
   <description>
-    <p>
-      MoveIt Resources for testing: Franka Emika Panda
-    </p>
-    <p>
-      A project-internal configuration for testing in MoveIt.
-    </p>
+    MoveIt configuration for Lebai LM3 and LM3-L1 robot models.
   </description>
   <author email="liufang_robot@outlook.com">liufang</author>
   <maintainer email="liufang_robot@outlook.com">liufang</maintainer>
