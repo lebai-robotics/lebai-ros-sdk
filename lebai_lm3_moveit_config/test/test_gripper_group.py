@@ -10,6 +10,7 @@ import xacro
 PACKAGE_DIR = Path(__file__).resolve().parents[1]
 REPO_DIR = PACKAGE_DIR.parent
 SUPPORT_DIR = REPO_DIR / "lebai_lm3_support"
+FIXED_ARM_JOINT_NAMES = [f"joint_{index}" for index in range(1, 7)]
 
 ROBOT_CONFIGS = [
     (
@@ -33,6 +34,25 @@ ROBOT_CONFIGS = [
         False,
     ),
 ]
+
+
+@pytest.mark.parametrize(("_srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_active_arm_joint_names_are_fixed(
+    _srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+    active_arm_joint_names = [
+        joint.attrib["name"]
+        for joint in robot.findall("joint")
+        if joint.attrib.get("type") == "revolute"
+        and not joint.attrib["name"].startswith("gripper_")
+        and joint.find("mimic") is None
+    ]
+
+    assert active_arm_joint_names == FIXED_ARM_JOINT_NAMES
 
 
 @pytest.mark.parametrize(("srdf_path", "xacro_path", "has_gripper"), ROBOT_CONFIGS)
@@ -220,14 +240,7 @@ def test_moveit_controller_config_declares_arm_and_gripper_action_servers():
         "action_ns": "",
         "type": "FollowJointTrajectory",
         "default": True,
-        "joints": [
-            "joint_1",
-            "joint_2",
-            "joint_3",
-            "joint_4",
-            "joint_5",
-            "joint_6",
-        ],
+        "joints": FIXED_ARM_JOINT_NAMES,
     }
     assert controllers["lebai_gripper_controller"] == {
         "action_ns": "gripper_cmd",

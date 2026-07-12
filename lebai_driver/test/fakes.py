@@ -323,13 +323,32 @@ class FakeRobotFactory:
 
 
 class FakeNode:
-    def __init__(self):
+    def __init__(self, parameter_overrides=None):
+        from lebai_driver.parameters import DEFAULT_JOINT_NAMES
+
         self.services = []
         self.service_callback_groups = {}
         self.actions = []
         self.publishers = []
         self.timers = []
         self._now = Time(sec=12, nanosec=34)
+        self.parameter_requests = []
+        self.parameter_values = {
+            'joint_names': DEFAULT_JOINT_NAMES,
+            'joint_state_publish_rate': 20.0,
+            'robot_state_publish_rate': 10.0,
+            'joint_motion_publish_rate': 20.0,
+            'io_state_publish_rate': 10.0,
+            'gripper_state_publish_rate': 10.0,
+            'gripper_joint_name': 'gripper_r_joint1',
+            'io_state_device': 'robot',
+            'io_state_digital_input_count': 0,
+            'io_state_digital_output_count': 0,
+            'io_state_analog_input_count': 0,
+            'io_state_analog_output_count': 0,
+            'io_state_dio_count': 0,
+        }
+        self.parameter_values.update(parameter_overrides or {})
 
     def create_service(self, srv_type, name, callback, callback_group=None):
         self.services.append((srv_type, name, callback))
@@ -357,24 +376,8 @@ class FakeNode:
         return FakeLogger()
 
     def get_parameter(self, name):
-        from lebai_driver.parameters import DEFAULT_JOINT_NAMES
-
-        values = {
-            'joint_names': DEFAULT_JOINT_NAMES,
-            'joint_state_publish_rate': 20.0,
-            'robot_state_publish_rate': 10.0,
-            'joint_motion_publish_rate': 20.0,
-            'io_state_publish_rate': 10.0,
-            'gripper_state_publish_rate': 10.0,
-            'gripper_joint_name': 'gripper_r_joint1',
-            'io_state_device': 'robot',
-            'io_state_digital_input_count': 0,
-            'io_state_digital_output_count': 0,
-            'io_state_analog_input_count': 0,
-            'io_state_analog_output_count': 0,
-            'io_state_dio_count': 0,
-        }
-        return FakeParameter(values[name])
+        self.parameter_requests.append(name)
+        return FakeParameter(self.parameter_values[name])
 
 
 class FakePublisher:
