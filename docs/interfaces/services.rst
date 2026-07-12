@@ -108,6 +108,10 @@
 归一化，再按控制器的 Euler ZYX 定义
 ``Rz(rz) * Ry(ry) * Rx(rx)`` 转换。
 
+``MovePvat`` 的 ``positions``、``velocities`` 和 ``accelerations`` 必须各含
+6 个有限数值，``duration`` 必须是大于零的有限秒数。无效请求会在进入
+``pylebai`` 前返回失败。
+
 关节运动示例：
 
 .. code-block:: bash
@@ -150,6 +154,31 @@
 .. code-block:: bash
 
    ros2 service call /lebai/motion/get_running_motion lebai_interfaces/srv/GetRunningMotion
+
+LED 和 signal
+-------------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Service
+     - 类型
+     - 用途
+   * - ``/lebai/led/set_led``
+     - ``lebai_interfaces/srv/SetLed``
+     - 设置控制器 LED。
+   * - ``/lebai/signal/get_signals``
+     - ``lebai_interfaces/srv/GetSignals``
+     - 读取连续 signal 值。
+   * - ``/lebai/signal/set_signals``
+     - ``lebai_interfaces/srv/SetSignals``
+     - 写入连续 signal 值。
+
+``SetLed.mode`` 使用 ``MODE_UNCHANGED``、``MODE_OFF``、``MODE_STEADY``、
+``MODE_BREATH``、``MODE_ROTATE_SEGMENTED``、``MODE_ROTATE_SOLID`` 和
+``MODE_FLASH``。``SetLed.speed`` 使用 ``SPEED_UNSPECIFIED``、``SPEED_FAST``、
+``SPEED_NORMAL`` 和 ``SPEED_SLOW``；数值 0 表示控制器/protobuf 的未指定速度，
+不是快速、正常或慢速。``color`` 可含 0 至 4 个数值为 0 至 15 的调色板索引。
 
 IO
 --
