@@ -11,6 +11,7 @@ from lebai_interfaces.srv import (
     WaitMove,
 )
 
+from lebai_driver.conversions import pose_to_sdk, twist_to_sdk
 from lebai_driver.errors import UNSUPPORTED, exception_message
 from lebai_driver.result import fail, ok
 
@@ -114,9 +115,9 @@ def _speedl(robot, request, response):
     response.motion_id = _motion_id(
         _sdk_method(robot, 'speedl')(
             request.acceleration,
-            _cartesian_pose(request.velocity),
+            twist_to_sdk(request.velocity),
             request.time,
-            _cartesian_pose(request.reference),
+            pose_to_sdk(request.reference),
         )
     )
 
@@ -165,18 +166,7 @@ def _sdk_method(robot, name):
 def _motion_target(target):
     if target.is_joint_pose:
         return _float_list(target.joint_positions)
-    return _cartesian_pose(target.cartesian_pose)
-
-
-def _cartesian_pose(pose):
-    return {
-        'x': float(pose.x),
-        'y': float(pose.y),
-        'z': float(pose.z),
-        'rx': float(pose.rx),
-        'ry': float(pose.ry),
-        'rz': float(pose.rz),
-    }
+    return pose_to_sdk(target.cartesian_pose)
 
 
 def _float_list(values):

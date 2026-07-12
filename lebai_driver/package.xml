@@ -14,8 +14,10 @@
   <exec_depend>xacro</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>control_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>lebai_interfaces</exec_depend>
   <exec_depend>lebai_lm3_support</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

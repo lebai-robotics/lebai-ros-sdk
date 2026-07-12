@@ -13,6 +13,7 @@ RESOURCES_DIR = REPOSITORY_DIR / "lebai_resources"
 
 DRIVER_RUNTIME_DEPENDENCIES = {
     "control_msgs",
+    "geometry_msgs",
     "launch",
     "launch_ros",
     "lebai_interfaces",
@@ -20,6 +21,7 @@ DRIVER_RUNTIME_DEPENDENCIES = {
     "rclpy",
     "robot_state_publisher",
     "sensor_msgs",
+    "tf_transformations",
     "xacro",
 }
 DRIVER_TEST_DEPENDENCIES = {
@@ -75,9 +77,11 @@ DRIVER_TEST_IMPORT_DEPENDENCIES = {
 }
 DRIVER_TEST_RUNTIME_IMPORTS = {
     "control_msgs",
+    "geometry_msgs",
     "launch",
     "launch_ros",
     "lebai_interfaces",
+    "pylebai",
     "rclpy",
     "sensor_msgs",
 }

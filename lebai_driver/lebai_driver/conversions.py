@@ -1,7 +1,9 @@
 import math
 
-from lebai_interfaces.msg import CartesianPose, ClawState, IOState, JointMotion, RobotState
+from geometry_msgs.msg import Point, Pose, Quaternion
+from lebai_interfaces.msg import ClawState, IOState, JointMotion, RobotState
 from sensor_msgs.msg import JointState
+from tf_transformations import euler_from_quaternion, quaternion_from_euler
 
 from lebai_driver.errors import exception_message
 
@@ -10,16 +12,69 @@ _POSE_FIELDS = ('x', 'y', 'z', 'rx', 'ry', 'rz')
 _GRIPPER_MAX_ANGLE = math.pi / 3.0
 
 
-def cartesian_pose_from_sdk(data):
-    values = [_value(data, index, name, 0.0) for index, name in enumerate(_POSE_FIELDS)]
-    return CartesianPose(
-        x=float(values[0]),
-        y=float(values[1]),
-        z=float(values[2]),
-        rx=float(values[3]),
-        ry=float(values[4]),
-        rz=float(values[5]),
+def pose_from_sdk(data):
+    values = _sdk_pose_values(data)
+    quaternion = quaternion_from_euler(
+        values['rx'],
+        values['ry'],
+        values['rz'],
+        axes='sxyz',
     )
+    return Pose(
+        position=Point(
+            x=values['x'],
+            y=values['y'],
+            z=values['z'],
+        ),
+        orientation=Quaternion(
+            x=float(quaternion[0]),
+            y=float(quaternion[1]),
+            z=float(quaternion[2]),
+            w=float(quaternion[3]),
+        ),
+    )
+
+
+def pose_to_sdk(pose):
+    position = _finite_values({
+        'x': pose.position.x,
+        'y': pose.position.y,
+        'z': pose.position.z,
+    }, 'ROS pose position')
+    quaternion = _finite_values({
+        'x': pose.orientation.x,
+        'y': pose.orientation.y,
+        'z': pose.orientation.z,
+        'w': pose.orientation.w,
+    }, 'ROS pose quaternion')
+    quaternion_values = [
+        quaternion['x'],
+        quaternion['y'],
+        quaternion['z'],
+        quaternion['w'],
+    ]
+    norm = math.hypot(*quaternion_values)
+    if norm == 0.0 or not math.isfinite(norm):
+        raise ValueError('ROS pose quaternion must be finite and nonzero')
+    normalized = [value / norm for value in quaternion_values]
+    rx, ry, rz = euler_from_quaternion(normalized, axes='sxyz')
+    return {
+        **position,
+        'rx': float(rx),
+        'ry': float(ry),
+        'rz': float(rz),
+    }
+
+
+def twist_to_sdk(twist):
+    return _finite_values({
+        'x': twist.linear.x,
+        'y': twist.linear.y,
+        'z': twist.linear.z,
+        'rx': twist.angular.x,
+        'ry': twist.angular.y,
+        'rz': twist.angular.z,
+    }, 'ROS twist')
 
 
 def robot_state_from_sdk(robot):
@@ -61,9 +116,9 @@ def joint_motion_from_sdk(robot):
     message.target_joint_speed = _float_list(robot.get_target_joint_speed())
     message.actual_joint_torques = _float_list(robot.get_actual_joint_torques())
     message.target_joint_torques = _float_list(robot.get_target_joint_torques())
-    message.actual_tcp_pose = cartesian_pose_from_sdk(robot.get_actual_tcp_pose())
-    message.target_tcp_pose = cartesian_pose_from_sdk(robot.get_target_tcp_pose())
-    message.actual_flange_pose = cartesian_pose_from_sdk(_actual_flange_pose(robot))
+    message.actual_tcp_pose = pose_from_sdk(robot.get_actual_tcp_pose())
+    message.target_tcp_pose = pose_from_sdk(robot.get_target_tcp_pose())
+    message.actual_flange_pose = pose_from_sdk(_actual_flange_pose(robot))
     return message
 
 
@@ -159,6 +214,36 @@ def model_joint_state_error(exc, joint_names, gripper_joint_name):
 def _actual_flange_pose(robot):
     data = robot.get_kin_data()
     return _value(data, 0, 'actual_flange_pose', {})
+
+
+def _sdk_pose_values(data):
+    values = {}
+    for name in _POSE_FIELDS:
+        try:
+            value = data[name]
+        except (IndexError, KeyError, TypeError) as exc:
+            raise ValueError('SDK Cartesian pose missing field %s' % name) from exc
+        try:
+            values[name] = float(value)
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise ValueError(
+                'SDK Cartesian pose field %s must be numeric' % name
+            ) from exc
+    return _finite_values(values, 'SDK Cartesian pose')
+
+
+def _finite_values(values, label):
+    converted = {name: float(value) for name, value in values.items()}
+    nonfinite = [
+        name
+        for name, value in converted.items()
+        if not math.isfinite(value)
+    ]
+    if nonfinite:
+        raise ValueError(
+            '%s fields must be finite: %s' % (label, ', '.join(nonfinite))
+        )
+    return converted
 
 
 def _float_list(values):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rclpy
+from geometry_msgs.msg import Point, Pose, Quaternion
 from rclpy.node import Node
 from lebai_interfaces.msg import MotionParams, MotionTarget
 from lebai_interfaces.srv import MoveJoint
@@ -31,12 +32,15 @@ class MoveExample(Node):
             self.get_logger().info('service "motion/movel" not available, waiting...')
         req = MoveLinear.Request()
         req.target.is_joint_pose = False
-        req.target.cartesian_pose.x = 0.022
-        req.target.cartesian_pose.y = 0.473
-        req.target.cartesian_pose.z = 0.431
-        req.target.cartesian_pose.rx = 0.918
-        req.target.cartesian_pose.ry = 0.128
-        req.target.cartesian_pose.rz = -0.364
+        req.target.cartesian_pose = Pose(
+            position=Point(x=0.022, y=0.473, z=0.431),
+            orientation=Quaternion(
+                x=0.4452199054419614,
+                y=-0.023637240544570032,
+                z=-0.1897987542851597,
+                w=0.8747553655334106,
+            ),
+        )
         req.params = MotionParams(acceleration=1.0, velocity=0.1)
         return call_service(self, srv, req, 'motion/movel')
 
