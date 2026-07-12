@@ -1,4 +1,9 @@
+import math
+
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from lebai_interfaces.msg import ClawState, IOState, JointMotion, RobotState
+from pylebai import l_master
+import pytest
 from sensor_msgs.msg import JointState
 
 from fakes import FakeClawData, FakeNode, FakeRobot
@@ -15,14 +20,123 @@ def _register(robot, node=None):
     return node, handles
 
 
-def test_conversion_helpers_accept_dict_list_tuple_and_object_poses():
-    from lebai_driver.conversions import cartesian_pose_from_sdk
+def _sdk_pose(**overrides):
+    values = {
+        'x': 0.0,
+        'y': 0.0,
+        'z': 0.0,
+        'rx': 0.0,
+        'ry': 0.0,
+        'rz': 0.0,
+    }
+    values.update(overrides)
+    pose = l_master.CartesianPose()
+    for name, value in values.items():
+        pose[name] = value
+    return pose
 
-    assert cartesian_pose_from_sdk({'x': 1, 'y': 2, 'z': 3, 'rx': 4, 'ry': 5, 'rz': 6}).x == 1.0
-    assert cartesian_pose_from_sdk([1, 2, 3, 4, 5, 6]).rz == 6.0
-    assert cartesian_pose_from_sdk((1, 2, 3)).z == 3.0
-    assert cartesian_pose_from_sdk(type('Pose', (), {'x': 7, 'rz': 8})()).x == 7.0
-    assert cartesian_pose_from_sdk(type('Pose', (), {'x': 7, 'rz': 8})()).rz == 8.0
+
+def test_sdk_swig_pose_converts_euler_zyx_to_ros_quaternion():
+    from lebai_driver.conversions import pose_from_sdk
+
+    sdk_pose = _sdk_pose(
+        x=1.0,
+        y=2.0,
+        z=3.0,
+        rx=math.pi / 2.0,
+        rz=math.pi / 2.0,
+    )
+
+    pose = pose_from_sdk(sdk_pose)
+
+    assert not isinstance(sdk_pose, dict)
+    assert isinstance(pose, Pose)
+    assert pose.position == Point(x=1.0, y=2.0, z=3.0)
+    assert [
+        pose.orientation.x,
+        pose.orientation.y,
+        pose.orientation.z,
+        pose.orientation.w,
+    ] == pytest.approx([0.5, 0.5, 0.5, 0.5])
+
+
+def test_sdk_pose_requires_every_finite_field():
+    from lebai_driver.conversions import pose_from_sdk
+
+    missing = _sdk_pose()
+    del missing['rz']
+
+    with pytest.raises(ValueError, match='rz'):
+        pose_from_sdk(missing)
+    with pytest.raises(ValueError, match='finite'):
+        pose_from_sdk(_sdk_pose(ry=float('nan')))
+    with pytest.raises(ValueError, match='finite'):
+        pose_from_sdk(_sdk_pose(x=float('inf')))
+
+
+def test_ros_pose_normalizes_quaternion_and_converts_to_sdk_euler_zyx():
+    from lebai_driver.conversions import pose_to_sdk
+
+    pose = Pose(
+        position=Point(x=1.0, y=2.0, z=3.0),
+        orientation=Quaternion(x=1.0, y=1.0, z=1.0, w=1.0),
+    )
+
+    sdk_pose = pose_to_sdk(pose)
+
+    assert sdk_pose == pytest.approx({
+        'x': 1.0,
+        'y': 2.0,
+        'z': 3.0,
+        'rx': math.pi / 2.0,
+        'ry': 0.0,
+        'rz': math.pi / 2.0,
+    })
+
+
+@pytest.mark.parametrize(
+    'orientation',
+    [
+        Quaternion(x=0.0, y=0.0, z=0.0, w=0.0),
+        Quaternion(x=float('nan'), y=0.0, z=0.0, w=1.0),
+        Quaternion(x=0.0, y=float('inf'), z=0.0, w=1.0),
+    ],
+)
+def test_ros_pose_rejects_zero_or_nonfinite_quaternion(orientation):
+    from lebai_driver.conversions import pose_to_sdk
+
+    with pytest.raises(ValueError, match='quaternion'):
+        pose_to_sdk(Pose(orientation=orientation))
+
+
+def test_ros_pose_and_twist_reject_nonfinite_components():
+    from lebai_driver.conversions import pose_to_sdk, twist_to_sdk
+
+    with pytest.raises(ValueError, match='finite'):
+        pose_to_sdk(Pose(
+            position=Point(x=float('nan')),
+            orientation=Quaternion(w=1.0),
+        ))
+    with pytest.raises(ValueError, match='finite'):
+        twist_to_sdk(Twist(linear=Vector3(x=float('inf'))))
+
+
+def test_ros_twist_maps_linear_and_angular_components_directly():
+    from lebai_driver.conversions import twist_to_sdk
+
+    twist = Twist(
+        linear=Vector3(x=1.0, y=2.0, z=3.0),
+        angular=Vector3(x=4.0, y=5.0, z=6.0),
+    )
+
+    assert twist_to_sdk(twist) == {
+        'x': 1.0,
+        'y': 2.0,
+        'z': 3.0,
+        'rx': 4.0,
+        'ry': 5.0,
+        'rz': 6.0,
+    }
 
 
 def test_robot_state_conversion_maps_sdk_fields():
@@ -60,9 +174,9 @@ def test_joint_state_and_motion_conversion_maps_sdk_fields():
     robot.target_joint_speed = [0.4, 0.5, 0.6]
     robot.actual_joint_torques = [10, 11, 12]
     robot.target_joint_torques = [13, 14, 15]
-    robot.actual_tcp_pose = {'x': 1, 'y': 2, 'z': 3, 'rx': 4, 'ry': 5, 'rz': 6}
-    robot.target_tcp_pose = {'x': 6, 'y': 5, 'z': 4, 'rx': 3, 'ry': 2, 'rz': 1}
-    robot.actual_flange_pose = {'x': 0.5, 'rz': 0.6}
+    robot.actual_tcp_pose = _sdk_pose(x=1, y=2, z=3, rx=math.pi / 2)
+    robot.target_tcp_pose = _sdk_pose(x=6, y=5, z=4, rz=math.pi / 2)
+    robot.actual_flange_pose = _sdk_pose(x=0.5, ry=math.pi / 2)
 
     joint_state = joint_state_from_sdk(robot, ['j1', 'j2', 'j3'])
     motion = joint_motion_from_sdk(robot)
@@ -80,10 +194,11 @@ def test_joint_state_and_motion_conversion_maps_sdk_fields():
     assert list(motion.target_joint_speed) == [0.4, 0.5, 0.6]
     assert list(motion.actual_joint_torques) == [10.0, 11.0, 12.0]
     assert list(motion.target_joint_torques) == [13.0, 14.0, 15.0]
-    assert motion.actual_tcp_pose.x == 1.0
-    assert motion.target_tcp_pose.rz == 1.0
-    assert motion.actual_flange_pose.x == 0.5
-    assert motion.actual_flange_pose.rz == 0.6
+    assert motion.actual_tcp_pose.position.x == 1.0
+    assert motion.actual_tcp_pose.orientation.x == pytest.approx(math.sqrt(0.5))
+    assert motion.target_tcp_pose.orientation.z == pytest.approx(math.sqrt(0.5))
+    assert motion.actual_flange_pose.position.x == 0.5
+    assert motion.actual_flange_pose.orientation.y == pytest.approx(math.sqrt(0.5))
 
 
 def test_io_and_claw_conversion_maps_sdk_fields():

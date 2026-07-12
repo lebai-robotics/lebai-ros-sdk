@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclpy</depend>
+  <depend>geometry_msgs</depend>
   <depend>lebai_interfaces</depend>
   <depend>control_msgs</depend>
   <depend>moveit_msgs</depend>

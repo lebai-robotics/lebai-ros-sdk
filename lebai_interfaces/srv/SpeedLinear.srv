@@ -1,7 +1,7 @@
 float64 acceleration
-lebai_interfaces/CartesianPose velocity
+geometry_msgs/Twist velocity
 float64 time
-lebai_interfaces/CartesianPose reference
+geometry_msgs/Pose reference
 ---
 lebai_interfaces/Result result
 uint32 motion_id

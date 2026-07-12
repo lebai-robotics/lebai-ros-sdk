@@ -101,6 +101,13 @@
      - ``lebai_interfaces/srv/GetMotionState``
      - 获取指定运动状态。
 
+``MotionTarget.cartesian_pose`` 和 ``SpeedLinear.reference`` 使用
+``geometry_msgs/msg/Pose``。``SpeedLinear.velocity`` 使用
+``geometry_msgs/msg/Twist``：``linear`` 对应 TCP 线速度，``angular`` 对应
+角速度。所有 ``Pose.orientation`` 都必须是有限的非零四元数；驱动会先
+归一化，再按控制器的 Euler ZYX 定义
+``Rz(rz) * Ry(ry) * Rx(rx)`` 转换。
+
 关节运动示例：
 
 .. code-block:: bash
@@ -113,6 +120,26 @@
      params: {
        acceleration: 0.5,
        velocity: 0.5,
+       time: 0.0,
+       blend_radius: 0.0
+     }
+   }"
+
+直线运动示例：
+
+.. code-block:: bash
+
+   ros2 service call /lebai/motion/movel lebai_interfaces/srv/MoveLinear "{
+     target: {
+       is_joint_pose: false,
+       cartesian_pose: {
+         position: {x: 0.3, y: 0.0, z: 0.4},
+         orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}
+       }
+     },
+     params: {
+       acceleration: 0.5,
+       velocity: 0.2,
        time: 0.0,
        blend_radius: 0.0
      }

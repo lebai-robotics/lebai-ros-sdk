@@ -1,3 +1,4 @@
+import math
 import os
 import time
 
@@ -92,6 +93,13 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         _spin_until(executor, lambda: joint_motions and io_states)
         assert joint_motions[-1].connected is True
         assert list(joint_motions[-1].actual_joint_positions)
+        orientation = joint_motions[-1].actual_tcp_pose.orientation
+        assert math.hypot(
+            orientation.x,
+            orientation.y,
+            orientation.z,
+            orientation.w,
+        ) == pytest.approx(1.0)
         assert io_states[-1].connected is True
 
         clients = [
