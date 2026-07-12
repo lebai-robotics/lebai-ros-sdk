@@ -41,7 +41,18 @@ def _make_led_signal_callback(connection, handler, sdk_gate=None):
 
 def _set_led(robot, request, response):
     del response
-    robot.set_led(request.mode, request.speed, list(request.color))
+    mode = int(request.mode)
+    speed = int(request.speed)
+    color = [int(value) for value in request.color]
+    if mode < 0 or mode > 6:
+        raise ValueError('mode must be between 0 and 6')
+    if speed < 0 or speed > 3:
+        raise ValueError('speed must be between 0 and 3')
+    if len(color) > 4:
+        raise ValueError('color must contain at most 4 values')
+    if any(value < 0 or value > 15 for value in color):
+        raise ValueError('color values must be between 0 and 15')
+    robot.set_led(mode, speed, color)
 
 
 def _get_signals(robot, request, response):

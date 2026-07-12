@@ -1,3 +1,5 @@
+import math
+
 from lebai_interfaces.srv import (
     Command,
     GetMotionState,
@@ -13,6 +15,7 @@ from lebai_interfaces.srv import (
 
 from lebai_driver.conversions import pose_to_sdk, twist_to_sdk
 from lebai_driver.errors import UNSUPPORTED, exception_message
+from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 from lebai_driver.result import fail, ok
 from lebai_driver.sdk_gate import exclusive_access
 
@@ -125,11 +128,20 @@ def _speedl(robot, request, response):
 
 def _move_pvat(robot, request, response):
     del response
+    positions = _validated_pvat_array(request.positions, 'positions')
+    velocities = _validated_pvat_array(request.velocities, 'velocities')
+    accelerations = _validated_pvat_array(
+        request.accelerations,
+        'accelerations',
+    )
+    duration = float(request.duration)
+    if not math.isfinite(duration) or duration <= 0.0:
+        raise ValueError('duration must be finite and greater than zero')
     _sdk_method(robot, 'move_pvat')(
-        _float_list(request.positions),
-        _float_list(request.velocities),
-        _float_list(request.accelerations),
-        request.duration,
+        positions,
+        velocities,
+        accelerations,
+        duration,
     )
 
 
@@ -172,6 +184,18 @@ def _motion_target(target):
 
 def _float_list(values):
     return [float(value) for value in values]
+
+
+def _validated_pvat_array(values, field_name):
+    converted = _float_list(values)
+    joint_count = len(DEFAULT_JOINT_NAMES)
+    if len(converted) != joint_count:
+        raise ValueError(
+            '%s must contain exactly %d values' % (field_name, joint_count)
+        )
+    if any(not math.isfinite(value) for value in converted):
+        raise ValueError('%s values must be finite' % field_name)
+    return converted
 
 
 def _motion_id(value):
