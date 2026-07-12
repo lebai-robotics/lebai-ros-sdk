@@ -4,6 +4,7 @@
   <xacro:include filename="$(find lebai_resources)/urdf/common_colours.xacro"/>
   <xacro:include filename="$(find lebai_resources)/urdf/common_constants.xacro"/>
   <xacro:include filename="$(find lebai_resources)/urdf/common_materials.xacro"/>
+  <xacro:include filename="$(find lebai_lm3_support)/urdf/lm3_joint_limits.xacro"/>
 <!-- Robot DH parameters define joint-->
 <xacro:property name="d1" value="0.21583" />
 <xacro:property name="d4" value="0.12063" />
@@ -34,29 +35,6 @@
 <xacro:property name="mass_link4" value="0.93256" />
 <xacro:property name="mass_link5" value="0.93256" />
 <xacro:property name="mass_link6" value="0.5782"/>
-
-<!-- Limit of joints-->
-<xacro:property name="joint1_upper_limit" value="6.28" />
-<xacro:property name="joint2_upper_limit" value="6.28" />
-<xacro:property name="joint3_upper_limit" value="6.28" />
-<xacro:property name="joint4_upper_limit" value="6.28" />
-<xacro:property name="joint5_upper_limit" value="6.28" />
-<xacro:property name="joint6_upper_limit" value="6.28" />
-
-
-<xacro:property name="joint1_lower_limit" value="-6.28" />
-<xacro:property name="joint2_lower_limit" value="-6.28" />
-<xacro:property name="joint3_lower_limit" value="-6.28" />
-<xacro:property name="joint4_lower_limit" value="-6.28" />
-<xacro:property name="joint5_lower_limit" value="-6.28" />
-<xacro:property name="joint6_lower_limit" value="-6.28" />
-
-<xacro:property name="joint1_vel_limit" value="3.14" />
-<xacro:property name="joint2_vel_limit" value="3.14" />
-<xacro:property name="joint3_vel_limit" value="3.14" />
-<xacro:property name="joint4_vel_limit" value="3.14" />
-<xacro:property name="joint5_vel_limit" value="3.14" />
-<xacro:property name="joint6_vel_limit" value="3.14" />
 
 <!-- Debug geometry sizes (used when use_simple_geometries:=true) -->
 <xacro:property name="debug_box_base" value="0.25 0.25 0.12" />
