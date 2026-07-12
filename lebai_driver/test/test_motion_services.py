@@ -1,6 +1,10 @@
 from contextlib import contextmanager
+import math
 
-from lebai_interfaces.msg import CartesianPose, MotionParams, MotionTarget
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+import lebai_interfaces.msg as interface_messages
+from lebai_interfaces.msg import JointMotion, MotionParams, MotionTarget
+import pytest
 from lebai_interfaces.srv import (
     Command,
     GetMotionState,
@@ -44,12 +48,37 @@ def _joint_target(*positions):
     return MotionTarget(is_joint_pose=True, joint_positions=list(positions))
 
 
-def _cartesian_pose(x=0.1, y=0.2, z=0.3, rx=0.4, ry=0.5, rz=0.6):
-    return CartesianPose(x=x, y=y, z=z, rx=rx, ry=ry, rz=rz)
+def _pose(
+    x=0.1,
+    y=0.2,
+    z=0.3,
+    qx=0.0,
+    qy=0.0,
+    qz=0.0,
+    qw=1.0,
+):
+    return Pose(
+        position=Point(x=x, y=y, z=z),
+        orientation=Quaternion(x=qx, y=qy, z=qz, w=qw),
+    )
 
 
 def _cartesian_target(**kwargs):
-    return MotionTarget(is_joint_pose=False, cartesian_pose=_cartesian_pose(**kwargs))
+    return MotionTarget(is_joint_pose=False, cartesian_pose=_pose(**kwargs))
+
+
+def test_motion_interfaces_use_standard_geometry_messages_only():
+    target = MotionTarget()
+    motion = JointMotion()
+    speed_request = SpeedLinear.Request()
+
+    assert isinstance(target.cartesian_pose, Pose)
+    assert isinstance(motion.actual_tcp_pose, Pose)
+    assert isinstance(motion.target_tcp_pose, Pose)
+    assert isinstance(motion.actual_flange_pose, Pose)
+    assert isinstance(speed_request.velocity, Twist)
+    assert isinstance(speed_request.reference, Pose)
+    assert not hasattr(interface_messages, 'CartesianPose')
 
 
 def test_motion_services_register_sdk_category_names():
@@ -131,7 +160,13 @@ def test_movel_maps_cartesian_target_to_sdk_pose_dict():
     robot = FakeRobot()
     _node, _services, callbacks = _register(robot)
     request = MoveLinear.Request(
-        target=_cartesian_target(x=0.11, y=0.22, z=0.33, rx=0.44, ry=0.55, rz=0.66),
+        target=_cartesian_target(
+            x=0.11,
+            y=0.22,
+            z=0.33,
+            qx=math.sqrt(0.5),
+            qw=math.sqrt(0.5),
+        ),
         params=_params(),
     )
 
@@ -141,7 +176,14 @@ def test_movel_maps_cartesian_target_to_sdk_pose_dict():
         (
             'movel',
             (
-                {'x': 0.11, 'y': 0.22, 'z': 0.33, 'rx': 0.44, 'ry': 0.55, 'rz': 0.66},
+                {
+                    'x': 0.11,
+                    'y': 0.22,
+                    'z': 0.33,
+                    'rx': math.pi / 2.0,
+                    'ry': 0.0,
+                    'rz': 0.0,
+                },
                 1.2,
                 0.4,
                 0.0,
@@ -196,9 +238,18 @@ def test_speed_and_pvat_services_map_request_fields():
     speedl_response = callbacks['motion/speedl'](
         SpeedLinear.Request(
             acceleration=2.0,
-            velocity=_cartesian_pose(x=0.01),
+            velocity=Twist(
+                linear=Vector3(x=0.01, y=0.02, z=0.03),
+                angular=Vector3(x=0.04, y=0.05, z=0.06),
+            ),
             time=0.5,
-            reference=_cartesian_pose(z=0.2),
+            reference=_pose(
+                x=0.1,
+                y=0.2,
+                z=0.2,
+                qz=math.sqrt(0.5),
+                qw=math.sqrt(0.5),
+            ),
         ),
         SpeedLinear.Response(),
     )
@@ -218,9 +269,16 @@ def test_speed_and_pvat_services_map_request_fields():
             'speedl',
             (
                 2.0,
-                {'x': 0.01, 'y': 0.2, 'z': 0.3, 'rx': 0.4, 'ry': 0.5, 'rz': 0.6},
+                {'x': 0.01, 'y': 0.02, 'z': 0.03, 'rx': 0.04, 'ry': 0.05, 'rz': 0.06},
                 0.5,
-                {'x': 0.1, 'y': 0.2, 'z': 0.2, 'rx': 0.4, 'ry': 0.5, 'rz': 0.6},
+                {
+                    'x': 0.1,
+                    'y': 0.2,
+                    'z': 0.2,
+                    'rx': 0.0,
+                    'ry': 0.0,
+                    'rz': math.pi / 2.0,
+                },
             ),
             {},
         ),
@@ -231,6 +289,51 @@ def test_speed_and_pvat_services_map_request_fields():
     assert speedl_response.result.success is True
     assert speedl_response.motion_id == 101
     assert pvat_response.result.success is True
+
+
+@pytest.mark.parametrize(
+    ('target_kwargs', 'error_text'),
+    [
+        ({'qx': 0.0, 'qy': 0.0, 'qz': 0.0, 'qw': 0.0}, 'quaternion'),
+        ({'x': float('nan')}, 'finite'),
+    ],
+)
+def test_cartesian_motion_rejects_invalid_pose_without_sdk_call(
+    target_kwargs,
+    error_text,
+):
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+    target = _cartesian_target(**target_kwargs)
+
+    response = callbacks['motion/movel'](
+        MoveLinear.Request(target=target, params=_params()),
+        MoveLinear.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert error_text in response.result.message
+    assert robot.calls == []
+
+
+def test_speed_linear_rejects_nonfinite_twist_without_sdk_call():
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/speedl'](
+        SpeedLinear.Request(
+            acceleration=1.0,
+            velocity=Twist(angular=Vector3(z=float('inf'))),
+            reference=_pose(),
+        ),
+        SpeedLinear.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'finite' in response.result.message
+    assert robot.calls == []
 
 
 def test_wait_stop_skip_and_motion_queries_map_to_sdk():

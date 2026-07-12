@@ -1,6 +1,17 @@
 from builtin_interfaces.msg import Time
 
 
+def _zero_sdk_pose():
+    return {
+        'x': 0.0,
+        'y': 0.0,
+        'z': 0.0,
+        'rx': 0.0,
+        'ry': 0.0,
+        'rz': 0.0,
+    }
+
+
 class FakeRobot:
     def __init__(self, robot_ip='127.0.0.1', simulator=False):
         self.robot_ip = robot_ip
@@ -34,9 +45,9 @@ class FakeRobot:
         self.target_joint_speed = []
         self.actual_joint_torques = []
         self.target_joint_torques = []
-        self.actual_tcp_pose = {}
-        self.target_tcp_pose = {}
-        self.actual_flange_pose = {}
+        self.actual_tcp_pose = _zero_sdk_pose()
+        self.target_tcp_pose = _zero_sdk_pose()
+        self.actual_flange_pose = _zero_sdk_pose()
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -310,7 +321,9 @@ class FakeClawData:
 
 class FakeJointMotionData:
     def __init__(self, actual_flange_pose=None):
-        self.actual_flange_pose = actual_flange_pose or {}
+        if actual_flange_pose is None:
+            actual_flange_pose = _zero_sdk_pose()
+        self.actual_flange_pose = actual_flange_pose
 
 
 class FakeRobotFactory:

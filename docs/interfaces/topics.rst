@@ -23,6 +23,11 @@
      - ``lebai_interfaces/msg/JointMotion``
      - 读取实际和目标关节/TCP 运动数据。
 
+``JointMotion`` 的 ``actual_tcp_pose``、``target_tcp_pose`` 和
+``actual_flange_pose`` 字段均为 ``geometry_msgs/msg/Pose``。位置使用
+``position``，姿态使用归一化四元数 ``orientation``；驱动会按控制器的
+Euler ZYX 定义 ``Rz(rz) * Ry(ry) * Rx(rx)`` 转换 ``rx``、``ry``、``rz``。
+
 常用命令：
 
 .. code-block:: bash

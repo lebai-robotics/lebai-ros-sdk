@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 PACKAGE_DIR = Path(__file__).resolve().parents[1]
 EXPECTED_RUNTIME_DEPENDENCIES = {
     "control_msgs",
+    "geometry_msgs",
     "lebai_interfaces",
     "moveit_msgs",
     "rclpy",
