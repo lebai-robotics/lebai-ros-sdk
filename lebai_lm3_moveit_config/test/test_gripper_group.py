@@ -36,6 +36,49 @@ ROBOT_CONFIGS = [
 ]
 
 
+@pytest.mark.parametrize(("srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_urdf_and_srdf_robot_names_match(
+    srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+
+    assert robot.attrib["name"] == srdf.attrib["name"]
+
+
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_srdf_has_exact_world_virtual_joint(
+    srdf_path,
+    _xacro_path,
+    _has_gripper,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    virtual_joints = srdf.findall("virtual_joint")
+
+    assert len(virtual_joints) == 1
+    assert virtual_joints[0].attrib == {
+        "name": "virtual_joint",
+        "type": "fixed",
+        "parent_frame": "world",
+        "child_link": "base_link",
+    }
+
+
+@pytest.mark.parametrize(("_srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_expanded_urdf_does_not_define_world_link(
+    _srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+
+    assert not robot.findall("./link[@name='world']")
+
+
 @pytest.mark.parametrize(("_srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
 def test_active_arm_joint_names_are_fixed(
     _srdf_path,
@@ -56,7 +99,12 @@ def test_active_arm_joint_names_are_fixed(
 
 
 @pytest.mark.parametrize(("srdf_path", "xacro_path", "has_gripper"), ROBOT_CONFIGS)
-def test_srdf_groups_reference_existing_active_joints(srdf_path, xacro_path, has_gripper, tmp_path):
+def test_srdf_groups_reference_existing_active_joints(
+    srdf_path,
+    xacro_path,
+    has_gripper,
+    tmp_path,
+):
     srdf = ET.parse(srdf_path).getroot()
     robot_joints = _robot_joint_names(xacro_path, tmp_path)
 
@@ -99,7 +147,11 @@ def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path, 
 
 
 @pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
-def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xacro_path, has_gripper):
+def test_gripper_group_is_registered_as_manipulator_end_effector(
+    srdf_path,
+    _xacro_path,
+    has_gripper,
+):
     srdf = ET.parse(srdf_path).getroot()
 
     end_effectors = [
