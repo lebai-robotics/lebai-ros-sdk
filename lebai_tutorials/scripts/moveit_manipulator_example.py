@@ -42,8 +42,8 @@ def make_joint_goal(joint_positions, plan_only):
 
 
 class MoveItManipulatorExample(Node):
-    def __init__(self, action_name):
-        super().__init__("moveit_manipulator_example")
+    def __init__(self, action_name, namespace):
+        super().__init__("moveit_manipulator_example", namespace=namespace)
         self._client = ActionClient(self, MoveGroup, action_name)
 
     def move_to_joint_positions(self, joint_positions, plan_only, timeout_sec):
@@ -89,9 +89,10 @@ def parse_args():
         help="six comma-separated joint target positions in radians",
     )
     parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--namespace", default="lebai")
     parser.add_argument(
         "--action-name",
-        default="/move_action",
+        default="move_action",
         help="moveit_msgs/action/MoveGroup action name",
     )
     parser.add_argument("--timeout", type=float, default=60.0)
@@ -102,7 +103,7 @@ def main():
     args = parse_args()
     joint_positions = parse_joint_positions(args.joints)
     rclpy.init()
-    node = MoveItManipulatorExample(args.action_name)
+    node = MoveItManipulatorExample(args.action_name, args.namespace)
     try:
         ok = node.move_to_joint_positions(joint_positions, args.plan_only, args.timeout)
     finally:

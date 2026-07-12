@@ -10,7 +10,7 @@ from lebai_driver.action_goal_owner import ActionGoalOwner
 from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 
 
-ACTION_NAME = '/lebai_trajectory_controller'
+ACTION_NAME = 'lebai_trajectory_controller/follow_joint_trajectory'
 GOAL_TOLERANCE = 0.01
 POLL_INTERVAL_SEC = 0.05
 RUNNING_ROBOT_STATES = {6, 7}

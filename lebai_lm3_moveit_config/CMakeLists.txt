@@ -16,6 +16,17 @@ if(BUILD_TESTING)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
   add_test(
+    NAME test_namespaced_launch
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_namespaced_launch.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  add_test(
+    NAME test_namespaced_stack_integration
+    COMMAND ${Python3_EXECUTABLE} -m pytest
+      test/test_namespaced_stack_integration.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  add_test(
     NAME test_launch_inventory
     COMMAND ${Python3_EXECUTABLE} -m pytest test/test_launch_inventory.py -q
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

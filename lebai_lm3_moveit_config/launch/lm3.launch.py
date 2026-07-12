@@ -61,6 +61,7 @@ def moveit_nodes(
     robot_description_planning,
     robot_ip,
     simulator,
+    namespace,
     robot_model,
     condition,
     joint_state_remappings,
@@ -83,6 +84,7 @@ def moveit_nodes(
             'publish_robot_description': "false",
             'robot_ip': robot_ip,
             'simulator': simulator,
+            'namespace': namespace,
             'robot_model': robot_model,
         }.items(),
         condition=condition,
@@ -91,6 +93,7 @@ def moveit_nodes(
     run_move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
+        namespace=namespace,
         output="screen",
         parameters=[
             robot_description,
@@ -110,6 +113,7 @@ def moveit_nodes(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
+        namespace=namespace,
         output="log",
         arguments=["-d", rviz_full_config],
         parameters=[
@@ -126,6 +130,7 @@ def moveit_nodes(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         name="robot_state_publisher",
+        namespace=namespace,
         output="both",
         parameters=[robot_description],
         remappings=joint_state_remappings,
@@ -150,12 +155,19 @@ def generate_launch_description():
     # db_arg = DeclareLaunchArgument(
     #     "db", default_value="False", description="Database flag"
     # )
-    robot_ip_arg = DeclareLaunchArgument(name='robot_ip',
-                                        description='IP of L-Master controller.')
+    robot_ip_arg = DeclareLaunchArgument(
+        name='robot_ip',
+        description='IP of L-Master controller.',
+    )
     simulator_arg = DeclareLaunchArgument(
         name='simulator',
         default_value='false',
         description='Use pylebai simulator mode.',
+    )
+    namespace_arg = DeclareLaunchArgument(
+        name='namespace',
+        default_value='lebai',
+        description='ROS namespace for the complete driver and MoveIt stack.',
     )
     has_gripper_arg = DeclareLaunchArgument(
         name='has_gripper',
@@ -165,12 +177,13 @@ def generate_launch_description():
     )
     robot_ip = LaunchConfiguration('robot_ip')
     simulator = LaunchConfiguration('simulator')
+    namespace = LaunchConfiguration('namespace')
     has_gripper = LaunchConfiguration('has_gripper')
     gripper_joint_state_remappings = [
-        ('joint_states', '/lebai/model/joint_states'),
+        ('joint_states', 'model/joint_states'),
     ]
     arm_joint_state_remappings = [
-        ('joint_states', '/lebai/status/joint_states'),
+        ('joint_states', 'status/joint_states'),
     ]
     # planning_context
     gripper_robot_description, gripper_robot_description_semantic = (
@@ -194,7 +207,14 @@ def generate_launch_description():
     ompl_planning_pipeline_config = {
         "move_group": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/ResolveConstraintFrames default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+            "request_adapters": (
+                "default_planner_request_adapters/AddTimeOptimalParameterization "
+                "default_planner_request_adapters/ResolveConstraintFrames "
+                "default_planner_request_adapters/FixWorkspaceBounds "
+                "default_planner_request_adapters/FixStartStateBounds "
+                "default_planner_request_adapters/FixStartStateCollision "
+                "default_planner_request_adapters/FixStartStatePathConstraints"
+            ),
             "start_state_max_bounds_error": 0.1,
         }
     }
@@ -209,7 +229,9 @@ def generate_launch_description():
     )
     moveit_controllers = {
         "moveit_simple_controller_manager": moveit_simple_controllers_yaml,
-        "moveit_controller_manager": "moveit_simple_controller_manager/MoveItSimpleControllerManager",
+        "moveit_controller_manager": (
+            "moveit_simple_controller_manager/MoveItSimpleControllerManager"
+        ),
     }
 
     trajectory_execution = {
@@ -251,6 +273,7 @@ def generate_launch_description():
         robot_description_planning,
         robot_ip,
         simulator,
+        namespace,
         "lm3_with_gripper.xacro",
         IfCondition(has_gripper),
         gripper_joint_state_remappings,
@@ -267,6 +290,7 @@ def generate_launch_description():
         robot_description_planning,
         robot_ip,
         simulator,
+        namespace,
         "lm3.xacro",
         UnlessCondition(has_gripper),
         arm_joint_state_remappings,
@@ -283,6 +307,7 @@ def generate_launch_description():
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_transform_publisher",
+        namespace=namespace,
         output="log",
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
     )
@@ -291,6 +316,7 @@ def generate_launch_description():
         [
             robot_ip_arg,
             simulator_arg,
+            namespace_arg,
             has_gripper_arg,
             static_tf,
             *gripper_nodes,

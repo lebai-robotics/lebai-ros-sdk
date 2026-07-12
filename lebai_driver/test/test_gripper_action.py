@@ -80,7 +80,7 @@ def test_gripper_action_registers_moveit_gripper_command_server():
     _server, action_type, name, callbacks = _register(FakeRobot())
 
     assert action_type is GripperCommand
-    assert name == '/lebai_gripper_controller/gripper_cmd'
+    assert name == 'lebai_gripper_controller/gripper_cmd'
     assert callbacks['goal_callback'] is not None
     assert callbacks['execute_callback'] is not None
     assert callbacks['cancel_callback'] is not None
