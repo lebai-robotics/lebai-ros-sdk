@@ -24,11 +24,7 @@ _DEPTH = 10
 
 
 def register_status_publishers(node, connection, callback_group=None, sdk_gate=None):
-    joint_names = _parameter_value(
-        node,
-        'joint_names',
-        DEFAULT_JOINT_NAMES,
-    )
+    joint_names = list(DEFAULT_JOINT_NAMES)
     gripper_joint_name = _parameter_value(
         node,
         'gripper_joint_name',

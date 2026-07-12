@@ -8,11 +8,12 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from fakes import FakeNode, FakeRobot
 
 
-def _register(robot):
+def _register(robot, node=None):
     from lebai_driver.connection import RobotConnection
     from lebai_driver.trajectory_action import register_trajectory_action
 
-    node = FakeNode()
+    if node is None:
+        node = FakeNode()
     connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
     action_server = register_trajectory_action(node, connection)
     action_type, name, callbacks = node.actions[0]
@@ -143,6 +144,19 @@ def test_trajectory_action_rejects_empty_or_wrong_joint_goals():
 
     assert empty_response == GoalResponse.REJECT
     assert wrong_joint_response == GoalResponse.REJECT
+
+
+def test_trajectory_action_rejects_parameter_advertised_prefixed_joint_names():
+    advertised_joint_names = [f'robot1_joint_{index}' for index in range(1, 7)]
+    node = FakeNode({'joint_names': advertised_joint_names})
+    _server, _action_type, _name, callbacks = _register(FakeRobot(), node=node)
+
+    response = callbacks['goal_callback'](
+        FakeGoalRequest(_trajectory(joint_names=advertised_joint_names))
+    )
+
+    assert response == GoalResponse.REJECT
+    assert 'joint_names' not in node.parameter_requests
 
 
 def test_trajectory_action_runs_controller_managed_pvat_trajectory():

@@ -15,8 +15,6 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'),
          glob(os.path.join('launch', '*.launch.py'))),
-        (os.path.join('share', package_name, 'config'),
-         glob(os.path.join('config', '*.yaml'))),
     ],
     install_requires=['setuptools', 'pylebai>=2.0.0,<3.0.0'],
     zip_safe=True,

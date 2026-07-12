@@ -6,6 +6,8 @@ from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 
+from lebai_driver.parameters import DEFAULT_JOINT_NAMES
+
 
 ACTION_NAME = '/lebai_trajectory_controller'
 GOAL_TOLERANCE = 0.01
@@ -30,7 +32,7 @@ class TrajectoryActionBridge:
     def __init__(self, node, connection):
         self.node = node
         self.connection = connection
-        self.joint_names = list(node.get_parameter('joint_names').value)
+        self.joint_names = list(DEFAULT_JOINT_NAMES)
         self.callback_group = ReentrantCallbackGroup()
 
     def register(self):

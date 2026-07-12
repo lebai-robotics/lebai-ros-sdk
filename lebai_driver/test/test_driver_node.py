@@ -14,7 +14,6 @@ def test_driver_node_declares_runtime_parameters():
         expected_names = {
             'robot_ip',
             'simulator',
-            'joint_names',
             'namespace',
             'joint_state_publish_rate',
             'robot_state_publish_rate',
@@ -32,14 +31,8 @@ def test_driver_node_declares_runtime_parameters():
 
         for name in expected_names:
             assert node.has_parameter(name)
-        assert list(node.get_parameter('joint_names').value) == [
-            'joint_1',
-            'joint_2',
-            'joint_3',
-            'joint_4',
-            'joint_5',
-            'joint_6',
-        ]
+        assert not node.has_parameter('joint_names')
+        assert node.get_parameter('gripper_joint_name').value == 'gripper_r_joint1'
         assert node.get_name() == 'lebai_driver'
         assert node.trajectory_action is not None
         assert node.gripper_action is not None
