@@ -36,6 +36,27 @@ def _sdk_pose(**overrides):
     return pose
 
 
+def _sdk_vector(values):
+    vector = l_master.DoubleVector()
+    for value in values:
+        vector.push_back(value)
+    return vector
+
+
+def _sdk_joint_motion_data():
+    data = l_master.JointMotionData()
+    data.actual_joint_pose = _sdk_vector([1, 2, 3])
+    data.target_joint_pose = _sdk_vector([4, 5, 6])
+    data.actual_joint_speed = _sdk_vector([0.1, 0.2, 0.3])
+    data.target_joint_speed = _sdk_vector([0.4, 0.5, 0.6])
+    data.actual_joint_torque = _sdk_vector([10, 11, 12])
+    data.target_joint_torque = _sdk_vector([13, 14, 15])
+    data.actual_tcp_pose = _sdk_pose(x=1, y=2, z=3, rx=math.pi / 2)
+    data.target_tcp_pose = _sdk_pose(x=6, y=5, z=4, rz=math.pi / 2)
+    data.actual_flange_pose = _sdk_pose(x=0.5, ry=math.pi / 2)
+    return data
+
+
 def test_sdk_swig_pose_converts_euler_zyx_to_ros_quaternion():
     from lebai_driver.conversions import pose_from_sdk
 
@@ -164,19 +185,11 @@ def test_robot_state_conversion_maps_sdk_fields():
     ]
 
 
-def test_joint_state_and_motion_conversion_maps_sdk_fields():
+def test_joint_state_and_motion_conversion_use_one_released_sdk_snapshot_each():
     from lebai_driver.conversions import joint_motion_from_sdk, joint_state_from_sdk
 
     robot = FakeRobot()
-    robot.actual_joint_positions = [1, 2, 3]
-    robot.target_joint_positions = [4, 5, 6]
-    robot.actual_joint_speed = [0.1, 0.2, 0.3]
-    robot.target_joint_speed = [0.4, 0.5, 0.6]
-    robot.actual_joint_torques = [10, 11, 12]
-    robot.target_joint_torques = [13, 14, 15]
-    robot.actual_tcp_pose = _sdk_pose(x=1, y=2, z=3, rx=math.pi / 2)
-    robot.target_tcp_pose = _sdk_pose(x=6, y=5, z=4, rz=math.pi / 2)
-    robot.actual_flange_pose = _sdk_pose(x=0.5, ry=math.pi / 2)
+    robot.kin_data = _sdk_joint_motion_data()
 
     joint_state = joint_state_from_sdk(robot, ['j1', 'j2', 'j3'])
     motion = joint_motion_from_sdk(robot)
@@ -199,6 +212,10 @@ def test_joint_state_and_motion_conversion_maps_sdk_fields():
     assert motion.target_tcp_pose.orientation.z == pytest.approx(math.sqrt(0.5))
     assert motion.actual_flange_pose.position.x == 0.5
     assert motion.actual_flange_pose.orientation.y == pytest.approx(math.sqrt(0.5))
+    assert robot.calls == [
+        ('get_kin_data', (), {}),
+        ('get_kin_data', (), {}),
+    ]
 
 
 def test_io_and_claw_conversion_maps_sdk_fields():
@@ -207,8 +224,10 @@ def test_io_and_claw_conversion_maps_sdk_fields():
     robot = FakeRobot()
     robot.digital_inputs[('robot', 0)] = True
     robot.digital_outputs[('robot', 1)] = True
-    robot.analog_inputs[('robot', 0)] = 1.5
-    robot.analog_outputs[('robot', 0)] = 2.5
+    robot.analog_inputs[('robot', 0)] = 1.25
+    robot.analog_inputs[('robot', 1)] = -2.5
+    robot.analog_outputs[('robot', 0)] = 3.5
+    robot.analog_outputs[('robot', 1)] = 4.75
     robot.dio_modes[('robot', 0)] = True
     robot.claw = FakeClawData(force=3.5, amplitude=4.5, hold_on=True)
 
@@ -217,9 +236,9 @@ def test_io_and_claw_conversion_maps_sdk_fields():
         device='robot',
         digital_input_count=2,
         digital_output_count=2,
-        analog_input_count=1,
-        analog_output_count=1,
-        dio_count=1,
+        analog_input_count=2,
+        analog_output_count=2,
+        dio_count=2,
     )
     claw_state = claw_state_from_sdk(robot)
 
@@ -228,14 +247,56 @@ def test_io_and_claw_conversion_maps_sdk_fields():
     assert io_state.device == 'robot'
     assert list(io_state.digital_inputs) == [True, False]
     assert list(io_state.digital_outputs) == [False, True]
-    assert list(io_state.analog_inputs) == [1.5]
-    assert list(io_state.analog_outputs) == [2.5]
-    assert list(io_state.dio_modes) == [True]
+    assert list(io_state.analog_inputs) == [1.25, -2.5]
+    assert list(io_state.analog_outputs) == [3.5, 4.75]
+    assert list(io_state.dio_modes) == [True, False]
     assert isinstance(claw_state, ClawState)
     assert claw_state.connected is True
     assert claw_state.force == 3.5
     assert claw_state.amplitude == 4.5
     assert claw_state.hold_on is True
+    assert robot.calls == [
+        ('get_dis', ('robot', 0, 2), {}),
+        ('get_dos', ('robot', 0, 2), {}),
+        ('get_ais', ('robot', 0, 2), {}),
+        ('get_aos', ('robot', 0, 2), {}),
+        ('get_dio_mode', ('robot', 0), {}),
+        ('get_dio_mode', ('robot', 1), {}),
+        ('get_claw', (), {}),
+    ]
+
+
+def test_io_conversion_skips_batch_calls_for_zero_counts():
+    from lebai_driver.conversions import io_state_from_sdk
+
+    robot = FakeRobot()
+
+    message = io_state_from_sdk(robot, device='robot')
+
+    assert list(message.digital_inputs) == []
+    assert list(message.digital_outputs) == []
+    assert list(message.analog_inputs) == []
+    assert list(message.analog_outputs) == []
+    assert robot.calls == []
+
+
+@pytest.mark.parametrize(
+    ('method_name', 'count_name'),
+    [
+        ('get_dis', 'digital_input_count'),
+        ('get_dos', 'digital_output_count'),
+        ('get_ais', 'analog_input_count'),
+        ('get_aos', 'analog_output_count'),
+    ],
+)
+def test_io_conversion_rejects_batch_length_mismatch(method_name, count_name):
+    from lebai_driver.conversions import io_state_from_sdk
+
+    robot = FakeRobot()
+    setattr(robot, method_name, lambda *_args: [0])
+
+    with pytest.raises(ValueError, match='returned 1 values, expected 2'):
+        io_state_from_sdk(robot, device='robot', **{count_name: 2})
 
 
 def test_claw_amplitude_maps_to_independent_gripper_joint_angle():
@@ -321,7 +382,7 @@ def test_status_publishers_register_topics_and_periods():
         (IOState, 'io/state', 10),
         (ClawState, 'claw/state', 10),
     ]
-    assert [timer.period for timer in node.timers] == [0.05, 0.1, 0.05, 0.1, 0.05, 0.1, 0.1]
+    assert len(node.timers) == 5
     assert len(handles) == 7
 
 
@@ -336,9 +397,9 @@ def test_status_publishers_always_use_fixed_arm_joint_names():
     robot.actual_joint_speed = [0.0] * 6
     robot.actual_joint_torques = [0.0] * 6
 
-    node, _handles = _register(robot, node=node)
-    node.timers[0].callback()
-    node.timers[2].callback()
+    node, handles = _register(robot, node=node)
+    timers = {publisher.name: timer for publisher, timer in handles}
+    timers['status/joint_states'].callback()
 
     fixed_joint_names = [f'joint_{index}' for index in range(1, 7)]
     assert 'joint_names' not in node.parameter_requests
@@ -355,7 +416,7 @@ def test_status_publishers_publish_messages_and_map_errors_to_message_field():
     robot.actual_joint_speed = [2.0]
     robot.actual_joint_torques = [3.0]
     robot.robot_state = 9
-    node, _handles = _register(robot)
+    node, handles = _register(robot)
 
     for timer in node.timers:
         timer.callback()
@@ -389,7 +450,8 @@ def test_status_publishers_publish_messages_and_map_errors_to_message_field():
     assert claw_state.connected is True
 
     robot.exceptions['get_robot_state'] = RuntimeError('status offline')
-    node.timers[3].callback()
+    timers = {publisher.name: timer for publisher, timer in handles}
+    timers['status/robot'].callback()
 
     failed_state = node.publishers[3].messages[-1]
     assert failed_state.connected is False
