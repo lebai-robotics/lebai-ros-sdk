@@ -92,11 +92,15 @@ def robot_state_error(exc):
 
 
 def joint_state_from_sdk(robot, joint_names):
+    return joint_state_from_kin_data(robot.get_kin_data(), joint_names)
+
+
+def joint_state_from_kin_data(data, joint_names):
     message = JointState()
     message.name = list(joint_names)
-    message.position = _float_list(robot.get_actual_joint_positions())
-    message.velocity = _float_list(robot.get_actual_joint_speed())
-    message.effort = _float_list(robot.get_actual_joint_torques())
+    message.position = _float_list(data.actual_joint_pose)
+    message.velocity = _float_list(data.actual_joint_speed)
+    message.effort = _float_list(data.actual_joint_torque)
     return message
 
 
@@ -108,17 +112,21 @@ def joint_state_error(exc, joint_names):
 
 
 def joint_motion_from_sdk(robot):
+    return joint_motion_from_kin_data(robot.get_kin_data())
+
+
+def joint_motion_from_kin_data(data):
     message = JointMotion()
     message.connected = True
-    message.actual_joint_positions = _float_list(robot.get_actual_joint_positions())
-    message.target_joint_positions = _float_list(robot.get_target_joint_positions())
-    message.actual_joint_speed = _float_list(robot.get_actual_joint_speed())
-    message.target_joint_speed = _float_list(robot.get_target_joint_speed())
-    message.actual_joint_torques = _float_list(robot.get_actual_joint_torques())
-    message.target_joint_torques = _float_list(robot.get_target_joint_torques())
-    message.actual_tcp_pose = pose_from_sdk(robot.get_actual_tcp_pose())
-    message.target_tcp_pose = pose_from_sdk(robot.get_target_tcp_pose())
-    message.actual_flange_pose = pose_from_sdk(_actual_flange_pose(robot))
+    message.actual_joint_positions = _float_list(data.actual_joint_pose)
+    message.target_joint_positions = _float_list(data.target_joint_pose)
+    message.actual_joint_speed = _float_list(data.actual_joint_speed)
+    message.target_joint_speed = _float_list(data.target_joint_speed)
+    message.actual_joint_torques = _float_list(data.actual_joint_torque)
+    message.target_joint_torques = _float_list(data.target_joint_torque)
+    message.actual_tcp_pose = pose_from_sdk(data.actual_tcp_pose)
+    message.target_tcp_pose = pose_from_sdk(data.target_tcp_pose)
+    message.actual_flange_pose = pose_from_sdk(data.actual_flange_pose)
     return message
 
 
@@ -138,22 +146,34 @@ def io_state_from_sdk(
     message = IOState()
     message.connected = True
     message.device = device
-    message.digital_inputs = [
-        bool(robot.get_di(device, pin))
-        for pin in range(int(digital_input_count))
-    ]
-    message.digital_outputs = [
-        bool(robot.get_do(device, pin))
-        for pin in range(int(digital_output_count))
-    ]
-    message.analog_inputs = [
-        float(robot.get_ai(device, pin))
-        for pin in range(int(analog_input_count))
-    ]
-    message.analog_outputs = [
-        float(robot.get_ao(device, pin))
-        for pin in range(int(analog_output_count))
-    ]
+    message.digital_inputs = _batch_io_values(
+        robot.get_dis,
+        'get_dis',
+        device,
+        digital_input_count,
+        bool,
+    )
+    message.digital_outputs = _batch_io_values(
+        robot.get_dos,
+        'get_dos',
+        device,
+        digital_output_count,
+        bool,
+    )
+    message.analog_inputs = _batch_io_values(
+        robot.get_ais,
+        'get_ais',
+        device,
+        analog_input_count,
+        float,
+    )
+    message.analog_outputs = _batch_io_values(
+        robot.get_aos,
+        'get_aos',
+        device,
+        analog_output_count,
+        float,
+    )
     message.dio_modes = [
         bool(robot.get_dio_mode(device, pin))
         for pin in range(int(dio_count))
@@ -188,7 +208,21 @@ def gripper_joint_state_from_claw(robot, joint_name):
 
 
 def model_joint_state_from_sdk(robot, joint_names, gripper_joint_name):
-    message = joint_state_from_sdk(robot, joint_names)
+    return model_joint_state_from_kin_data(
+        robot,
+        robot.get_kin_data(),
+        joint_names,
+        gripper_joint_name,
+    )
+
+
+def model_joint_state_from_kin_data(
+    robot,
+    data,
+    joint_names,
+    gripper_joint_name,
+):
+    message = joint_state_from_kin_data(data, joint_names)
     gripper_joint_state = gripper_joint_state_from_claw(robot, gripper_joint_name)
     message.name.append(gripper_joint_state.name[0])
     message.position.append(gripper_joint_state.position[0])
@@ -209,11 +243,6 @@ def model_joint_state_error(exc, joint_names, gripper_joint_name):
     message.name.append(gripper_joint_name)
     message.position = [0.0 for _name in message.name]
     return message
-
-
-def _actual_flange_pose(robot):
-    data = robot.get_kin_data()
-    return _value(data, 0, 'actual_flange_pose', {})
 
 
 def _sdk_pose_values(data):
@@ -250,6 +279,19 @@ def _float_list(values):
     if values is None:
         return []
     return [float(value) for value in values]
+
+
+def _batch_io_values(getter, getter_name, device, count, convert):
+    count = int(count)
+    if count <= 0:
+        return []
+    values = list(getter(device, 0, count))
+    if len(values) != count:
+        raise ValueError(
+            'SDK %s returned %d values, expected %d'
+            % (getter_name, len(values), count)
+        )
+    return [convert(value) for value in values]
 
 
 def _amplitude_to_gripper_angle(amplitude):
