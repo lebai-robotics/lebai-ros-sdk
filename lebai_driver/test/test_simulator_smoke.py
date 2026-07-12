@@ -146,6 +146,19 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         assert start_result.result.success is True
         started = True
 
+        for mode, speed, color in [
+            (srv.SetLed.Request.MODE_UNCHANGED, srv.SetLed.Request.SPEED_UNSPECIFIED, []),
+            (srv.SetLed.Request.MODE_FLASH, srv.SetLed.Request.SPEED_SLOW, [0, 15, 0, 15]),
+        ]:
+            led_result = _call_service(
+                executor,
+                probe,
+                srv.SetLed,
+                '/lebai/led/set_led',
+                srv.SetLed.Request(mode=mode, speed=speed, color=color),
+            )
+            assert led_result.result.success is True
+
         movej = _call_service(
             executor,
             probe,
@@ -185,6 +198,21 @@ def test_driver_talks_to_simulator_topics_and_core_services():
             timeout_sec=_MOTION_TIMEOUT_SEC,
         )
         assert wait.result.success is True
+
+        pvat = _call_service(
+            executor,
+            probe,
+            srv.MovePvat,
+            '/lebai/motion/move_pvat',
+            srv.MovePvat.Request(
+                positions=list(joint_states[-1].position[:6]),
+                velocities=[0.0] * 6,
+                accelerations=[0.0] * 6,
+                duration=0.01,
+            ),
+            timeout_sec=_MOTION_TIMEOUT_SEC,
+        )
+        assert pvat.result.success is True
 
         if os.environ.get('LEBAI_TEST_START_STOP') == '1':
             stop_result = _call_command(
@@ -249,6 +277,7 @@ def _driver_service_specs(srv):
         (srv.Command, '/lebai/motion/skip_move'),
         (srv.GetRunningMotion, '/lebai/motion/get_running_motion'),
         (srv.GetMotionState, '/lebai/motion/get_motion_state'),
+        (srv.SetLed, '/lebai/led/set_led'),
         (srv.Command, '/lebai/start_stop/start_sys'),
         (srv.Command, '/lebai/start_stop/stop_sys'),
         (srv.Command, '/lebai/start_stop/powerdown'),

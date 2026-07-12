@@ -66,6 +66,22 @@ def _cartesian_target(**kwargs):
     return MotionTarget(is_joint_pose=False, cartesian_pose=_pose(**kwargs))
 
 
+def _pvat_request(
+    positions=None,
+    velocities=None,
+    accelerations=None,
+    duration=0.01,
+):
+    return MovePvat.Request(
+        positions=list(positions if positions is not None else [0.0] * 6),
+        velocities=list(velocities if velocities is not None else [0.0] * 6),
+        accelerations=list(
+            accelerations if accelerations is not None else [0.0] * 6
+        ),
+        duration=duration,
+    )
+
+
 def test_motion_interfaces_use_standard_geometry_messages_only():
     target = MotionTarget()
     motion = JointMotion()
@@ -212,10 +228,10 @@ def test_speed_and_pvat_services_map_request_fields():
         SpeedLinear.Response(),
     )
     pvat_response = callbacks['motion/move_pvat'](
-        MovePvat.Request(
-            positions=[1.0, 2.0],
-            velocities=[3.0, 4.0],
-            accelerations=[5.0, 6.0],
+        _pvat_request(
+            positions=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            velocities=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            accelerations=[1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
             duration=0.007,
         ),
         MovePvat.Response(),
@@ -240,13 +256,106 @@ def test_speed_and_pvat_services_map_request_fields():
             ),
             {},
         ),
-        ('move_pvat', ([1.0, 2.0], [3.0, 4.0], [5.0, 6.0], 0.007), {}),
+        (
+            'move_pvat',
+            (
+                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                [1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
+                0.007,
+            ),
+            {},
+        ),
     ]
     assert speedj_response.result.success is True
     assert speedj_response.motion_id == 100
     assert speedl_response.result.success is True
     assert speedl_response.motion_id == 101
     assert pvat_response.result.success is True
+
+
+@pytest.mark.parametrize(
+    ('field_name', 'values'),
+    [
+        ('positions', [0.0] * 5),
+        ('positions', [0.0] * 7),
+        ('velocities', [0.0] * 5),
+        ('velocities', [0.0] * 7),
+        ('accelerations', [0.0] * 5),
+        ('accelerations', [0.0] * 7),
+    ],
+)
+def test_move_pvat_rejects_non_six_element_arrays_without_sdk_call(
+    field_name,
+    values,
+):
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+    request = _pvat_request()
+    setattr(request, field_name, values)
+
+    response = callbacks['motion/move_pvat'](request, MovePvat.Response())
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert field_name in response.result.message
+    assert '6' in response.result.message
+    assert robot.calls == []
+
+
+@pytest.mark.parametrize(
+    ('field_name', 'value'),
+    [
+        ('positions', float('nan')),
+        ('positions', float('inf')),
+        ('positions', float('-inf')),
+        ('velocities', float('nan')),
+        ('velocities', float('inf')),
+        ('velocities', float('-inf')),
+        ('accelerations', float('nan')),
+        ('accelerations', float('inf')),
+        ('accelerations', float('-inf')),
+    ],
+)
+def test_move_pvat_rejects_nonfinite_array_values_without_sdk_call(
+    field_name,
+    value,
+):
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+    request = _pvat_request()
+    values = list(getattr(request, field_name))
+    values[2] = value
+    setattr(request, field_name, values)
+
+    response = callbacks['motion/move_pvat'](request, MovePvat.Response())
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert field_name in response.result.message
+    assert 'finite' in response.result.message
+    assert robot.calls == []
+
+
+@pytest.mark.parametrize(
+    'duration',
+    [0.0, -0.01, float('nan'), float('inf'), float('-inf')],
+)
+def test_move_pvat_rejects_nonpositive_or_nonfinite_duration_without_sdk_call(
+    duration,
+):
+    robot = FakeRobot()
+    _node, _services, callbacks = _register(robot)
+
+    response = callbacks['motion/move_pvat'](
+        _pvat_request(duration=duration),
+        MovePvat.Response(),
+    )
+
+    assert response.result.success is False
+    assert response.result.code == 1
+    assert 'duration' in response.result.message
+    assert robot.calls == []
 
 
 @pytest.mark.parametrize(
