@@ -11,8 +11,8 @@ from lebai_tutorials_common import amplitude_to_gripper_joint
 
 
 class MoveItGripperAmplitudeExample(Node):
-    def __init__(self, action_name):
-        super().__init__("moveit_gripper_amplitude_example")
+    def __init__(self, action_name, namespace):
+        super().__init__("moveit_gripper_amplitude_example", namespace=namespace)
         self._client = ActionClient(self, GripperCommand, action_name)
 
     def send_amplitude(self, amplitude, max_effort, timeout_sec):
@@ -62,9 +62,10 @@ def parse_args():
     )
     parser.add_argument("--amplitude", type=float, default=50.0, help="claw amplitude, 0..100")
     parser.add_argument("--max-effort", type=float, default=50.0)
+    parser.add_argument("--namespace", default="lebai")
     parser.add_argument(
         "--action-name",
-        default="/lebai_gripper_controller/gripper_cmd",
+        default="lebai_gripper_controller/gripper_cmd",
         help="control_msgs/action/GripperCommand action name",
     )
     parser.add_argument("--timeout", type=float, default=30.0)
@@ -74,7 +75,7 @@ def parse_args():
 def main():
     args = parse_args()
     rclpy.init()
-    node = MoveItGripperAmplitudeExample(args.action_name)
+    node = MoveItGripperAmplitudeExample(args.action_name, args.namespace)
     try:
         ok = node.send_amplitude(args.amplitude, args.max_effort, args.timeout)
     finally:

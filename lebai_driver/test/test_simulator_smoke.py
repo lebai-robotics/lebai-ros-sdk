@@ -114,14 +114,14 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         trajectory_client = ActionClient(
             probe,
             FollowJointTrajectory,
-            '/lebai_trajectory_controller',
+            '/lebai/lebai_trajectory_controller/follow_joint_trajectory',
         )
         _spin_until(executor, trajectory_client.server_is_ready)
 
         gripper_client = ActionClient(
             probe,
             GripperCommand,
-            '/lebai_gripper_controller/gripper_cmd',
+            '/lebai/lebai_gripper_controller/gripper_cmd',
         )
         _spin_until(executor, gripper_client.server_is_ready)
 
