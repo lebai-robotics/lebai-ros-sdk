@@ -10,6 +10,11 @@ if(BUILD_TESTING)
     COMMAND ${Python3_EXECUTABLE} -m pytest test/test_gripper_group.py -q
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
+  add_test(
+    NAME test_launch_inventory
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_launch_inventory.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 endif()
 
 ament_package()
