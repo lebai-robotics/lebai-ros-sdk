@@ -411,6 +411,7 @@ def test_moveit_test_dependencies_are_direct_and_exact():
     assert _dependency_names(package_root, "test_depend") == {
         "launch_testing",
         "launch_testing_ros",
+        "moveit_msgs",
         "python3-pytest",
         "rcl_interfaces",
         "rclpy",

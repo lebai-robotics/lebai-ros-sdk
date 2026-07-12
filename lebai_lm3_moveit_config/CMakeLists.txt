@@ -11,6 +11,11 @@ if(BUILD_TESTING)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
   add_test(
+    NAME test_model_startup
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_model_startup.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  add_test(
     NAME test_launch_inventory
     COMMAND ${Python3_EXECUTABLE} -m pytest test/test_launch_inventory.py -q
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
