@@ -59,12 +59,13 @@ class FakeGoalRequest:
 
 
 class FakeGoalHandle:
-    def __init__(self, trajectory, cancel_requested=False):
-        self.request = FakeGoalRequest(trajectory)
+    def __init__(self, trajectory, cancel_requested=False, request=None):
+        self.request = request if request is not None else FakeGoalRequest(trajectory)
         self.is_cancel_requested = cancel_requested
         self.succeeded = False
         self.aborted = False
         self.cancel_complete = False
+        self.execute_requested = False
 
     def succeed(self):
         self.succeeded = True
@@ -74,6 +75,27 @@ class FakeGoalHandle:
 
     def canceled(self):
         self.cancel_complete = True
+
+    def execute(self):
+        self.execute_requested = True
+
+
+def _accepted_goal_handle(callbacks, trajectory, cancel_requested=False):
+    request = FakeGoalRequest(trajectory)
+    assert callbacks['goal_callback'](request) == GoalResponse.ACCEPT
+    goal_handle = FakeGoalHandle(
+        trajectory,
+        cancel_requested=cancel_requested,
+        request=request,
+    )
+    callbacks['handle_accepted_callback'](goal_handle)
+    assert goal_handle.execute_requested is True
+    return goal_handle
+
+
+def _assert_next_trajectory_goal_is_accepted(callbacks):
+    response = callbacks['goal_callback'](FakeGoalRequest(_trajectory()))
+    assert response == GoalResponse.ACCEPT
 
 
 class MovingFakeRobot(FakeRobot):
@@ -123,6 +145,7 @@ def test_trajectory_action_registers_follow_joint_trajectory_server():
     assert callbacks['goal_callback'] is not None
     assert callbacks['execute_callback'] is not None
     assert callbacks['cancel_callback'] is not None
+    assert callbacks['handle_accepted_callback'] is not None
     assert callbacks['callback_group'] is not None
 
 
@@ -132,6 +155,71 @@ def test_trajectory_action_accepts_valid_arm_trajectory():
     response = callbacks['goal_callback'](FakeGoalRequest(_trajectory()))
 
     assert response == GoalResponse.ACCEPT
+
+
+def test_trajectory_action_rejects_second_goal_without_robot_command():
+    robot = FakeRobot()
+    _server, _action_type, _name, callbacks = _register(robot)
+    first = FakeGoalRequest(_trajectory())
+    second = FakeGoalRequest(_trajectory())
+
+    first_response = callbacks['goal_callback'](first)
+    second_response = callbacks['goal_callback'](second)
+
+    assert first_response == GoalResponse.ACCEPT
+    assert second_response == GoalResponse.REJECT
+    assert robot.calls == []
+
+
+def test_trajectory_action_drops_goal_whose_pending_reservation_expired():
+    from lebai_driver.action_goal_owner import ActionGoalOwner
+
+    class Clock:
+        now = 10.0
+
+        def monotonic(self):
+            return self.now
+
+    clock = Clock()
+    robot = FakeRobot()
+    _server, _action_type, _name, callbacks = _register(robot)
+    bridge = callbacks['execute_callback'].__self__
+    bridge.goal_owner = ActionGoalOwner(
+        pending_timeout_sec=1.0,
+        monotonic=clock.monotonic,
+    )
+    expired_request = FakeGoalRequest(_trajectory())
+    assert callbacks['goal_callback'](expired_request) == GoalResponse.ACCEPT
+    clock.now = 11.0
+    assert callbacks['goal_callback'](
+        FakeGoalRequest(_trajectory())
+    ) == GoalResponse.ACCEPT
+    expired_handle = FakeGoalHandle(_trajectory(), request=expired_request)
+
+    callbacks['handle_accepted_callback'](expired_handle)
+    result = callbacks['execute_callback'](expired_handle)
+
+    assert expired_handle.aborted is True
+    assert expired_handle.execute_requested is True
+    assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
+    assert robot.calls == []
+
+
+def test_stale_trajectory_cancel_cannot_stop_newer_goal():
+    robot = FakeRobot()
+    robot.robot_state = 5
+    robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
+    _server, _action_type, _name, callbacks = _register(robot)
+    first_handle = _accepted_goal_handle(callbacks, _trajectory())
+    callbacks['execute_callback'](first_handle)
+    robot.calls.clear()
+
+    second_request = FakeGoalRequest(_trajectory())
+    assert callbacks['goal_callback'](second_request) == GoalResponse.ACCEPT
+    response = callbacks['cancel_callback'](first_handle)
+
+    assert response.name == 'REJECT'
+    assert robot.calls == []
 
 
 def test_trajectory_action_rejects_empty_or_wrong_joint_goals():
@@ -164,7 +252,7 @@ def test_trajectory_action_runs_controller_managed_pvat_trajectory():
     robot.robot_state = 5
     robot.actual_joint_positions = [2, 3, 4, 5, 6, 7]
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
@@ -218,7 +306,7 @@ def test_trajectory_action_runs_controller_managed_pvat_trajectory():
 def test_trajectory_action_does_not_start_saved_trajectory_after_cancel():
     robot = CancelOnSaveFakeRobot()
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
     robot.goal_handle = goal_handle
 
     result = callbacks['execute_callback'](goal_handle)
@@ -231,6 +319,7 @@ def test_trajectory_action_does_not_start_saved_trajectory_after_cancel():
     }
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.cancel_complete is True
+    _assert_next_trajectory_goal_is_accepted(callbacks)
 
 
 def test_trajectory_action_uses_controller_playback_without_sdk_access_lock():
@@ -240,7 +329,7 @@ def test_trajectory_action_uses_controller_playback_without_sdk_access_lock():
     _server, _action_type, _name, callbacks = _register(robot)
     bridge = callbacks['execute_callback'].__self__
     bridge.sdk_lock = FailingLock()
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
@@ -260,7 +349,7 @@ def test_trajectory_action_waits_for_sdk_motion_state_and_final_positions(monkey
         ],
     )
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
@@ -286,35 +375,45 @@ def test_trajectory_action_rejects_invalid_point_shapes_during_execution():
         _point(0.0, [0, 0, 0, 0, 0, 0]),
         _point(0.5, [1, 2, 3], velocities=[0.1, 0.1, 0.1], accelerations=[0.2, 0.2, 0.2]),
     ])
-    goal_handle = FakeGoalHandle(trajectory)
+    goal_handle = _accepted_goal_handle(callbacks, trajectory)
 
     result = callbacks['execute_callback'](goal_handle)
 
     assert robot.calls == []
     assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
     assert goal_handle.aborted is True
+    _assert_next_trajectory_goal_is_accepted(callbacks)
 
 
 def test_trajectory_action_cancel_stops_robot():
     robot = FakeRobot()
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory(), cancel_requested=True)
+    goal_handle = _accepted_goal_handle(
+        callbacks,
+        _trajectory(),
+        cancel_requested=True,
+    )
 
     result = callbacks['execute_callback'](goal_handle)
 
     assert robot.calls == [('stop_move', (), {})]
     assert result.error_code == FollowJointTrajectory.Result.SUCCESSFUL
     assert goal_handle.cancel_complete is True
+    _assert_next_trajectory_goal_is_accepted(callbacks)
 
 
-def test_trajectory_action_cancel_callback_stops_robot_immediately():
+def test_trajectory_action_cancel_callback_defers_stop_to_active_execute():
     robot = FakeRobot()
     _server, _action_type, _name, callbacks = _register(robot)
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
-    response = callbacks['cancel_callback'](object())
+    response = callbacks['cancel_callback'](goal_handle)
 
     assert response.name == 'ACCEPT'
-    assert robot.calls == [('stop_move', (), {})]
+    assert robot.calls == []
+    assert callbacks['goal_callback'](
+        FakeGoalRequest(_trajectory())
+    ) == GoalResponse.REJECT
 
 
 def test_trajectory_action_aborts_when_sdk_rejects_saved_trajectory():
@@ -322,7 +421,7 @@ def test_trajectory_action_aborts_when_sdk_rejects_saved_trajectory():
     error = RuntimeError('controller rejected trajectory')
     robot.exceptions['call'] = error
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
@@ -331,13 +430,14 @@ def test_trajectory_action_aborts_when_sdk_rejects_saved_trajectory():
     assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
     assert result.error_string == 'controller rejected trajectory'
     assert goal_handle.aborted is True
+    _assert_next_trajectory_goal_is_accepted(callbacks)
 
 
 def test_trajectory_action_stops_and_cleans_up_when_playback_fails():
     robot = FakeRobot()
     robot.exceptions['move_trajectory'] = RuntimeError('playback failed')
     _server, _action_type, _name, callbacks = _register(robot)
-    goal_handle = FakeGoalHandle(_trajectory())
+    goal_handle = _accepted_goal_handle(callbacks, _trajectory())
 
     result = callbacks['execute_callback'](goal_handle)
 
@@ -355,3 +455,4 @@ def test_trajectory_action_stops_and_cleans_up_when_playback_fails():
     assert result.error_code == FollowJointTrajectory.Result.INVALID_GOAL
     assert result.error_string == 'playback failed'
     assert goal_handle.aborted is True
+    _assert_next_trajectory_goal_is_accepted(callbacks)
