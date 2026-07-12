@@ -58,6 +58,7 @@ def moveit_robot_description(robot_model, srdf_file):
 def moveit_nodes(
     robot_description,
     robot_description_semantic,
+    robot_description_planning,
     robot_ip,
     simulator,
     robot_model,
@@ -94,6 +95,7 @@ def moveit_nodes(
         parameters=[
             robot_description,
             robot_description_semantic,
+            robot_description_planning,
             kinematics_yaml,
             ompl_planning_pipeline_config,
             trajectory_execution,
@@ -181,6 +183,12 @@ def generate_launch_description():
     kinematics_yaml = load_yaml(
         "lebai_lm3_moveit_config", "config/kinematics.yaml"
     )
+    robot_description_planning = {
+        "robot_description_planning": load_yaml(
+            "lebai_lm3_moveit_config",
+            "config/joint_limits.yaml",
+        )
+    }
 
     # Planning Functionality
     ompl_planning_pipeline_config = {
@@ -240,6 +248,7 @@ def generate_launch_description():
     gripper_nodes = moveit_nodes(
         gripper_robot_description,
         gripper_robot_description_semantic,
+        robot_description_planning,
         robot_ip,
         simulator,
         "lm3_with_gripper.xacro",
@@ -255,6 +264,7 @@ def generate_launch_description():
     arm_nodes = moveit_nodes(
         arm_robot_description,
         arm_robot_description_semantic,
+        robot_description_planning,
         robot_ip,
         simulator,
         "lm3.xacro",

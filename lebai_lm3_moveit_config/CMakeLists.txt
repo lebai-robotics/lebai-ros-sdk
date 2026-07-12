@@ -20,6 +20,16 @@ if(BUILD_TESTING)
     COMMAND ${Python3_EXECUTABLE} -m pytest test/test_package_dependencies.py -q
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
+  add_test(
+    NAME test_planning_limits
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_planning_limits.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  add_test(
+    NAME test_planning_limits_launch
+    COMMAND ${Python3_EXECUTABLE} -m pytest test/test_planning_limits_launch.py -q
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 endif()
 
 ament_package()

@@ -405,11 +405,15 @@ def test_moveit_rejects_obsolete_and_panda_dependencies():
     assert not (declared & REJECTED_DEPENDENCIES)
 
 
-def test_moveit_pytest_dependency_is_declared():
+def test_moveit_test_dependencies_are_direct_and_exact():
     package_root = ET.parse(PACKAGE_DIR / "package.xml").getroot()
 
     assert _dependency_names(package_root, "test_depend") == {
-        "python3-pytest"
+        "launch_testing",
+        "launch_testing_ros",
+        "python3-pytest",
+        "rcl_interfaces",
+        "rclpy",
     }
 
 

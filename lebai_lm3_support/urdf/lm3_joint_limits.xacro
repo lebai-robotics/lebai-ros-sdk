@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="joint1_upper_limit" value="12.57" />
+  <xacro:property name="joint2_upper_limit" value="1.57" />
+  <xacro:property name="joint3_upper_limit" value="3.14" />
+  <xacro:property name="joint4_upper_limit" value="12.57" />
+  <xacro:property name="joint5_upper_limit" value="12.57" />
+  <xacro:property name="joint6_upper_limit" value="12.57" />
+
+  <xacro:property name="joint1_lower_limit" value="-12.57" />
+  <xacro:property name="joint2_lower_limit" value="-4.71" />
+  <xacro:property name="joint3_lower_limit" value="-3.14" />
+  <xacro:property name="joint4_lower_limit" value="-12.57" />
+  <xacro:property name="joint5_lower_limit" value="-12.57" />
+  <xacro:property name="joint6_lower_limit" value="-12.57" />
+
+  <xacro:property name="joint1_vel_limit" value="3.49" />
+  <xacro:property name="joint2_vel_limit" value="3.49" />
+  <xacro:property name="joint3_vel_limit" value="3.49" />
+  <xacro:property name="joint4_vel_limit" value="3.49" />
+  <xacro:property name="joint5_vel_limit" value="3.49" />
+  <xacro:property name="joint6_vel_limit" value="3.49" />
+</robot>
