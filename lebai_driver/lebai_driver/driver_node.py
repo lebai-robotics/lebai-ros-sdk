@@ -1,5 +1,8 @@
 import rclpy
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from rclpy.callback_groups import (
+    MutuallyExclusiveCallbackGroup,
+    ReentrantCallbackGroup,
+)
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
@@ -33,6 +36,7 @@ class LebaiDriverNode(Node):
         )
 
         self.service_callback_group = MutuallyExclusiveCallbackGroup()
+        self.wait_move_callback_group = ReentrantCallbackGroup()
         self.service_sdk_gate = StatusServiceGate()
 
         register_status_publishers(
@@ -50,6 +54,7 @@ class LebaiDriverNode(Node):
             self,
             self.connection,
             callback_group=self.service_callback_group,
+            wait_callback_group=self.wait_move_callback_group,
             sdk_gate=self.service_sdk_gate,
         )
         register_io_services(
