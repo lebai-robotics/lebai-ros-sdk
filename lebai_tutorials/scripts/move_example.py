@@ -6,6 +6,8 @@ from lebai_interfaces.msg import MotionParams, MotionTarget
 from lebai_interfaces.srv import MoveJoint
 from lebai_interfaces.srv import MoveLinear
 
+from lebai_tutorials_common import call_service
+
 
 class MoveExample(Node):
     def __init__(self):
@@ -21,7 +23,7 @@ class MoveExample(Node):
             joint_positions=[-0.516, -1.384, 0.932, -1.084, -0.833, -0.792],
         )
         req.params = MotionParams(acceleration=1.0, velocity=0.1)
-        self._call(srv, req, 'motion/movej')
+        return call_service(self, srv, req, 'motion/movej')
 
     def send_move_linear(self):
         srv = self.create_client(MoveLinear, '/lebai/motion/movel')
@@ -36,34 +38,28 @@ class MoveExample(Node):
         req.target.cartesian_pose.ry = 0.128
         req.target.cartesian_pose.rz = -0.364
         req.params = MotionParams(acceleration=1.0, velocity=0.1)
-        self._call(srv, req, 'motion/movel')
-
-    def _call(self, srv, req, label):
-        future = srv.call_async(req)
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if future.done():
-                try:
-                    future.result()
-                except Exception as e:
-                    self.get_logger().info('Service "%s" failed %r' % (label, e))
-                else:
-                    self.get_logger().info('Service "%s" succeeded.' % label)
-                break
+        return call_service(self, srv, req, 'motion/movel')
 
 
 def run():
     move_example = MoveExample()
-    move_example.send_move_joint()
-    move_example.send_move_linear()
-    move_example.destroy_node()
-    return
+    try:
+        outcomes = (
+            move_example.send_move_joint(),
+            move_example.send_move_linear(),
+        )
+        return all(outcomes)
+    finally:
+        move_example.destroy_node()
 
 
 def main():
     rclpy.init()
-    run()
-    rclpy.shutdown()
+    try:
+        succeeded = run()
+    finally:
+        rclpy.shutdown()
+    raise SystemExit(0 if succeeded else 1)
 
 
 if __name__ == '__main__':
