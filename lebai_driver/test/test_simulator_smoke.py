@@ -194,7 +194,10 @@ def test_driver_talks_to_simulator_topics_and_core_services():
             probe,
             srv.WaitMove,
             '/lebai/motion/wait_move',
-            srv.WaitMove.Request(motion_id=movej.motion_id),
+            srv.WaitMove.Request(
+                motion_id=movej.motion_id,
+                timeout_sec=_MOTION_TIMEOUT_SEC - 5.0,
+            ),
             timeout_sec=_MOTION_TIMEOUT_SEC,
         )
         assert wait.result.success is True
