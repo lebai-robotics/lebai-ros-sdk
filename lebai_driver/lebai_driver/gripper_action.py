@@ -8,7 +8,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from lebai_driver.action_goal_owner import ActionGoalOwner
 
 
-ACTION_NAME = '/lebai_gripper_controller/gripper_cmd'
+ACTION_NAME = 'lebai_gripper_controller/gripper_cmd'
 DEFAULT_FORCE = 100.0
 GOAL_TOLERANCE = 0.01
 MAX_AMPLITUDE = 100.0

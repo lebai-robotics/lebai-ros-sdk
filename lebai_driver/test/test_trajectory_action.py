@@ -147,7 +147,7 @@ def test_trajectory_action_registers_follow_joint_trajectory_server():
     _server, action_type, name, callbacks = _register(FakeRobot())
 
     assert action_type is FollowJointTrajectory
-    assert name == '/lebai_trajectory_controller'
+    assert name == 'lebai_trajectory_controller/follow_joint_trajectory'
     assert callbacks['goal_callback'] is not None
     assert callbacks['execute_callback'] is not None
     assert callbacks['cancel_callback'] is not None

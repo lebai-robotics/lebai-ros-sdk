@@ -249,12 +249,12 @@ def test_moveit_launches_forward_simulator_and_selects_joint_state_topic_by_grip
         assert "'simulator': simulator" in launch_file
         assert (
             "gripper_joint_state_remappings = [\n"
-            "        ('joint_states', '/lebai/model/joint_states'),\n"
+            "        ('joint_states', 'model/joint_states'),\n"
             "    ]"
         ) in launch_file
         assert (
             "arm_joint_state_remappings = [\n"
-            "        ('joint_states', '/lebai/status/joint_states'),\n"
+            "        ('joint_states', 'status/joint_states'),\n"
             "    ]"
         ) in launch_file
         assert launch_file.count("remappings=joint_state_remappings") == 3
@@ -289,7 +289,7 @@ def test_moveit_controller_config_declares_arm_and_gripper_action_servers():
         "lebai_gripper_controller",
     ]
     assert controllers["lebai_trajectory_controller"] == {
-        "action_ns": "",
+        "action_ns": "follow_joint_trajectory",
         "type": "FollowJointTrajectory",
         "default": True,
         "joints": FIXED_ARM_JOINT_NAMES,

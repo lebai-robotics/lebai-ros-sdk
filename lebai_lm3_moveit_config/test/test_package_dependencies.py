@@ -32,6 +32,17 @@ EXPECTED_RUNTIME_DEPENDENCIES = {
     "tf2_ros",
     "xacro",
 }
+EXPECTED_TEST_DEPENDENCIES = {
+    "control_msgs",
+    "launch_testing",
+    "launch_testing_ros",
+    "moveit_msgs",
+    "python3-pytest",
+    "rcl_interfaces",
+    "rclpy",
+    "sensor_msgs",
+    "std_msgs",
+}
 REJECTED_DEPENDENCIES = {
     "backward_ros",
     "joint_state_publisher",
@@ -408,14 +419,9 @@ def test_moveit_rejects_obsolete_and_panda_dependencies():
 def test_moveit_test_dependencies_are_direct_and_exact():
     package_root = ET.parse(PACKAGE_DIR / "package.xml").getroot()
 
-    assert _dependency_names(package_root, "test_depend") == {
-        "launch_testing",
-        "launch_testing_ros",
-        "moveit_msgs",
-        "python3-pytest",
-        "rcl_interfaces",
-        "rclpy",
-    }
+    assert _dependency_names(package_root, "test_depend") == (
+        EXPECTED_TEST_DEPENDENCIES
+    )
 
 
 def test_moveit_sources_explain_every_runtime_dependency():
