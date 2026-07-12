@@ -48,6 +48,7 @@ class FakeRobot:
         self.actual_tcp_pose = _zero_sdk_pose()
         self.target_tcp_pose = _zero_sdk_pose()
         self.actual_flange_pose = _zero_sdk_pose()
+        self.kin_data = None
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -187,7 +188,17 @@ class FakeRobot:
 
     def get_kin_data(self):
         self._record('get_kin_data')
+        if self.kin_data is not None:
+            return self.kin_data
         return FakeJointMotionData(
+            actual_joint_pose=self.actual_joint_positions,
+            actual_joint_speed=self.actual_joint_speed,
+            actual_joint_torque=self.actual_joint_torques,
+            target_joint_pose=self.target_joint_positions,
+            target_joint_speed=self.target_joint_speed,
+            target_joint_torque=self.target_joint_torques,
+            actual_tcp_pose=self.actual_tcp_pose,
+            target_tcp_pose=self.target_tcp_pose,
             actual_flange_pose=self.actual_flange_pose,
         )
 
@@ -320,10 +331,27 @@ class FakeClawData:
 
 
 class FakeJointMotionData:
-    def __init__(self, actual_flange_pose=None):
-        if actual_flange_pose is None:
-            actual_flange_pose = _zero_sdk_pose()
-        self.actual_flange_pose = actual_flange_pose
+    def __init__(
+        self,
+        actual_joint_pose=None,
+        actual_joint_speed=None,
+        actual_joint_torque=None,
+        target_joint_pose=None,
+        target_joint_speed=None,
+        target_joint_torque=None,
+        actual_tcp_pose=None,
+        target_tcp_pose=None,
+        actual_flange_pose=None,
+    ):
+        self.actual_joint_pose = list(actual_joint_pose or [])
+        self.actual_joint_speed = list(actual_joint_speed or [])
+        self.actual_joint_torque = list(actual_joint_torque or [])
+        self.target_joint_pose = list(target_joint_pose or [])
+        self.target_joint_speed = list(target_joint_speed or [])
+        self.target_joint_torque = list(target_joint_torque or [])
+        self.actual_tcp_pose = actual_tcp_pose or _zero_sdk_pose()
+        self.target_tcp_pose = target_tcp_pose or _zero_sdk_pose()
+        self.actual_flange_pose = actual_flange_pose or _zero_sdk_pose()
 
 
 class FakeRobotFactory:
@@ -345,6 +373,7 @@ class FakeNode:
         self.publishers = []
         self.timers = []
         self._now = Time(sec=12, nanosec=34)
+        self.clock_now_calls = 0
         self.parameter_requests = []
         self.parameter_values = {
             'joint_names': DEFAULT_JOINT_NAMES,
@@ -383,7 +412,7 @@ class FakeNode:
         return timer
 
     def get_clock(self):
-        return FakeClock(self._now)
+        return FakeClock(self._now, self)
 
     def get_logger(self):
         return FakeLogger()
@@ -417,10 +446,12 @@ class FakeParameter:
 
 
 class FakeClock:
-    def __init__(self, message):
+    def __init__(self, message, node):
         self.message = message
+        self.node = node
 
     def now(self):
+        self.node.clock_now_calls += 1
         return self
 
     def to_msg(self):
