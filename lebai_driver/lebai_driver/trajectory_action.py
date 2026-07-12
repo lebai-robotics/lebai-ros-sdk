@@ -6,6 +6,7 @@ from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 
+from lebai_driver.action_goal_owner import ActionGoalOwner
 from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 
 
@@ -35,6 +36,7 @@ class TrajectoryActionBridge:
         self.joint_names = list(DEFAULT_JOINT_NAMES)
         self.callback_group = ReentrantCallbackGroup()
         self.sdk_lock = connection.sdk_access
+        self.goal_owner = ActionGoalOwner()
 
     def register(self):
         if hasattr(self.node, 'create_action_server'):
@@ -44,6 +46,7 @@ class TrajectoryActionBridge:
                 execute_callback=self.execute_callback,
                 goal_callback=self.goal_callback,
                 cancel_callback=self.cancel_callback,
+                handle_accepted_callback=self.handle_accepted_callback,
                 callback_group=self.callback_group,
             )
         return ActionServer(
@@ -53,6 +56,7 @@ class TrajectoryActionBridge:
             execute_callback=self.execute_callback,
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback,
+            handle_accepted_callback=self.handle_accepted_callback,
             callback_group=self.callback_group,
         )
 
@@ -64,15 +68,47 @@ class TrajectoryActionBridge:
         if list(trajectory.joint_names) != self.joint_names:
             self.node.get_logger().error('Lebai trajectory rejected invalid joints')
             return GoalResponse.REJECT
+        if not self.goal_owner.try_reserve(id(goal_request)):
+            self.node.get_logger().error('Lebai trajectory rejected concurrent goal')
+            return GoalResponse.REJECT
         return GoalResponse.ACCEPT
 
-    def cancel_callback(self, _goal_handle):
+    def cancel_callback(self, goal_handle):
+        if not self.goal_owner.is_owner(id(goal_handle.request)):
+            self.node.get_logger().error('Lebai trajectory rejected stale cancel')
+            return CancelResponse.REJECT
         self.node.get_logger().info('Lebai trajectory received cancel request')
-        with self._sdk_access() as robot:
-            robot.stop_move()
         return CancelResponse.ACCEPT
 
+    def handle_accepted_callback(self, goal_handle):
+        goal_id = id(goal_handle.request)
+        owns_goal = self.goal_owner.activate(goal_id)
+        if not owns_goal:
+            self.node.get_logger().error(
+                'Lebai trajectory dropping expired accepted goal'
+            )
+        try:
+            # Scheduling the callback is required so rclpy can publish a final result.
+            goal_handle.execute()
+        except Exception:
+            if owns_goal:
+                self.goal_owner.release(goal_id)
+            raise
+
     def execute_callback(self, goal_handle):
+        goal_id = id(goal_handle.request)
+        if not self.goal_owner.activate(goal_id):
+            result = FollowJointTrajectory.Result()
+            result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
+            result.error_string = 'goal does not own trajectory action'
+            goal_handle.abort()
+            return result
+        try:
+            return self._execute_owned_goal(goal_handle)
+        finally:
+            self.goal_owner.release(goal_id)
+
+    def _execute_owned_goal(self, goal_handle):
         result = FollowJointTrajectory.Result()
         trajectory = goal_handle.request.trajectory
 
