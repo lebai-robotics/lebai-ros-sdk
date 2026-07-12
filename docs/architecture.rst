@@ -36,12 +36,14 @@
    * - ``robot_model``
      - ``lm3_with_gripper.xacro``
      - 要发布的 URDF/Xacro 模型。
-   * - ``joint_names``
-     - ``['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']``
-     - 发布到 ``/lebai/model/joint_states`` 的机械臂关节名；必须和 URDF 关节名一致，RViz/TF 才能显示完整模型。
    * - ``gripper_joint_name``
      - ``gripper_r_joint1``
      - claw 幅度映射到模型时使用的 gripper 关节名。
+
+机械臂关节名不是运行时参数。状态 topic 和
+``FollowJointTrajectory`` action 固定使用 ``joint_1`` 到 ``joint_6``，
+不支持通过参数或 YAML 文件重映射。夹爪模型关节仍可通过单数参数
+``gripper_joint_name`` 配置。
 
 状态发布频率参数
 ----------------

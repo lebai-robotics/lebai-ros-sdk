@@ -4,11 +4,12 @@ from sensor_msgs.msg import JointState
 from fakes import FakeClawData, FakeNode, FakeRobot
 
 
-def _register(robot):
+def _register(robot, node=None):
     from lebai_driver.connection import RobotConnection
     from lebai_driver.status import register_status_publishers
 
-    node = FakeNode()
+    if node is None:
+        node = FakeNode()
     connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
     handles = register_status_publishers(node, connection)
     return node, handles
@@ -207,6 +208,30 @@ def test_status_publishers_register_topics_and_periods():
     ]
     assert [timer.period for timer in node.timers] == [0.05, 0.1, 0.05, 0.1, 0.05, 0.1, 0.1]
     assert len(handles) == 7
+
+
+def test_status_publishers_always_use_fixed_arm_joint_names():
+    advertised_joint_names = [f'robot1_joint_{index}' for index in range(1, 7)]
+    node = FakeNode({
+        'joint_names': advertised_joint_names,
+        'gripper_joint_name': 'custom_gripper_joint',
+    })
+    robot = FakeRobot()
+    robot.actual_joint_positions = [0.0] * 6
+    robot.actual_joint_speed = [0.0] * 6
+    robot.actual_joint_torques = [0.0] * 6
+
+    node, _handles = _register(robot, node=node)
+    node.timers[0].callback()
+    node.timers[2].callback()
+
+    fixed_joint_names = [f'joint_{index}' for index in range(1, 7)]
+    assert 'joint_names' not in node.parameter_requests
+    assert node.publishers[0].messages[-1].name == fixed_joint_names
+    assert node.publishers[2].messages[-1].name == [
+        *fixed_joint_names,
+        'custom_gripper_joint',
+    ]
 
 
 def test_status_publishers_publish_messages_and_map_errors_to_message_field():
