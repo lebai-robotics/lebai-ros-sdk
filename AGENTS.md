@@ -30,6 +30,12 @@ controller access goes through released `pylebai`.
 
 ## Verification
 
+Run the canonical linter gate from this repository root:
+
+```bash
+PYTHONNOUSERSITE=1 ./scripts/run-linters.sh
+```
+
 Run workspace builds and tests from the workspace root, not from this repository
 directory:
 

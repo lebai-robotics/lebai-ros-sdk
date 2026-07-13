@@ -67,6 +67,14 @@ jobs:
             --skip-keys pylebai \
             -y
 
+      - name: Run linters
+        shell: bash
+        run: |
+          set -eo pipefail
+          source /opt/ros/lyrical/setup.bash
+          source .venv/bin/activate
+          PYTHONNOUSERSITE=1 ./scripts/run-linters.sh
+
       - name: Build
         shell: bash
         run: |
