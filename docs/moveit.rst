@@ -20,9 +20,15 @@ MoveIt
 
 两个公开 launch 默认把驱动、MoveIt、RViz、robot_state_publisher 和静态 TF
 节点放在 ``lebai`` 命名空间中，也就是使用 ``namespace:=lebai``。因此默认的
-MoveIt action 是 ``/lebai/move_action``，驱动 action 是
+MoveIt 相对 action ``move_action`` 解析为 ``/lebai/move_action``。驱动也注册
+两个相对 action
+``lebai_trajectory_controller/follow_joint_trajectory`` 和
+``lebai_gripper_controller/gripper_cmd``，默认分别解析为
 ``/lebai/lebai_trajectory_controller/follow_joint_trajectory`` 和
 ``/lebai/lebai_gripper_controller/gripper_cmd``。
+
+机械臂状态、MoveIt controller 配置和 ``FollowJointTrajectory`` action 使用
+固定关节名 ``joint_1`` 到 ``joint_6``；这些名称不能通过 launch 参数重映射。
 
 连接仿真控制器时，将 ``robot_ip`` 指向仿真控制器所在主机。下面示例使用本机
 ``127.0.0.1``：
@@ -33,13 +39,13 @@ MoveIt action 是 ``/lebai/move_action``，驱动 action 是
      robot_ip:=127.0.0.1 \
      simulator:=true
 
-连接真实控制器时，将 ``robot_ip`` 改成控制器 IP，并省略
-``simulator:=true``：
+连接真实控制器时，从终端读取实际控制器 IP，并省略 ``simulator:=true``：
 
 .. code-block:: bash
 
+   read -r -p "Controller IP: " ROBOT_IP
    ros2 launch lebai_lm3_moveit_config lm3.launch.py \
-     robot_ip:=192.168.1.100
+     robot_ip:="$ROBOT_IP"
 
 启动 LM3-L1 MoveIt：
 
