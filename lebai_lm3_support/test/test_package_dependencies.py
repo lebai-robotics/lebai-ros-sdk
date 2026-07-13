@@ -47,8 +47,14 @@ SUPPORT_RUNTIME_DEPENDENCIES = {
 SUPPORT_TEST_DEPENDENCIES = {
     "ament_lint_auto",
     "ament_lint_common",
+    "launch_testing",
+    "launch_testing_ros",
     "python3-pytest",
+    "python3-pytest-xvfb",
     "python3-yaml",
+    "rclpy",
+    "rmw_cyclonedds_cpp",
+    "std_msgs",
 }
 SUPPORT_PUBLIC_PYTHON_LAUNCHES = frozenset(
     {
@@ -86,7 +92,12 @@ DRIVER_TEST_RUNTIME_IMPORTS = {
     "sensor_msgs",
 }
 SUPPORT_TEST_IMPORT_DEPENDENCIES = {
+    "launch_testing": "launch_testing",
+    "launch_testing_ros": "launch_testing_ros",
     "pytest": "python3-pytest",
+    "pytest_xvfb": "python3-pytest-xvfb",
+    "rclpy": "rclpy",
+    "std_msgs": "std_msgs",
     "yaml": "python3-yaml",
 }
 
