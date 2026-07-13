@@ -7,13 +7,13 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
 from lebai_driver.connection import RobotConnection
+from lebai_driver.config_services import register_config_services
 from lebai_driver.parameters import DEFAULT_PARAMETERS
 from lebai_driver.claw_services import register_claw_services
 from lebai_driver.gripper_action import register_gripper_action
 from lebai_driver.io_services import register_io_services
 from lebai_driver.led_signal_services import register_led_signal_services
 from lebai_driver.motion_services import register_motion_services
-from lebai_driver.resource_services import register_resource_services
 from lebai_driver.start_stop_services import register_start_stop_services
 from lebai_driver.status import register_status_publishers
 from lebai_driver.trajectory_action import register_trajectory_action
@@ -71,7 +71,7 @@ class LebaiDriverNode(Node):
             self.connection,
             callback_group=self.service_callback_group,
         )
-        register_resource_services(
+        register_config_services(
             self,
             self.connection,
             callback_group=self.service_callback_group,
