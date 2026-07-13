@@ -15,17 +15,20 @@
 启动真实控制器
 --------------
 
-将 ``robot_ip`` 替换为机器人控制器 IP：
+从终端读取实际控制器 IP，再启动驱动：
 
 .. code-block:: bash
 
-   ros2 launch lebai_driver driver.launch.py robot_ip:=192.168.1.100
+   read -r -p "Controller IP: " ROBOT_IP
+   ros2 launch lebai_driver driver.launch.py robot_ip:="$ROBOT_IP"
 
 默认命名空间是 ``/lebai``。如果需要修改命名空间：
 
 .. code-block:: bash
 
-   ros2 launch lebai_driver driver.launch.py robot_ip:=192.168.1.100 namespace:=my_robot
+   ros2 launch lebai_driver driver.launch.py \
+     robot_ip:="$ROBOT_IP" \
+     namespace:=my_robot
 
 查看机器人状态
 --------------
@@ -35,6 +38,17 @@
    ros2 topic echo /lebai/status/robot
    ros2 topic echo /lebai/status/joint_states
    ros2 topic echo /lebai/status/joint_motion
+
+机械臂状态和 ``FollowJointTrajectory`` action 固定使用 ``joint_1`` 到
+``joint_6``，不支持运行时重映射。两个驱动 action 使用相对名称，在默认
+命名空间下可以这样检查：
+
+.. code-block:: bash
+
+   ros2 action info /lebai/lebai_trajectory_controller/follow_joint_trajectory
+   ros2 action info /lebai/lebai_gripper_controller/gripper_cmd
+
+修改 ``namespace`` 后，这两个路径的 ``/lebai`` 前缀也相应改变。
 
 查看模型关节状态和 TF
 ---------------------
@@ -52,10 +66,14 @@
 
    source /opt/ros/humble/setup.bash
    source install/setup.bash
-   rviz2 -d "$(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/view.rviz"
+   rviz2 \
+     -d "$(ros2 pkg prefix lebai_lm3_support)/share/lebai_lm3_support/rviz/view.rviz" \
+     --ros-args -r __ns:=/lebai
 
-该 RViz 配置使用 ``RobotModel`` display，从 ``/lebai/robot_description`` 读取
-机器人模型，并通过 ``/tf`` 显示实时姿态。MoveIt 规划和执行请使用
+该 RViz 配置的 ``RobotModel`` display 使用相对名称
+``robot_description``。上面的 ``__ns:=/lebai`` 让它解析为驱动发布的
+``/lebai/robot_description``，并通过全局 ``/tf`` 显示实时姿态。使用其他
+驱动命名空间时，应把 RViz 的 ``__ns`` 设为相同值。MoveIt 规划和执行请使用
 ``lebai_lm3_moveit_config`` 的启动文件和 RViz ``MotionPlanning`` 面板。
 
 如果只想启动驱动，不发布机器人模型：
@@ -129,13 +147,16 @@
 
 .. code-block:: bash
 
-   ros2 service call /lebai/io/set_do lebai_interfaces/srv/SetDigitalOutput "{device: robot, pin: 0, value: true}"
+   ros2 service call /lebai/io/set_do lebai_interfaces/srv/SetDigitalOutput "{device: ROBOT, pin: 0, value: true}"
 
 读取数字输入：
 
 .. code-block:: bash
 
-   ros2 service call /lebai/io/get_di lebai_interfaces/srv/GetDigitalInput "{device: robot, pin: 0}"
+   ros2 service call /lebai/io/get_di lebai_interfaces/srv/GetDigitalInput "{device: ROBOT, pin: 0}"
+
+IO device 当前仍是字符串。请使用大写规范名，例如 ``ROBOT``、``FLANGE``；
+未知值或小写值可能由 released SDK 回退到 ``ROBOT``。
 
 启动控制器发现
 --------------
