@@ -1,3 +1,17 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from lebai_interfaces.msg import GripperState
 from lebai_interfaces.srv import (
     Command,
@@ -32,7 +46,11 @@ def test_gripper_interfaces_register_sdk_category_names():
         (Command, 'gripper/turn_on_auto_calibration'),
         (Command, 'gripper/turn_off_auto_calibration'),
     ]
-    assert [(publisher.msg_type, publisher.name, publisher.depth) for publisher in node.publishers] == [
+    publishers = [
+        (publisher.msg_type, publisher.name, publisher.depth)
+        for publisher in node.publishers
+    ]
+    assert publishers == [
         (GripperState, 'gripper/state', 10),
     ]
     assert [timer.period for timer in node.timers] == [0.1]

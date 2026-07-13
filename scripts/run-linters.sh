@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lebai_interfaces.msg import Result
+set -euo pipefail
+export PYTHONNOUSERSITE=1
 
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${repository_root}"
 
-def ok(message=''):
-    return Result(success=True, code=0, message=message)
-
-
-def fail(message, code=1):
-    return Result(success=False, code=code, message=message)
+python3 -m pytest lebai_driver/test/test_copyright.py -q
+python3 -m pytest lebai_driver/test/test_flake8.py -q
+python3 -m pytest lebai_driver/test/test_pep257.py -q
