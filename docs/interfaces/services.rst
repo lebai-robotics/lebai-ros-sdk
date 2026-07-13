@@ -1,8 +1,9 @@
 服务 Services
 =============
 
-以下 service 使用默认 ``/lebai`` 命名空间。每个响应都包含
-``lebai_interfaces/msg/Result``：
+以下表格是当前 runtime 的完整 service 清单，使用默认 ``/lebai`` 命名空间。
+名称在 node 中是相对名称；修改对应 launch 的 ``namespace`` 参数后，前缀会
+随之变化。每个响应都包含 ``lebai_interfaces/msg/Result``：
 
 .. code-block:: text
 
