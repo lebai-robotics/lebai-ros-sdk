@@ -4,12 +4,12 @@ from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
 
 
-def register_resource_services(node, connection, callback_group=None):
+def register_config_services(node, connection, callback_group=None):
     definitions = [
-        (LoadResourceList, 'resource/load_tcp_list', _load_tcp_list),
-        (LoadResourceList, 'resource/load_pose_list', _load_pose_list),
-        (LoadResourceList, 'resource/load_frame_list', _load_frame_list),
-        (LoadResourceList, 'resource/load_trajectory_list', _load_trajectory_list),
+        (LoadResourceList, 'config/load_tcp_list', _load_tcp_list),
+        (LoadResourceList, 'config/load_pose_list', _load_pose_list),
+        (LoadResourceList, 'config/load_frame_list', _load_frame_list),
+        (LoadResourceList, 'config/load_trajectory_list', _load_trajectory_list),
     ]
 
     services = []
@@ -18,14 +18,14 @@ def register_resource_services(node, connection, callback_group=None):
             node.create_service(
                 srv_type,
                 service_name,
-                _make_resource_callback(connection, handler),
+                _make_config_callback(connection, handler),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_resource_callback(connection, handler):
+def _make_config_callback(connection, handler):
     def callback(request, response):
         try:
             with connection.sdk_access() as robot:
