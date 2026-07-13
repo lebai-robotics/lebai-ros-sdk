@@ -1,3 +1,17 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import ast
 from pathlib import Path
 import sys
@@ -318,7 +332,10 @@ def test_driver_runtime_dependencies_are_direct_and_exact():
 def test_driver_test_dependencies_cover_direct_test_imports():
     package_root = _package_root(DRIVER_DIR)
     test_trees = _python_trees(DRIVER_DIR / "test")
-    imported = _import_roots(test_trees, {"fakes", "lebai_driver"})
+    imported = _import_roots(
+        test_trees,
+        {"fakes", "lebai_driver", "linter_paths"},
+    )
 
     assert imported == (
         set(DRIVER_TEST_IMPORT_DEPENDENCIES)
