@@ -32,6 +32,8 @@ DRIVER_TEST_DEPENDENCIES = {
     "python3-packaging",
     "python3-pytest",
     "python3-setuptools",
+    "python3-yaml",
+    "rosidl_runtime_py",
     "trajectory_msgs",
 }
 SUPPORT_RUNTIME_DEPENDENCIES = {
@@ -78,8 +80,10 @@ DRIVER_TEST_IMPORT_DEPENDENCIES = {
     "builtin_interfaces": "builtin_interfaces",
     "packaging": "python3-packaging",
     "pytest": "python3-pytest",
+    "rosidl_runtime_py": "rosidl_runtime_py",
     "setuptools": "python3-setuptools",
     "trajectory_msgs": "trajectory_msgs",
+    "yaml": "python3-yaml",
 }
 DRIVER_TEST_RUNTIME_IMPORTS = {
     "control_msgs",

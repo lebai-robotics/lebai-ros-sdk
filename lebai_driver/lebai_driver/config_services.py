@@ -5,12 +5,12 @@ from lebai_driver.result import fail, ok
 from lebai_driver.sdk_gate import exclusive_access
 
 
-def register_resource_services(node, connection, callback_group=None, sdk_gate=None):
+def register_config_services(node, connection, callback_group=None, sdk_gate=None):
     definitions = [
-        (LoadResourceList, 'resource/load_tcp_list', _load_tcp_list),
-        (LoadResourceList, 'resource/load_pose_list', _load_pose_list),
-        (LoadResourceList, 'resource/load_frame_list', _load_frame_list),
-        (LoadResourceList, 'resource/load_trajectory_list', _load_trajectory_list),
+        (LoadResourceList, 'config/load_tcp_list', _load_tcp_list),
+        (LoadResourceList, 'config/load_pose_list', _load_pose_list),
+        (LoadResourceList, 'config/load_frame_list', _load_frame_list),
+        (LoadResourceList, 'config/load_trajectory_list', _load_trajectory_list),
     ]
 
     services = []
@@ -19,14 +19,14 @@ def register_resource_services(node, connection, callback_group=None, sdk_gate=N
             node.create_service(
                 srv_type,
                 service_name,
-                _make_resource_callback(connection, handler, sdk_gate),
+                _make_config_callback(connection, handler, sdk_gate),
                 callback_group=callback_group,
             )
         )
     return services
 
 
-def _make_resource_callback(connection, handler, sdk_gate=None):
+def _make_config_callback(connection, handler, sdk_gate=None):
     def callback(request, response):
         try:
             with exclusive_access(sdk_gate):

@@ -7,11 +7,11 @@ from fakes import FakeNode, FakeRobot
 
 def _register(robot):
     from lebai_driver.connection import RobotConnection
-    from lebai_driver.resource_services import register_resource_services
+    from lebai_driver.config_services import register_config_services
 
     node = FakeNode()
     connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
-    services = register_resource_services(node, connection)
+    services = register_config_services(node, connection)
     callbacks = {
         name: callback
         for _srv_type, name, callback in node.services
@@ -19,21 +19,21 @@ def _register(robot):
     return node, services, callbacks
 
 
-def test_resource_services_register_sdk_category_names():
+def test_config_services_register_sdk_category_names():
     robot = FakeRobot()
 
     node, services, _callbacks = _register(robot)
 
     assert [(srv_type, name) for srv_type, name, _callback in node.services] == [
-        (LoadResourceList, 'resource/load_tcp_list'),
-        (LoadResourceList, 'resource/load_pose_list'),
-        (LoadResourceList, 'resource/load_frame_list'),
-        (LoadResourceList, 'resource/load_trajectory_list'),
+        (LoadResourceList, 'config/load_tcp_list'),
+        (LoadResourceList, 'config/load_pose_list'),
+        (LoadResourceList, 'config/load_frame_list'),
+        (LoadResourceList, 'config/load_trajectory_list'),
     ]
     assert len(services) == 4
 
 
-def test_resource_list_services_forward_directory_and_return_names():
+def test_config_list_services_forward_directory_and_return_names():
     robot = FakeRobot()
     robot.resource_lists['tcp']['tools'] = ['flange_tcp', 'camera_tcp']
     robot.resource_lists['pose']['waypoints'] = ['home', 'pick']
@@ -41,19 +41,19 @@ def test_resource_list_services_forward_directory_and_return_names():
     robot.resource_lists['trajectory']['jobs'] = ['cycle_a', 'cycle_b']
     _node, _services, callbacks = _register(robot)
 
-    tcp_response = callbacks['resource/load_tcp_list'](
+    tcp_response = callbacks['config/load_tcp_list'](
         LoadResourceList.Request(directory='tools'),
         LoadResourceList.Response(),
     )
-    pose_response = callbacks['resource/load_pose_list'](
+    pose_response = callbacks['config/load_pose_list'](
         LoadResourceList.Request(directory='waypoints'),
         LoadResourceList.Response(),
     )
-    frame_response = callbacks['resource/load_frame_list'](
+    frame_response = callbacks['config/load_frame_list'](
         LoadResourceList.Request(directory='fixtures'),
         LoadResourceList.Response(),
     )
-    trajectory_response = callbacks['resource/load_trajectory_list'](
+    trajectory_response = callbacks['config/load_trajectory_list'](
         LoadResourceList.Request(directory='jobs'),
         LoadResourceList.Response(),
     )
@@ -74,9 +74,9 @@ def test_resource_list_services_forward_directory_and_return_names():
     assert list(trajectory_response.names) == ['cycle_a', 'cycle_b']
 
 
-def test_resource_service_wraps_sdk_call_with_exclusive_gate():
+def test_config_service_wraps_sdk_call_with_exclusive_gate():
     from lebai_driver.connection import RobotConnection
-    from lebai_driver.resource_services import register_resource_services
+    from lebai_driver.config_services import register_config_services
 
     class RecordingGate:
         def __init__(self):
@@ -102,9 +102,9 @@ def test_resource_service_wraps_sdk_call_with_exclusive_gate():
     robot = GuardedRobot(gate)
     robot.resource_lists['tcp']['tools'] = ['flange_tcp']
     connection = RobotConnection('127.0.0.1', robot_factory=lambda *_args, **_kwargs: robot)
-    register_resource_services(node, connection, sdk_gate=gate)
+    register_config_services(node, connection, sdk_gate=gate)
     callback = dict((name, callback) for _srv_type, name, callback in node.services)[
-        'resource/load_tcp_list'
+        'config/load_tcp_list'
     ]
 
     response = callback(
@@ -118,12 +118,12 @@ def test_resource_service_wraps_sdk_call_with_exclusive_gate():
     assert list(response.names) == ['flange_tcp']
 
 
-def test_resource_list_services_convert_entries_to_strings():
+def test_config_list_services_convert_entries_to_strings():
     robot = FakeRobot()
     robot.resource_lists['tcp'][''] = ['tcp_1', 2]
     _node, _services, callbacks = _register(robot)
 
-    response = callbacks['resource/load_tcp_list'](
+    response = callbacks['config/load_tcp_list'](
         LoadResourceList.Request(directory=''),
         LoadResourceList.Response(),
     )
@@ -132,12 +132,12 @@ def test_resource_list_services_convert_entries_to_strings():
     assert list(response.names) == ['tcp_1', '2']
 
 
-def test_resource_list_service_maps_sdk_exception_to_result():
+def test_config_list_service_maps_sdk_exception_to_result():
     robot = FakeRobot()
     robot.exceptions['load_pose_list'] = RuntimeError('pose list unavailable')
     _node, _services, callbacks = _register(robot)
 
-    response = callbacks['resource/load_pose_list'](
+    response = callbacks['config/load_pose_list'](
         LoadResourceList.Request(directory='waypoints'),
         LoadResourceList.Response(),
     )
