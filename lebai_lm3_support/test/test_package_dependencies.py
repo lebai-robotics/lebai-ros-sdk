@@ -113,10 +113,12 @@ SUPPORT_TEST_IMPORT_DEPENDENCIES = {
     "launch_testing": "launch_testing",
     "launch_testing_ros": "launch_testing_ros",
     "pytest": "python3-pytest",
-    "pytest_xvfb": "python3-pytest-xvfb",
     "rclpy": "rclpy",
     "std_msgs": "std_msgs",
     "yaml": "python3-yaml",
+}
+SUPPORT_TEST_PLUGIN_DEPENDENCIES = {
+    "python3-pytest-xvfb",
 }
 
 
@@ -387,7 +389,7 @@ def test_support_test_dependencies_cover_direct_test_imports():
         SUPPORT_TEST_IMPORT_DEPENDENCIES[name]
         for name in imported
         if name in SUPPORT_TEST_IMPORT_DEPENDENCIES
-    } <= SUPPORT_TEST_DEPENDENCIES
+    } | SUPPORT_TEST_PLUGIN_DEPENDENCIES <= SUPPORT_TEST_DEPENDENCIES
     assert _dependency_names(
         package_root, "test_depend"
     ) == SUPPORT_TEST_DEPENDENCIES
