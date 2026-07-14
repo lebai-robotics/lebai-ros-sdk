@@ -1,45 +1,47 @@
-# TODO
+# Blocked and Deferred Work
 
-This file tracks future work that is not part of the current active scope.
+This file contains only work that has an accepted direction but cannot be
+completed safely in the current runtime. Current services, topics, actions,
+launch files, and examples are documented under `docs/`.
 
-## Deferred Runtime Areas
+## RSDK-001: Execute ROS trajectories without controller pre-positioning
 
-The active runtime branches currently prioritize released `pylebai` APIs for
-start/stop, motion, status, IO, resource lists, claw, discovery, and standalone
-gripper support. Public documentation should focus on currently usable flows;
-future support notes belong in this file unless they are part of a concrete
-release.
+The current controller playback path pre-positions before replaying stored
+trajectory data. `FollowJointTrajectory` must eventually validate the requested
+start state and use a distinct PVAT path that never inserts that move.
 
-Later phases should cover:
+This remains blocked on authorized controller/protocol work, a corresponding
+SDK API, and a released `pylebai>=2.1.0,<3.0.0` exposing it. The ROS driver must
+not claim or emulate no-preposition execution before those dependencies exist.
 
-- actions
-- config/files/modbus/serial/storage APIs
-- box device discovery APIs
-- programs and scenes
-- robotics SDK areas beyond current runtime scope
-- other released SDK areas not yet mapped into ROS
-- distro-scoped release documentation for active runtime branches beyond Humble
+## RSDK-005: Replace string IO devices with a typed enum
 
-## Planned Version System
+The released SDK accepts canonical uppercase device names such as `ROBOT` and
+`FLANGE`, but an unknown or lowercase string can silently fall back to `ROBOT`.
+The ROS interface therefore remains unsafe for misspelled device names.
 
-Do not implement this in the current API expansion branch.
+The accepted fix requires a stable SDK/SWIG `IoDevice` enum, a released
+`pylebai` facade exposing it, and a coordinated typed ROS interface. Until that
+release is available, callers and new requests should use canonical uppercase
+device names. The existing `io_example.py` currently retains legacy lowercase
+`robot` as a ROBOT-only compatibility example; do not copy that value
+for `FLANGE` or any other device.
 
-Use a distro-scoped release version model for runtime branches:
+## RSDK-014: Support standard trajectory tolerances
 
-- Package versions are tracked per active distro branch.
-- Tags use distro prefixes: `humble-vX.Y.Z`, `jazzy-vX.Y.Z`, and
-  `lyrical-vX.Y.Z`.
-- Keep versions aligned across active distro branches when the same feature or
-  fix applies to all of them.
-- Allow distro-specific patch releases when only one distro branch needs a fix,
-  for example `humble-v0.2.1`.
-- `main` does not own the runtime package version; it coordinates docs and
-  GitHub Pages orchestration.
+`FollowJointTrajectory` currently ignores `path_tolerance`, `goal_tolerance`,
+and `goal_time_tolerance`. Empty tolerances retain the current fixed 0.01 rad
+goal tolerance and local timeout policy.
 
-## API Expansion Order
+Coherent kinematics snapshots are now available, but explicit tolerance
+semantics and validation remain deferred to avoid introducing false motion
+failures. Any implementation must preserve current behavior for ordinary
+MoveIt goals and test supplied path, goal, and time tolerances separately.
 
-Expand APIs one coherent PR at a time instead of putting every deferred API area
-into one branch.
+## RSDK-027: Provide validated simplified LM3 collision geometry
 
-No concrete API expansion item is currently queued. Pick the next coherent area
-from Deferred Runtime Areas and add it here before implementation.
+The LM3 MoveIt model currently uses detailed visual meshes for collision
+geometry, which makes model and planning-scene startup expensive. Replacing
+them remains deferred until conservative simplified collision assets are
+generated and validated against representative robot states. Existing debug
+boxes are not suitable production collision geometry.

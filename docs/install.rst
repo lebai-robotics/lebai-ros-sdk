@@ -39,7 +39,7 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 
    python3 -m venv .venv --system-site-packages
    source .venv/bin/activate
-   python3 -m pip install pylebai
+   python3 -m pip install "pylebai>=2.0.0,<3.0.0"
 
 安装 ROS 包依赖：
 
@@ -54,7 +54,7 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 .. code-block:: bash
 
    source .venv/bin/activate
-   colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
+   colcon build --symlink-install
    source install/setup.bash
 
 检查安装
@@ -72,6 +72,18 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 
    ros2 interface list | grep lebai_interfaces
 
+安装后还可以确认三个驱动 launch、两个 MoveIt launch 和模型显示 launch：
+
+.. code-block:: bash
+
+   ros2 launch lebai_driver discovery.launch.py --show-args
+   ros2 launch lebai_driver serial_gripper.launch.py --show-args
+   ros2 launch lebai_lm3_moveit_config lm3.launch.py --show-args
+   ros2 launch lebai_lm3_moveit_config lm3_l1.launch.py --show-args
+   ros2 launch lebai_lm3_support standalone_lm3.launch.py --show-args
+
+完整的公开 launch 清单和用途见 :doc:`architecture`。
+
 常用包
 ------
 
@@ -83,3 +95,9 @@ Python 环境。先创建一个可以读取 ROS apt 包的虚拟环境，再安�
 
 ``lebai_tutorials``
    提供可直接运行的 Python 示例。
+
+``lebai_lm3_support``
+   提供 LM3/LM3-L1 模型、资源和独立 RViz display launch。
+
+``lebai_lm3_moveit_config``
+   提供 LM3/LM3-L1 的 MoveIt 规划、RViz 和执行 launch。
