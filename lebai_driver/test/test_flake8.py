@@ -30,6 +30,7 @@ def test_flake8_config_uses_stable_core_rules():
 
     assert config.read(FLAKE8_CONFIG) == [str(FLAKE8_CONFIG)]
     assert config['flake8']['select'] == 'E,F,W,C90'
+    assert config['flake8']['extend-ignore'] == 'W503'
     assert config['flake8'].getint('max-line-length') == 99
     assert config['flake8'].getboolean('show-source')
     assert config['flake8'].getboolean('statistics')
