@@ -192,6 +192,12 @@ def test_display_graph_launch_test_is_registered_with_cmake():
             assert "--no-xvfb" in command, name
 
 
+def test_display_graph_does_not_call_pytest_xvfb_internals():
+    source = DISPLAY_GRAPH_TEST.read_text(encoding="utf-8")
+
+    assert "pytest_xvfb.xvfb_available" not in source
+
+
 def test_display_graph_outer_matrix_contains_all_fourteen_cases(monkeypatch):
     module = _load_display_graph_test(monkeypatch)
 

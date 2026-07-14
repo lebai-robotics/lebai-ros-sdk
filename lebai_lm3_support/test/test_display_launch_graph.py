@@ -30,7 +30,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 import launch_testing
 from launch_testing_ros import MessagePump
 import pytest
-import pytest_xvfb
 import rclpy
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import String
@@ -208,7 +207,6 @@ class TestDisplayLaunchGraph(unittest.TestCase):
     ):
         del launch_name
         self._start_ros(domain_id)
-        self.assertTrue(pytest_xvfb.xvfb_available())
         self.assertTrue(os.environ.get("DISPLAY"))
 
         topic_name = _resolved_topic(namespace, "robot_description")
