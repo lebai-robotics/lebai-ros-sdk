@@ -62,7 +62,7 @@ jobs:
           . .venv/bin/activate
           python3 -m pip install "${{ matrix.pylebai }}"
           rosdep install \
-            --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --from-paths lebai_interfaces lebai_driver lebai_resources lebai_lm3_support lebai_tutorials \
             --ignore-src \
             --rosdistro "$ROS_DISTRO" \
             --skip-keys pylebai \
@@ -83,7 +83,7 @@ jobs:
           source /opt/ros/lyrical/setup.bash
           source .venv/bin/activate
           colcon build \
-            --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --packages-select lebai_interfaces lebai_driver lebai_resources lebai_lm3_support lebai_tutorials \
             --symlink-install
 
       - name: Run unit tests

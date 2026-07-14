@@ -53,7 +53,8 @@ def test_lyrical_ci_defers_unreleased_moveit_package():
     build = steps['Build']['run']
     unit_tests = steps['Run unit tests']['run']
     active_packages = (
-        'lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials'
+        'lebai_interfaces lebai_driver lebai_resources lebai_lm3_support '
+        'lebai_tutorials'
     )
 
     assert f'--from-paths {active_packages}' in install
