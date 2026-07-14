@@ -19,6 +19,7 @@ import yaml
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+LINTER_SCRIPT = REPOSITORY_ROOT / 'scripts' / 'run-linters.sh'
 WORKFLOW_PATH = next(
     (REPOSITORY_ROOT / '.github' / 'workflows').glob('ros2_*_ci.yml')
 )
@@ -41,6 +42,13 @@ def test_container_trusts_checked_out_workspace_before_linting():
     )
 
     assert 'git config --global --add safe.directory "$GITHUB_WORKSPACE"' in setup
+
+
+def test_linter_script_disables_launch_testing_plugin():
+    script = LINTER_SCRIPT.read_text(encoding='utf-8')
+
+    assert '-p no:launch_testing' in script
+    assert '-p no:launch_ros' in script
 
 
 @pytest.mark.skipif(

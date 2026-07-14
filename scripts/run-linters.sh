@@ -15,6 +15,7 @@
 
 set -euo pipefail
 export PYTHONNOUSERSITE=1
+export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:-} -p no:launch_testing -p no:launch_ros"
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repository_root}"
