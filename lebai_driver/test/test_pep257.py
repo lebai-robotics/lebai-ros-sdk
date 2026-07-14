@@ -1,3 +1,4 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
 # Copyright 2015 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from importlib.util import find_spec
+
 from ament_pep257.main import main
+from linter_paths import maintained_python_paths
 import pytest
 
 
 @pytest.mark.linter
 @pytest.mark.pep257
 def test_pep257():
-    rc = main(argv=['.', 'test'])
+    assert find_spec('pydocstyle') is not None, 'pydocstyle backend is missing'
+    rc = main(argv=[str(path) for path in maintained_python_paths()])
     assert rc == 0, 'Found code style errors / warnings'

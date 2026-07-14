@@ -3,12 +3,7 @@
   <name>lebai_lm3_moveit_config</name>
   <version>0.0.1</version>
   <description>
-    <p>
-      MoveIt Resources for testing: Franka Emika Panda
-    </p>
-    <p>
-      A project-internal configuration for testing in MoveIt.
-    </p>
+    MoveIt configuration for Lebai LM3 and LM3-L1 robot models.
   </description>
   <author email="liufang_robot@outlook.com">liufang</author>
   <maintainer email="liufang_robot@outlook.com">liufang</maintainer>
@@ -16,13 +11,34 @@
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>backward_ros</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>xacro</exec_depend>
   <exec_depend>lebai_driver</exec_depend>
   <exec_depend>lebai_lm3_support</exec_depend>
-  <exec_depend>joint_state_publisher</exec_depend>
-  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_kinematics</exec_depend>
+  <exec_depend>moveit_planners_ompl</exec_depend>
+  <exec_depend>moveit_simple_controller_manager</exec_depend>
+  <exec_depend>moveit_ros_visualization</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
-  <exec_depend>xacro</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>rviz_default_plugins</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>control_msgs</test_depend>
+  <test_depend>launch_testing</test_depend>
+  <test_depend>launch_testing_ros</test_depend>
+  <test_depend>moveit_msgs</test_depend>
+  <test_depend>rcl_interfaces</test_depend>
+  <test_depend>rclpy</test_depend>
+  <test_depend>sensor_msgs</test_depend>
+  <test_depend>std_msgs</test_depend>
+
   <export>
       <build_type>ament_cmake</build_type>
   </export>

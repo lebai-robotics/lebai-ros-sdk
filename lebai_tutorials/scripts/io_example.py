@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import rclpy
 from rclpy.node import Node
 from lebai_interfaces.srv import SetAnalogOutput, SetDigitalOutput
+
+from lebai_tutorials_common import call_service
 
 
 class IOExample(Node):
@@ -17,7 +33,7 @@ class IOExample(Node):
         req.device = 'robot'
         req.pin = 0
         req.value = True
-        self._call(srv, req, 'io/set_do')
+        return call_service(self, srv, req, 'io/set_do')
 
     def set_ao(self):
         srv = self.create_client(SetAnalogOutput, '/lebai/io/set_ao')
@@ -27,34 +43,28 @@ class IOExample(Node):
         req.device = 'robot'
         req.pin = 0
         req.value = 3.0
-        self._call(srv, req, 'io/set_ao')
-
-    def _call(self, srv, req, label):
-        future = srv.call_async(req)
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if future.done():
-                try:
-                    future.result()
-                except Exception as e:
-                    self.get_logger().info('Service "%s" failed %r' % (label, e))
-                else:
-                    self.get_logger().info('Service "%s" succeeded.' % label)
-                break
+        return call_service(self, srv, req, 'io/set_ao')
 
 
 def run():
     io_example = IOExample()
-    io_example.set_do()
-    io_example.set_ao()
-    io_example.destroy_node()
-    return
+    try:
+        outcomes = (
+            io_example.set_do(),
+            io_example.set_ao(),
+        )
+        return all(outcomes)
+    finally:
+        io_example.destroy_node()
 
 
 def main():
     rclpy.init()
-    run()
-    rclpy.shutdown()
+    try:
+        succeeded = run()
+    finally:
+        rclpy.shutdown()
+    raise SystemExit(0 if succeeded else 1)
 
 
 if __name__ == '__main__':

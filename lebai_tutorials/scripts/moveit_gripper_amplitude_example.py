@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import argparse
 
@@ -11,8 +25,8 @@ from lebai_tutorials_common import amplitude_to_gripper_joint
 
 
 class MoveItGripperAmplitudeExample(Node):
-    def __init__(self, action_name):
-        super().__init__("moveit_gripper_amplitude_example")
+    def __init__(self, action_name, namespace):
+        super().__init__("moveit_gripper_amplitude_example", namespace=namespace)
         self._client = ActionClient(self, GripperCommand, action_name)
 
     def send_amplitude(self, amplitude, max_effort, timeout_sec):
@@ -62,9 +76,10 @@ def parse_args():
     )
     parser.add_argument("--amplitude", type=float, default=50.0, help="claw amplitude, 0..100")
     parser.add_argument("--max-effort", type=float, default=50.0)
+    parser.add_argument("--namespace", default="lebai")
     parser.add_argument(
         "--action-name",
-        default="/lebai_gripper_controller/gripper_cmd",
+        default="lebai_gripper_controller/gripper_cmd",
         help="control_msgs/action/GripperCommand action name",
     )
     parser.add_argument("--timeout", type=float, default=30.0)
@@ -74,7 +89,7 @@ def parse_args():
 def main():
     args = parse_args()
     rclpy.init()
-    node = MoveItGripperAmplitudeExample(args.action_name)
+    node = MoveItGripperAmplitudeExample(args.action_name, args.namespace)
     try:
         ok = node.send_amplitude(args.amplitude, args.max_effort, args.timeout)
     finally:

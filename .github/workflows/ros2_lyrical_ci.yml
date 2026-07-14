@@ -17,6 +17,12 @@ jobs:
     name: Lyrical unit and simulator tests
     # The ROS/Ubuntu environment under test is the Lyrical container below.
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        pylebai:
+          - 'pylebai==2.0.0'
+          - 'pylebai>=2.0.0,<3.0.0'
     container:
       image: ros:lyrical-ros-base
       options: --user 0
@@ -47,19 +53,28 @@ jobs:
             python3-rosdep \
             python3-venv \
             python3-vcstool
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
           rosdep update
           python3 -m venv .venv --system-site-packages
           . .venv/bin/activate
-          python3 -m pip install pylebai
+          python3 -m pip install "${{ matrix.pylebai }}"
           rosdep install \
-            --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --from-paths lebai_interfaces lebai_driver lebai_resources lebai_lm3_support lebai_tutorials \
             --ignore-src \
-            --rosdistro lyrical \
+            --rosdistro "$ROS_DISTRO" \
             --skip-keys pylebai \
             -y
+
+      - name: Run linters
+        shell: bash
+        run: |
+          set -eo pipefail
+          source /opt/ros/lyrical/setup.bash
+          source .venv/bin/activate
+          PYTHONNOUSERSITE=1 ./scripts/run-linters.sh
 
       - name: Build
         shell: bash
@@ -68,7 +83,7 @@ jobs:
           source /opt/ros/lyrical/setup.bash
           source .venv/bin/activate
           colcon build \
-            --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --packages-select lebai_interfaces lebai_driver lebai_resources lebai_lm3_support lebai_tutorials \
             --symlink-install
 
       - name: Run unit tests
@@ -78,7 +93,9 @@ jobs:
           source .venv/bin/activate
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
+          python3 -m pytest lebai_lm3_support/test/test_package_dependencies.py -q
           python3 -m pytest lebai_lm3_support/test -q
+          PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test/test_package_dependencies.py -q
           PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test -q
 
       - name: Run simulator smoke tests

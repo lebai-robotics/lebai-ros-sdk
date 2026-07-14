@@ -1,51 +1,70 @@
-import os
-from ament_index_python.packages import get_package_share_path
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.actions import IncludeLaunchDescription
-from launch.substitutions import Command, LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
-from launch_ros.actions import Node
-from launch_ros.parameter_descriptions import ParameterValue
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution, TextSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    has_gripper_arg = DeclareLaunchArgument(name='has_gripper', default_value='false', choices=['true', 'false'],
-                                            description='mount gripper on the end')
-    # launch.actions.substitutions.
-    has_gripper_condition = LaunchConfiguration('has_gripper')
-    display_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('lebai_lm3_support'),
-                'launch',
-                'display_lm3.launch.py'
-            ])
-        ]),
-        launch_arguments={
-            'joint_state_publisher': 'true'
-        }.items(),
-        condition=UnlessCondition(has_gripper_condition)
+    namespace_arg = DeclareLaunchArgument(
+        "namespace",
+        default_value="",
+        description="Namespace for the standalone display nodes",
     )
-    display_with_gripper_node = IncludeLaunchDescription(
+    has_gripper_arg = DeclareLaunchArgument(
+        "has_gripper",
+        default_value="false",
+        choices=["true", "false"],
+        description="Mount gripper on the end",
+    )
+    namespace = LaunchConfiguration("namespace")
+    has_gripper = LaunchConfiguration("has_gripper")
+    launch_dir = PathJoinSubstitution([
+        FindPackageShare("lebai_lm3_support"),
+        "launch",
+    ])
+
+    display = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('lebai_lm3_support'),
-                'launch',
-                'display_lm3_with_gripper.launch.py'
-            ])
+            launch_dir,
+            "/display_lm3.launch.py",
         ]),
         launch_arguments={
-            'joint_state_publisher': 'true'
+            "joint_state_publisher": "true",
+            "namespace": namespace,
         }.items(),
-        condition=IfCondition(has_gripper_condition)
+        condition=UnlessCondition(has_gripper),
+    )
+    display_with_gripper = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            launch_dir,
+            "/display_lm3_with_gripper.launch.py",
+        ]),
+        launch_arguments={
+            "joint_state_publisher": "true",
+            "namespace": namespace,
+        }.items(),
+        condition=IfCondition(has_gripper),
     )
 
     return LaunchDescription([
+        namespace_arg,
         has_gripper_arg,
-        display_node,
-        display_with_gripper_node,
+        display,
+        display_with_gripper,
     ])

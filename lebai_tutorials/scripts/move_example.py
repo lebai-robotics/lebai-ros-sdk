@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import rclpy
+from geometry_msgs.msg import Point, Pose, Quaternion
 from rclpy.node import Node
 from lebai_interfaces.msg import MotionParams, MotionTarget
 from lebai_interfaces.srv import MoveJoint
 from lebai_interfaces.srv import MoveLinear
+
+from lebai_tutorials_common import call_service
 
 
 class MoveExample(Node):
@@ -21,7 +38,7 @@ class MoveExample(Node):
             joint_positions=[-0.516, -1.384, 0.932, -1.084, -0.833, -0.792],
         )
         req.params = MotionParams(acceleration=1.0, velocity=0.1)
-        self._call(srv, req, 'motion/movej')
+        return call_service(self, srv, req, 'motion/movej')
 
     def send_move_linear(self):
         srv = self.create_client(MoveLinear, '/lebai/motion/movel')
@@ -29,41 +46,38 @@ class MoveExample(Node):
             self.get_logger().info('service "motion/movel" not available, waiting...')
         req = MoveLinear.Request()
         req.target.is_joint_pose = False
-        req.target.cartesian_pose.x = 0.022
-        req.target.cartesian_pose.y = 0.473
-        req.target.cartesian_pose.z = 0.431
-        req.target.cartesian_pose.rx = 0.918
-        req.target.cartesian_pose.ry = 0.128
-        req.target.cartesian_pose.rz = -0.364
+        req.target.cartesian_pose = Pose(
+            position=Point(x=0.022, y=0.473, z=0.431),
+            orientation=Quaternion(
+                x=0.4452199054419614,
+                y=-0.023637240544570032,
+                z=-0.1897987542851597,
+                w=0.8747553655334106,
+            ),
+        )
         req.params = MotionParams(acceleration=1.0, velocity=0.1)
-        self._call(srv, req, 'motion/movel')
-
-    def _call(self, srv, req, label):
-        future = srv.call_async(req)
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if future.done():
-                try:
-                    future.result()
-                except Exception as e:
-                    self.get_logger().info('Service "%s" failed %r' % (label, e))
-                else:
-                    self.get_logger().info('Service "%s" succeeded.' % label)
-                break
+        return call_service(self, srv, req, 'motion/movel')
 
 
 def run():
     move_example = MoveExample()
-    move_example.send_move_joint()
-    move_example.send_move_linear()
-    move_example.destroy_node()
-    return
+    try:
+        outcomes = (
+            move_example.send_move_joint(),
+            move_example.send_move_linear(),
+        )
+        return all(outcomes)
+    finally:
+        move_example.destroy_node()
 
 
 def main():
     rclpy.init()
-    run()
-    rclpy.shutdown()
+    try:
+        succeeded = run()
+    finally:
+        rclpy.shutdown()
+    raise SystemExit(0 if succeeded else 1)
 
 
 if __name__ == '__main__':

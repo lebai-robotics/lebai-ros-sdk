@@ -12,17 +12,23 @@
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>xacro</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>control_msgs</exec_depend>
-  <exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>lebai_interfaces</exec_depend>
   <exec_depend>lebai_lm3_support</exec_depend>
+  <exec_depend>tf_transformations</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
+  <test_depend>builtin_interfaces</test_depend>
+  <test_depend>python3-packaging</test_depend>
   <test_depend>python3-pytest</test_depend>
+  <test_depend>python3-setuptools</test_depend>
+  <test_depend>python3-yaml</test_depend>
+  <test_depend>rosidl_runtime_py</test_depend>
+  <test_depend>trajectory_msgs</test_depend>
 
   <export>
     <build_type>ament_python</build_type>

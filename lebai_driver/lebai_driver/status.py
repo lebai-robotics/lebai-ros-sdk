@@ -1,3 +1,17 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from lebai_interfaces.msg import ClawState, IOState, JointMotion, RobotState
 from sensor_msgs.msg import JointState
 
@@ -9,10 +23,13 @@ from lebai_driver.conversions import (
     io_state_error,
     io_state_from_sdk,
     joint_motion_error,
+    joint_motion_from_kin_data,
     joint_motion_from_sdk,
     joint_state_error,
+    joint_state_from_kin_data,
     joint_state_from_sdk,
     model_joint_state_error,
+    model_joint_state_from_kin_data,
     model_joint_state_from_sdk,
     robot_state_error,
     robot_state_from_sdk,
@@ -29,11 +46,7 @@ def register_status_publishers(
     callback_group=None,
     model_state_callback_group=None,
 ):
-    joint_names = _parameter_value(
-        node,
-        'joint_names',
-        DEFAULT_JOINT_NAMES,
-    )
+    joint_names = list(DEFAULT_JOINT_NAMES)
     gripper_joint_name = _parameter_value(
         node,
         'gripper_joint_name',
@@ -47,14 +60,17 @@ def register_status_publishers(
         'analog_output_count': _parameter_value(node, 'io_state_analog_output_count', 0),
         'dio_count': _parameter_value(node, 'io_state_dio_count', 0),
     }
+    joint_state_rate = _parameter_value(node, 'joint_state_publish_rate', 20.0)
+    joint_motion_rate = _parameter_value(node, 'joint_motion_publish_rate', 20.0)
 
     registrations = [
         _PublisherRegistration(
             JointState,
             'status/joint_states',
-            _parameter_value(node, 'joint_state_publish_rate', 20.0),
+            joint_state_rate,
             lambda robot: joint_state_from_sdk(robot, joint_names),
             lambda exc: joint_state_error(exc, joint_names),
+            lambda _robot, data: joint_state_from_kin_data(data, joint_names),
         ),
         _PublisherRegistration(
             JointState,
@@ -66,13 +82,19 @@ def register_status_publishers(
         _PublisherRegistration(
             JointState,
             'model/joint_states',
-            _parameter_value(node, 'joint_state_publish_rate', 20.0),
+            joint_state_rate,
             lambda robot: model_joint_state_from_sdk(
                 robot,
                 joint_names,
                 gripper_joint_name,
             ),
             lambda exc: model_joint_state_error(exc, joint_names, gripper_joint_name),
+            lambda robot, data: model_joint_state_from_kin_data(
+                robot,
+                data,
+                joint_names,
+                gripper_joint_name,
+            ),
         ),
         _PublisherRegistration(
             RobotState,
@@ -84,9 +106,10 @@ def register_status_publishers(
         _PublisherRegistration(
             JointMotion,
             'status/joint_motion',
-            _parameter_value(node, 'joint_motion_publish_rate', 20.0),
+            joint_motion_rate,
             joint_motion_from_sdk,
             joint_motion_error,
+            lambda _robot, data: joint_motion_from_kin_data(data),
         ),
         _PublisherRegistration(
             IOState,
@@ -104,18 +127,56 @@ def register_status_publishers(
         ),
     ]
 
-    handles = []
-    for registration in registrations:
-        publisher = node.create_publisher(registration.msg_type, registration.topic, _DEPTH)
-        timer = node.create_timer(
-            _period(registration.rate),
-            _make_publish_callback(node, connection, publisher, registration),
-            callback_group=_callback_group_for(
+    publications = [
+        (
+            registration,
+            node.create_publisher(
+                registration.msg_type,
                 registration.topic,
+                _DEPTH,
+            ),
+        )
+        for registration in registrations
+    ]
+    kinematics_publications = [
+        publication
+        for publication in publications
+        if publication[0].build_kinematics_message is not None
+    ]
+    shared_kinematics_timer = None
+    if _rates_match(kinematics_publications):
+        shared_kinematics_timer = node.create_timer(
+            _period(kinematics_publications[0][0].rate),
+            _make_kinematics_publish_callback(
+                node,
+                connection,
+                kinematics_publications,
+            ),
+            callback_group=_callback_group_for(
+                'model/joint_states',
                 callback_group,
                 model_state_callback_group,
             ),
         )
+
+    handles = []
+    for registration, publisher in publications:
+        timer = shared_kinematics_timer
+        if timer is None or registration.build_kinematics_message is None:
+            timer = node.create_timer(
+                _period(registration.rate),
+                _make_publish_callback(
+                    node,
+                    connection,
+                    publisher,
+                    registration,
+                ),
+                callback_group=_callback_group_for(
+                    registration.topic,
+                    callback_group,
+                    model_state_callback_group,
+                ),
+            )
         handles.append((publisher, timer))
     return handles
 
@@ -141,6 +202,36 @@ def _make_publish_callback(node, connection, publisher, registration):
     return callback
 
 
+def _make_kinematics_publish_callback(
+    node,
+    connection,
+    publications,
+):
+    def callback():
+        try:
+            with connection.sdk_access() as robot:
+                data = robot.get_kin_data()
+                messages = []
+                for registration, publisher in publications:
+                    try:
+                        message = registration.build_kinematics_message(robot, data)
+                    except Exception as exc:
+                        message = registration.build_error_message(exc)
+                    messages.append((publisher, message))
+        except Exception as exc:
+            messages = [
+                (publisher, registration.build_error_message(exc))
+                for registration, publisher in publications
+            ]
+
+        stamp = node.get_clock().now().to_msg()
+        for publisher, message in messages:
+            message.header.stamp = stamp
+            publisher.publish(message)
+
+    return callback
+
+
 def _parameter_value(node, name, default):
     try:
         return node.get_parameter(name).value
@@ -155,10 +246,23 @@ def _period(rate):
     return 1.0 / rate
 
 
+def _rates_match(publications):
+    return len({float(registration.rate) for registration, _publisher in publications}) == 1
+
+
 class _PublisherRegistration:
-    def __init__(self, msg_type, topic, rate, build_message, build_error_message):
+    def __init__(
+        self,
+        msg_type,
+        topic,
+        rate,
+        build_message,
+        build_error_message,
+        build_kinematics_message=None,
+    ):
         self.msg_type = msg_type
         self.topic = topic
         self.rate = rate
         self.build_message = build_message
         self.build_error_message = build_error_message
+        self.build_kinematics_message = build_kinematics_message

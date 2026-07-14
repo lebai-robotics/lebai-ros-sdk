@@ -1,3 +1,17 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from pathlib import Path
 import os
 import xml.etree.ElementTree as ET
@@ -10,6 +24,7 @@ import xacro
 PACKAGE_DIR = Path(__file__).resolve().parents[1]
 REPO_DIR = PACKAGE_DIR.parent
 SUPPORT_DIR = REPO_DIR / "lebai_lm3_support"
+FIXED_ARM_JOINT_NAMES = [f"joint_{index}" for index in range(1, 7)]
 
 ROBOT_CONFIGS = [
     (
@@ -35,8 +50,75 @@ ROBOT_CONFIGS = [
 ]
 
 
+@pytest.mark.parametrize(("srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_urdf_and_srdf_robot_names_match(
+    srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+
+    assert robot.attrib["name"] == srdf.attrib["name"]
+
+
+@pytest.mark.parametrize(("srdf_path", "_xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_srdf_has_exact_world_virtual_joint(
+    srdf_path,
+    _xacro_path,
+    _has_gripper,
+):
+    srdf = ET.parse(srdf_path).getroot()
+    virtual_joints = srdf.findall("virtual_joint")
+
+    assert len(virtual_joints) == 1
+    assert virtual_joints[0].attrib == {
+        "name": "virtual_joint",
+        "type": "fixed",
+        "parent_frame": "world",
+        "child_link": "base_link",
+    }
+
+
+@pytest.mark.parametrize(("_srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_expanded_urdf_does_not_define_world_link(
+    _srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+
+    assert not robot.findall("./link[@name='world']")
+
+
+@pytest.mark.parametrize(("_srdf_path", "xacro_path", "_has_gripper"), ROBOT_CONFIGS)
+def test_active_arm_joint_names_are_fixed(
+    _srdf_path,
+    xacro_path,
+    _has_gripper,
+    tmp_path,
+):
+    robot = _robot_from_xacro(xacro_path, tmp_path)
+    active_arm_joint_names = [
+        joint.attrib["name"]
+        for joint in robot.findall("joint")
+        if joint.attrib.get("type") == "revolute"
+        and not joint.attrib["name"].startswith("gripper_")
+        and joint.find("mimic") is None
+    ]
+
+    assert active_arm_joint_names == FIXED_ARM_JOINT_NAMES
+
+
 @pytest.mark.parametrize(("srdf_path", "xacro_path", "has_gripper"), ROBOT_CONFIGS)
-def test_srdf_groups_reference_existing_active_joints(srdf_path, xacro_path, has_gripper, tmp_path):
+def test_srdf_groups_reference_existing_active_joints(
+    srdf_path,
+    xacro_path,
+    has_gripper,
+    tmp_path,
+):
     srdf = ET.parse(srdf_path).getroot()
     robot_joints = _robot_joint_names(xacro_path, tmp_path)
 
@@ -79,7 +161,11 @@ def test_gripper_group_has_named_open_and_closed_states(srdf_path, _xacro_path, 
 
 
 @pytest.mark.parametrize(("srdf_path", "_xacro_path", "has_gripper"), ROBOT_CONFIGS)
-def test_gripper_group_is_registered_as_manipulator_end_effector(srdf_path, _xacro_path, has_gripper):
+def test_gripper_group_is_registered_as_manipulator_end_effector(
+    srdf_path,
+    _xacro_path,
+    has_gripper,
+):
     srdf = ET.parse(srdf_path).getroot()
 
     end_effectors = [
@@ -177,12 +263,12 @@ def test_moveit_launches_forward_simulator_and_selects_joint_state_topic_by_grip
         assert "'simulator': simulator" in launch_file
         assert (
             "gripper_joint_state_remappings = [\n"
-            "        ('joint_states', '/lebai/model/joint_states'),\n"
+            "        ('joint_states', 'model/joint_states'),\n"
             "    ]"
         ) in launch_file
         assert (
             "arm_joint_state_remappings = [\n"
-            "        ('joint_states', '/lebai/status/joint_states'),\n"
+            "        ('joint_states', 'status/joint_states'),\n"
             "    ]"
         ) in launch_file
         assert launch_file.count("remappings=joint_state_remappings") == 3
@@ -217,17 +303,10 @@ def test_moveit_controller_config_declares_arm_and_gripper_action_servers():
         "lebai_gripper_controller",
     ]
     assert controllers["lebai_trajectory_controller"] == {
-        "action_ns": "",
+        "action_ns": "follow_joint_trajectory",
         "type": "FollowJointTrajectory",
         "default": True,
-        "joints": [
-            "joint_1",
-            "joint_2",
-            "joint_3",
-            "joint_4",
-            "joint_5",
-            "joint_6",
-        ],
+        "joints": FIXED_ARM_JOINT_NAMES,
     }
     assert controllers["lebai_gripper_controller"] == {
         "action_ns": "gripper_cmd",

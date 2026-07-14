@@ -1,4 +1,19 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from importlib.util import module_from_spec, spec_from_file_location
+import os
 from pathlib import Path
 
 from launch import LaunchDescription
@@ -12,14 +27,19 @@ def test_driver_launch_file_imports_and_generates_description():
 
     assert isinstance(description, LaunchDescription)
     assert _launch_argument_names(description) >= {
+        'gripper_joint_name',
         'publish_robot_description',
         'robot_model',
     }
+    assert 'joint_names' not in _launch_argument_names(description)
     assert _node_specs(description) == [
         ('lebai_driver', 'driver'),
         ('robot_state_publisher', 'robot_state_publisher'),
     ]
     robot_state_publisher = description.entities[-1]
+    driver = description.entities[-2]
+    assert 'joint_names' not in _node_parameters(driver)
+    assert 'gripper_joint_name' in _node_parameters(driver)
     assert ('joint_states', 'model/joint_states') in _node_remappings(robot_state_publisher)
     assert isinstance(
         _node_parameters(robot_state_publisher)['robot_description']._ParameterValue__value[0],
@@ -39,12 +59,53 @@ def test_serial_gripper_launch_file_imports_and_generates_description():
     assert isinstance(description, LaunchDescription)
 
 
+def test_legacy_joint_name_config_files_are_not_shipped():
+    repository = Path(__file__).resolve().parents[2]
+    package_names = ('lebai_driver', 'lebai_lm3_support')
+    legacy_files = {
+        'joint_names_gripper.yaml',
+        'joint_names_lm3.yaml',
+        'joint_names_two_lm3.yaml',
+    }
+
+    for package_name in package_names:
+        source_config = repository / package_name / 'config'
+        assert not legacy_files.intersection(_file_names(source_config))
+
+    for package_name in package_names:
+        installed_share = _active_installed_share(package_name)
+        if installed_share is not None:
+            installed_config = installed_share / 'config'
+            assert not legacy_files.intersection(_file_names(installed_config))
+
+
 def _load_launch(filename):
     path = Path(__file__).resolve().parents[1] / 'launch' / filename
     spec = spec_from_file_location(filename.replace('.', '_'), path)
     module = module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _file_names(directory):
+    if not directory.is_dir():
+        return set()
+    return {path.name for path in directory.iterdir()}
+
+
+def _active_installed_share(package_name):
+    for prefix in os.environ.get('AMENT_PREFIX_PATH', '').split(os.pathsep):
+        package_marker = (
+            Path(prefix)
+            / 'share'
+            / 'ament_index'
+            / 'resource_index'
+            / 'packages'
+            / package_name
+        )
+        if package_marker.exists():
+            return Path(prefix) / 'share' / package_name
+    return None
 
 
 def _launch_argument_names(description):
