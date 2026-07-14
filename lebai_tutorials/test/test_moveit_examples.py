@@ -1,6 +1,23 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import math
+import os
+import sys
 
 import pytest
+import rclpy
 
 from lebai_tutorials_common import (
     MANIPULATOR_JOINT_NAMES,
@@ -8,6 +25,27 @@ from lebai_tutorials_common import (
     parse_joint_positions,
 )
 from moveit_manipulator_example import make_joint_goal
+import moveit_gripper_amplitude_example
+import moveit_manipulator_example
+
+
+MOVEIT_EXAMPLES = (
+    (
+        moveit_manipulator_example,
+        moveit_manipulator_example.MoveItManipulatorExample,
+        "move_action",
+    ),
+    (
+        moveit_gripper_amplitude_example,
+        moveit_gripper_amplitude_example.MoveItGripperAmplitudeExample,
+        "lebai_gripper_controller/gripper_cmd",
+    ),
+)
+ACTION_CLIENT_SUFFIXES = {
+    "/_action/cancel_goal",
+    "/_action/get_result",
+    "/_action/send_goal",
+}
 
 
 def test_amplitude_to_gripper_joint_maps_percent_to_active_joint_angle():
@@ -51,3 +89,80 @@ def test_make_joint_goal_targets_manipulator_joint_constraints():
     assert [constraint.position for constraint in constraints] == target
     assert all(constraint.tolerance_above == pytest.approx(0.01) for constraint in constraints)
     assert all(constraint.tolerance_below == pytest.approx(0.01) for constraint in constraints)
+
+
+@pytest.mark.parametrize(("module", "node_type", "relative_action"), MOVEIT_EXAMPLES)
+def test_moveit_example_default_action_resolves_under_lebai_namespace(
+    module,
+    node_type,
+    relative_action,
+    monkeypatch,
+):
+    monkeypatch.setattr(sys, "argv", [module.__file__])
+    args = module.parse_args()
+
+    assert args.namespace == "lebai"
+    assert args.action_name == relative_action
+    _assert_action_client_resolution(
+        node_type,
+        action_name=args.action_name,
+        namespace=args.namespace,
+        expected_action=f"/lebai/{relative_action}",
+        monkeypatch=monkeypatch,
+    )
+
+
+@pytest.mark.parametrize(("module", "node_type", "relative_action"), MOVEIT_EXAMPLES)
+def test_moveit_example_custom_namespace_resolves_the_same_relative_action(
+    module,
+    node_type,
+    relative_action,
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [module.__file__, "--namespace", "robot_1"],
+    )
+    args = module.parse_args()
+
+    assert args.namespace == "robot_1"
+    assert args.action_name == relative_action
+    _assert_action_client_resolution(
+        node_type,
+        action_name=args.action_name,
+        namespace=args.namespace,
+        expected_action=f"/robot_1/{relative_action}",
+        monkeypatch=monkeypatch,
+    )
+
+
+def _assert_action_client_resolution(
+    node_type,
+    action_name,
+    namespace,
+    expected_action,
+    monkeypatch,
+):
+    monkeypatch.setenv("ROS_DOMAIN_ID", str(200 + os.getpid() % 20))
+    rclpy.init()
+    node = None
+    try:
+        node = node_type(action_name, namespace)
+        clients = {
+            client_name
+            for client_name, _client_types in node.get_client_names_and_types_by_node(
+                node.get_name(),
+                node.get_namespace(),
+            )
+        }
+        assert clients == {
+            expected_action + suffix
+            for suffix in ACTION_CLIENT_SUFFIXES
+        }
+    finally:
+        if node is not None:
+            node._client.destroy()
+            node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()

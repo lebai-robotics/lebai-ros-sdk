@@ -5,7 +5,7 @@ controller_names:
   - lebai_gripper_controller
 
 lebai_trajectory_controller:
-  action_ns: ""
+  action_ns: follow_joint_trajectory
   type: FollowJointTrajectory
   default: true
   joints:

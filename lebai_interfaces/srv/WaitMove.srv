@@ -1,3 +1,4 @@
 uint32 motion_id
+float64 timeout_sec
 ---
 lebai_interfaces/Result result

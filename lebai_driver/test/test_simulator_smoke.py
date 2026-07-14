@@ -1,3 +1,18 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import math
 import os
 import time
 
@@ -92,6 +107,13 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         _spin_until(executor, lambda: joint_motions and io_states)
         assert joint_motions[-1].connected is True
         assert list(joint_motions[-1].actual_joint_positions)
+        orientation = joint_motions[-1].actual_tcp_pose.orientation
+        assert math.hypot(
+            orientation.x,
+            orientation.y,
+            orientation.z,
+            orientation.w,
+        ) == pytest.approx(1.0)
         assert io_states[-1].connected is True
 
         clients = [
@@ -106,14 +128,14 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         trajectory_client = ActionClient(
             probe,
             FollowJointTrajectory,
-            '/lebai_trajectory_controller',
+            '/lebai/lebai_trajectory_controller/follow_joint_trajectory',
         )
         _spin_until(executor, trajectory_client.server_is_ready)
 
         gripper_client = ActionClient(
             probe,
             GripperCommand,
-            '/lebai_gripper_controller/gripper_cmd',
+            '/lebai/lebai_gripper_controller/gripper_cmd',
         )
         _spin_until(executor, gripper_client.server_is_ready)
 
@@ -137,6 +159,19 @@ def test_driver_talks_to_simulator_topics_and_core_services():
         )
         assert start_result.result.success is True
         started = True
+
+        for mode, speed, color in [
+            (srv.SetLed.Request.MODE_UNCHANGED, srv.SetLed.Request.SPEED_UNSPECIFIED, []),
+            (srv.SetLed.Request.MODE_FLASH, srv.SetLed.Request.SPEED_SLOW, [0, 15, 0, 15]),
+        ]:
+            led_result = _call_service(
+                executor,
+                probe,
+                srv.SetLed,
+                '/lebai/led/set_led',
+                srv.SetLed.Request(mode=mode, speed=speed, color=color),
+            )
+            assert led_result.result.success is True
 
         movej = _call_service(
             executor,
@@ -173,10 +208,28 @@ def test_driver_talks_to_simulator_topics_and_core_services():
             probe,
             srv.WaitMove,
             '/lebai/motion/wait_move',
-            srv.WaitMove.Request(motion_id=movej.motion_id),
+            srv.WaitMove.Request(
+                motion_id=movej.motion_id,
+                timeout_sec=_MOTION_TIMEOUT_SEC - 5.0,
+            ),
             timeout_sec=_MOTION_TIMEOUT_SEC,
         )
         assert wait.result.success is True
+
+        pvat = _call_service(
+            executor,
+            probe,
+            srv.MovePvat,
+            '/lebai/motion/move_pvat',
+            srv.MovePvat.Request(
+                positions=list(joint_states[-1].position[:6]),
+                velocities=[0.0] * 6,
+                accelerations=[0.0] * 6,
+                duration=0.01,
+            ),
+            timeout_sec=_MOTION_TIMEOUT_SEC,
+        )
+        assert pvat.result.success is True
 
         if os.environ.get('LEBAI_TEST_START_STOP') == '1':
             stop_result = _call_command(
@@ -241,6 +294,7 @@ def _driver_service_specs(srv):
         (srv.Command, '/lebai/motion/skip_move'),
         (srv.GetRunningMotion, '/lebai/motion/get_running_motion'),
         (srv.GetMotionState, '/lebai/motion/get_motion_state'),
+        (srv.SetLed, '/lebai/led/set_led'),
         (srv.Command, '/lebai/start_stop/start_sys'),
         (srv.Command, '/lebai/start_stop/stop_sys'),
         (srv.Command, '/lebai/start_stop/powerdown'),
@@ -265,10 +319,10 @@ def _driver_service_specs(srv):
         (srv.GetAnalogOutputs, '/lebai/io/get_aos'),
         (srv.SetDioMode, '/lebai/io/set_dio_mode'),
         (srv.GetDioMode, '/lebai/io/get_dio_mode'),
-        (srv.LoadResourceList, '/lebai/resource/load_tcp_list'),
-        (srv.LoadResourceList, '/lebai/resource/load_pose_list'),
-        (srv.LoadResourceList, '/lebai/resource/load_frame_list'),
-        (srv.LoadResourceList, '/lebai/resource/load_trajectory_list'),
+        (srv.LoadResourceList, '/lebai/config/load_tcp_list'),
+        (srv.LoadResourceList, '/lebai/config/load_pose_list'),
+        (srv.LoadResourceList, '/lebai/config/load_frame_list'),
+        (srv.LoadResourceList, '/lebai/config/load_trajectory_list'),
         (srv.Command, '/lebai/claw/init_claw'),
         (srv.SetClaw, '/lebai/claw/set_claw'),
         (srv.GetClaw, '/lebai/claw/get_claw'),

@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
 
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 
 import rclpy
@@ -42,8 +56,8 @@ def make_joint_goal(joint_positions, plan_only):
 
 
 class MoveItManipulatorExample(Node):
-    def __init__(self, action_name):
-        super().__init__("moveit_manipulator_example")
+    def __init__(self, action_name, namespace):
+        super().__init__("moveit_manipulator_example", namespace=namespace)
         self._client = ActionClient(self, MoveGroup, action_name)
 
     def move_to_joint_positions(self, joint_positions, plan_only, timeout_sec):
@@ -89,9 +103,10 @@ def parse_args():
         help="six comma-separated joint target positions in radians",
     )
     parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--namespace", default="lebai")
     parser.add_argument(
         "--action-name",
-        default="/move_action",
+        default="move_action",
         help="moveit_msgs/action/MoveGroup action name",
     )
     parser.add_argument("--timeout", type=float, default=60.0)
@@ -102,7 +117,7 @@ def main():
     args = parse_args()
     joint_positions = parse_joint_positions(args.joints)
     rclpy.init()
-    node = MoveItManipulatorExample(args.action_name)
+    node = MoveItManipulatorExample(args.action_name, args.namespace)
     try:
         ok = node.move_to_joint_positions(joint_positions, args.plan_only, args.timeout)
     finally:

@@ -16,6 +16,12 @@ jobs:
   humble:
     name: Humble unit and simulator tests
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        pylebai:
+          - 'pylebai==2.0.0'
+          - 'pylebai>=2.0.0,<3.0.0'
     container:
       image: ros:humble-ros-base
       options: --user 0
@@ -45,26 +51,32 @@ jobs:
             python3-pytest \
             python3-rosdep \
             python3-vcstool
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
           rosdep update
-          python3 -m pip install pylebai
+          python3 -m pip install "${{ matrix.pylebai }}"
           rosdep install \
-            --from-paths lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
+            --from-paths . \
             --ignore-src \
-            --rosdistro humble \
+            --rosdistro "$ROS_DISTRO" \
             --skip-keys pylebai \
             -y
+
+      - name: Run linters
+        shell: bash
+        run: |
+          set -eo pipefail
+          source /opt/ros/humble/setup.bash
+          PYTHONNOUSERSITE=1 ./scripts/run-linters.sh
 
       - name: Build
         shell: bash
         run: |
           set -eo pipefail
           source /opt/ros/humble/setup.bash
-          colcon build \
-            --packages-select lebai_interfaces lebai_driver lebai_lm3_support lebai_tutorials \
-            --symlink-install
+          colcon build --symlink-install
 
       - name: Run unit tests
         shell: bash
@@ -72,8 +84,12 @@ jobs:
           set -eo pipefail
           source install/setup.bash
           python3 -m pytest lebai_driver/test -q -m "not integration and not linter"
+          python3 -m pytest lebai_lm3_support/test/test_package_dependencies.py -q
           python3 -m pytest lebai_lm3_support/test -q
+          PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test/test_package_dependencies.py -q
           PYTHONPATH=lebai_tutorials/scripts:$PYTHONPATH python3 -m pytest lebai_tutorials/test -q
+          python3 -m pytest lebai_lm3_moveit_config/test/test_package_dependencies.py -q
+          python3 -m pytest lebai_lm3_moveit_config/test -q
 
       - name: Run simulator smoke tests
         shell: bash

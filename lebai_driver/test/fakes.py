@@ -1,4 +1,29 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from builtin_interfaces.msg import Time
+
+
+def _zero_sdk_pose():
+    return {
+        'x': 0.0,
+        'y': 0.0,
+        'z': 0.0,
+        'rx': 0.0,
+        'ry': 0.0,
+        'rz': 0.0,
+    }
 
 
 class FakeRobot:
@@ -34,9 +59,10 @@ class FakeRobot:
         self.target_joint_speed = []
         self.actual_joint_torques = []
         self.target_joint_torques = []
-        self.actual_tcp_pose = {}
-        self.target_tcp_pose = {}
-        self.actual_flange_pose = {}
+        self.actual_tcp_pose = _zero_sdk_pose()
+        self.target_tcp_pose = _zero_sdk_pose()
+        self.actual_flange_pose = _zero_sdk_pose()
+        self.kin_data = None
 
     def _record(self, name, *args, **kwargs):
         self.calls.append((name, args, kwargs))
@@ -176,7 +202,17 @@ class FakeRobot:
 
     def get_kin_data(self):
         self._record('get_kin_data')
+        if self.kin_data is not None:
+            return self.kin_data
         return FakeJointMotionData(
+            actual_joint_pose=self.actual_joint_positions,
+            actual_joint_speed=self.actual_joint_speed,
+            actual_joint_torque=self.actual_joint_torques,
+            target_joint_pose=self.target_joint_positions,
+            target_joint_speed=self.target_joint_speed,
+            target_joint_torque=self.target_joint_torques,
+            actual_tcp_pose=self.actual_tcp_pose,
+            target_tcp_pose=self.target_tcp_pose,
             actual_flange_pose=self.actual_flange_pose,
         )
 
@@ -309,8 +345,27 @@ class FakeClawData:
 
 
 class FakeJointMotionData:
-    def __init__(self, actual_flange_pose=None):
-        self.actual_flange_pose = actual_flange_pose or {}
+    def __init__(
+        self,
+        actual_joint_pose=None,
+        actual_joint_speed=None,
+        actual_joint_torque=None,
+        target_joint_pose=None,
+        target_joint_speed=None,
+        target_joint_torque=None,
+        actual_tcp_pose=None,
+        target_tcp_pose=None,
+        actual_flange_pose=None,
+    ):
+        self.actual_joint_pose = list(actual_joint_pose or [])
+        self.actual_joint_speed = list(actual_joint_speed or [])
+        self.actual_joint_torque = list(actual_joint_torque or [])
+        self.target_joint_pose = list(target_joint_pose or [])
+        self.target_joint_speed = list(target_joint_speed or [])
+        self.target_joint_torque = list(target_joint_torque or [])
+        self.actual_tcp_pose = actual_tcp_pose or _zero_sdk_pose()
+        self.target_tcp_pose = target_tcp_pose or _zero_sdk_pose()
+        self.actual_flange_pose = actual_flange_pose or _zero_sdk_pose()
 
 
 class FakeRobotFactory:
@@ -323,13 +378,33 @@ class FakeRobotFactory:
 
 
 class FakeNode:
-    def __init__(self):
+    def __init__(self, parameter_overrides=None):
+        from lebai_driver.parameters import DEFAULT_JOINT_NAMES
+
         self.services = []
         self.service_callback_groups = {}
         self.actions = []
         self.publishers = []
         self.timers = []
         self._now = Time(sec=12, nanosec=34)
+        self.clock_now_calls = 0
+        self.parameter_requests = []
+        self.parameter_values = {
+            'joint_names': DEFAULT_JOINT_NAMES,
+            'joint_state_publish_rate': 20.0,
+            'robot_state_publish_rate': 10.0,
+            'joint_motion_publish_rate': 20.0,
+            'io_state_publish_rate': 10.0,
+            'gripper_state_publish_rate': 10.0,
+            'gripper_joint_name': 'gripper_r_joint1',
+            'io_state_device': 'robot',
+            'io_state_digital_input_count': 0,
+            'io_state_digital_output_count': 0,
+            'io_state_analog_input_count': 0,
+            'io_state_analog_output_count': 0,
+            'io_state_dio_count': 0,
+        }
+        self.parameter_values.update(parameter_overrides or {})
 
     def create_service(self, srv_type, name, callback, callback_group=None):
         self.services.append((srv_type, name, callback))
@@ -351,30 +426,14 @@ class FakeNode:
         return timer
 
     def get_clock(self):
-        return FakeClock(self._now)
+        return FakeClock(self._now, self)
 
     def get_logger(self):
         return FakeLogger()
 
     def get_parameter(self, name):
-        from lebai_driver.parameters import DEFAULT_JOINT_NAMES
-
-        values = {
-            'joint_names': DEFAULT_JOINT_NAMES,
-            'joint_state_publish_rate': 20.0,
-            'robot_state_publish_rate': 10.0,
-            'joint_motion_publish_rate': 20.0,
-            'io_state_publish_rate': 10.0,
-            'gripper_state_publish_rate': 10.0,
-            'gripper_joint_name': 'gripper_r_joint1',
-            'io_state_device': 'robot',
-            'io_state_digital_input_count': 0,
-            'io_state_digital_output_count': 0,
-            'io_state_analog_input_count': 0,
-            'io_state_analog_output_count': 0,
-            'io_state_dio_count': 0,
-        }
-        return FakeParameter(values[name])
+        self.parameter_requests.append(name)
+        return FakeParameter(self.parameter_values[name])
 
 
 class FakePublisher:
@@ -401,10 +460,12 @@ class FakeParameter:
 
 
 class FakeClock:
-    def __init__(self, message):
+    def __init__(self, message, node):
         self.message = message
+        self.node = node
 
     def now(self):
+        self.node.clock_now_calls += 1
         return self
 
     def to_msg(self):

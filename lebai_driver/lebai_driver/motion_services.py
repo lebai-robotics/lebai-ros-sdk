@@ -1,3 +1,21 @@
+# Copyright 2022-2026 Shanghai Lebai Robotics Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import math
+from threading import Lock
+from time import monotonic, sleep
+
 from lebai_interfaces.srv import (
     Command,
     GetMotionState,
@@ -11,15 +29,25 @@ from lebai_interfaces.srv import (
     WaitMove,
 )
 
+from lebai_driver.conversions import pose_to_sdk, twist_to_sdk
 from lebai_driver.errors import UNSUPPORTED, exception_message
+from lebai_driver.parameters import DEFAULT_JOINT_NAMES
 from lebai_driver.result import fail, ok
 from lebai_driver.sdk_gate import exclusive_access
 
 
 _UNSUPPORTED_MESSAGE = 'unsupported by installed pylebai'
+_WAIT_POLL_INTERVAL_SEC = 0.05
+_WAIT_PENDING_STATES = {'WAIT', 'RUNNING'}
 
 
-def register_motion_services(node, connection, callback_group=None, sdk_gate=None):
+def register_motion_services(
+    node,
+    connection,
+    callback_group=None,
+    wait_callback_group=None,
+    sdk_gate=None,
+):
     definitions = [
         (MoveJoint, 'motion/movej', _movej),
         (MoveLinear, 'motion/movel', _movel),
@@ -36,12 +64,22 @@ def register_motion_services(node, connection, callback_group=None, sdk_gate=Non
 
     services = []
     for srv_type, service_name, handler in definitions:
+        if handler is _wait_move:
+            callback = _make_wait_move_callback(connection, sdk_gate)
+            service_callback_group = (
+                wait_callback_group
+                if wait_callback_group is not None
+                else callback_group
+            )
+        else:
+            callback = _make_motion_callback(connection, handler, sdk_gate)
+            service_callback_group = callback_group
         services.append(
             node.create_service(
                 srv_type,
                 service_name,
-                _make_motion_callback(connection, handler, sdk_gate),
-                callback_group=callback_group,
+                callback,
+                callback_group=service_callback_group,
             )
         )
     return services
@@ -58,6 +96,37 @@ def _make_motion_callback(connection, handler, sdk_gate=None):
             response.result = fail(exception_message(exc))
         else:
             response.result = ok()
+        return response
+
+    return callback
+
+
+def _make_wait_move_callback(connection, sdk_gate=None):
+    active_wait = Lock()
+
+    def callback(request, response):
+        if not active_wait.acquire(blocking=False):
+            response.result = fail('another wait_move request is active')
+            return response
+        try:
+            try:
+                _wait_move(
+                    lambda motion_id: _poll_motion_state(
+                        connection,
+                        sdk_gate,
+                        motion_id,
+                    ),
+                    request,
+                    response,
+                )
+            except _UnsupportedMethod:
+                response.result = fail(_UNSUPPORTED_MESSAGE, code=UNSUPPORTED)
+            except Exception as exc:
+                response.result = fail(exception_message(exc))
+            else:
+                response.result = ok()
+        finally:
+            active_wait.release()
         return response
 
     return callback
@@ -115,26 +184,68 @@ def _speedl(robot, request, response):
     response.motion_id = _motion_id(
         _sdk_method(robot, 'speedl')(
             request.acceleration,
-            _cartesian_pose(request.velocity),
+            twist_to_sdk(request.velocity),
             request.time,
-            _cartesian_pose(request.reference),
+            pose_to_sdk(request.reference),
         )
     )
 
 
 def _move_pvat(robot, request, response):
     del response
+    positions = _validated_pvat_array(request.positions, 'positions')
+    velocities = _validated_pvat_array(request.velocities, 'velocities')
+    accelerations = _validated_pvat_array(
+        request.accelerations,
+        'accelerations',
+    )
+    duration = float(request.duration)
+    if not math.isfinite(duration) or duration <= 0.0:
+        raise ValueError('duration must be finite and greater than zero')
     _sdk_method(robot, 'move_pvat')(
-        _float_list(request.positions),
-        _float_list(request.velocities),
-        _float_list(request.accelerations),
-        request.duration,
+        positions,
+        velocities,
+        accelerations,
+        duration,
     )
 
 
-def _wait_move(robot, request, response):
+def _wait_move(poll_motion_state, request, response):
     del response
-    _sdk_method(robot, 'wait_move')(request.motion_id)
+    motion_id = int(request.motion_id)
+    timeout_sec = float(request.timeout_sec)
+    if motion_id == 0:
+        raise ValueError('motion_id must be greater than zero')
+    if not math.isfinite(timeout_sec) or timeout_sec < 0.0:
+        raise ValueError('timeout_sec must be finite and non-negative')
+
+    deadline = None if timeout_sec == 0.0 else monotonic() + timeout_sec
+    while True:
+        if deadline is not None and monotonic() >= deadline:
+            raise TimeoutError('wait_move timed out')
+
+        state = poll_motion_state(motion_id)
+        if deadline is not None and monotonic() >= deadline:
+            raise TimeoutError('wait_move timed out')
+        if state == 'FINISHED':
+            return
+        if state not in _WAIT_PENDING_STATES:
+            raise RuntimeError('unknown motion state: %s' % state)
+
+        sleep_sec = _WAIT_POLL_INTERVAL_SEC
+        if deadline is not None:
+            remaining_sec = deadline - monotonic()
+            if remaining_sec <= 0.0:
+                raise TimeoutError('wait_move timed out')
+            sleep_sec = min(sleep_sec, remaining_sec)
+        sleep(sleep_sec)
+
+
+def _poll_motion_state(connection, sdk_gate, motion_id):
+    with exclusive_access(sdk_gate):
+        return str(
+            _sdk_method(connection.robot, 'get_motion_state')(motion_id)
+        )
 
 
 def _stop_move(robot, request, response):
@@ -166,22 +277,23 @@ def _sdk_method(robot, name):
 def _motion_target(target):
     if target.is_joint_pose:
         return _float_list(target.joint_positions)
-    return _cartesian_pose(target.cartesian_pose)
-
-
-def _cartesian_pose(pose):
-    return {
-        'x': float(pose.x),
-        'y': float(pose.y),
-        'z': float(pose.z),
-        'rx': float(pose.rx),
-        'ry': float(pose.ry),
-        'rz': float(pose.rz),
-    }
+    return pose_to_sdk(target.cartesian_pose)
 
 
 def _float_list(values):
     return [float(value) for value in values]
+
+
+def _validated_pvat_array(values, field_name):
+    converted = _float_list(values)
+    joint_count = len(DEFAULT_JOINT_NAMES)
+    if len(converted) != joint_count:
+        raise ValueError(
+            '%s must contain exactly %d values' % (field_name, joint_count)
+        )
+    if any(not math.isfinite(value) for value in converted):
+        raise ValueError('%s values must be finite' % field_name)
+    return converted
 
 
 def _motion_id(value):

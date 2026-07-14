@@ -30,13 +30,20 @@ controller access goes through released `pylebai`.
 
 ## Verification
 
+Run the canonical linter gate from this repository root:
+
+```bash
+PYTHONNOUSERSITE=1 ./scripts/run-linters.sh
+```
+
 Run workspace builds and tests from the workspace root, not from this repository
 directory:
 
 ```bash
 cd /path/to/lebai_ws
 source /opt/ros/${ROS_DISTRO:-humble}/setup.bash
-colcon build --packages-select lebai_interfaces lebai_driver lebai_tutorials --symlink-install
+rosdep install --from-paths src --ignore-src --rosdistro "${ROS_DISTRO:-humble}" -y --skip-keys pylebai
+colcon build --symlink-install
 source install/setup.bash
 python3 -m pytest src/lebai-ros-sdk/lebai_driver/test -q -m "not integration and not linter"
 ```
