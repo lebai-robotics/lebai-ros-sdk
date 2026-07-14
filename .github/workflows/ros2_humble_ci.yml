@@ -51,6 +51,7 @@ jobs:
             python3-pytest \
             python3-rosdep \
             python3-vcstool
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
