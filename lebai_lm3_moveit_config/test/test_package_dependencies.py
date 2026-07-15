@@ -40,6 +40,7 @@ EXPECTED_RUNTIME_DEPENDENCIES = {
     "moveit_ros_visualization",
     "moveit_simple_controller_manager",
     "python3-yaml",
+    "rclpy",
     "robot_state_publisher",
     "rviz2",
     "rviz_default_plugins",
@@ -68,6 +69,7 @@ IMPORT_DEPENDENCIES = {
     "ament_index_python": "ament_index_python",
     "launch": "launch",
     "launch_ros": "launch_ros",
+    "rclpy": "rclpy",
     "xacro": "xacro",
     "yaml": "python3-yaml",
 }
