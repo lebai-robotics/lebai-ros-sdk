@@ -13,10 +13,17 @@
 # limitations under the License.
 
 import os
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+
 import yaml
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+from launch.actions import OpaqueFunction
+from launch.actions import RegisterEventHandler
+from launch.actions import SetLaunchConfiguration
+from launch.event_handlers import OnProcessExit, OnShutdown
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
@@ -24,7 +31,133 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
+from rclpy.validate_namespace import validate_namespace
 import xacro
+
+
+_MOVEIT_RVIZ_DISPLAY_CLASSES = {
+    "moveit_rviz_plugin/MotionPlanning",
+    "moveit_rviz_plugin/PlanningScene",
+}
+_GENERATED_RVIZ_CONFIG_KEY = "_lebai_moveit_rviz_config"
+
+
+def _move_group_namespace(namespace):
+    normalized_namespace = (
+        namespace if namespace.startswith("/") else f"/{namespace}"
+    )
+    validate_namespace(normalized_namespace)
+    return "" if normalized_namespace == "/" else normalized_namespace
+
+
+def _set_move_group_namespace(value, namespace, found_classes):
+    if isinstance(value, dict):
+        display_class = value.get("Class")
+        if display_class in _MOVEIT_RVIZ_DISPLAY_CLASSES:
+            if "Move Group Namespace" not in value:
+                raise ValueError(
+                    f"RViz display {display_class!r} lacks "
+                    "'Move Group Namespace'"
+                )
+            value["Move Group Namespace"] = namespace
+            found_classes.add(display_class)
+
+        for nested_value in value.values():
+            _set_move_group_namespace(
+                nested_value,
+                namespace,
+                found_classes,
+            )
+    elif isinstance(value, list):
+        for nested_value in value:
+            _set_move_group_namespace(
+                nested_value,
+                namespace,
+                found_classes,
+            )
+
+
+def _prepare_rviz_config(context, rviz_config_path, rviz_nodes):
+    temporary_path = None
+    try:
+        namespace = _move_group_namespace(
+            LaunchConfiguration("namespace").perform(context)
+        )
+        with rviz_config_path.open("r", encoding="utf-8") as config_file:
+            rviz_config = yaml.safe_load(config_file)
+
+        if not isinstance(rviz_config, dict):
+            raise ValueError("RViz config root must be a mapping")
+
+        visualization_manager = rviz_config.get("Visualization Manager")
+        if not isinstance(visualization_manager, dict):
+            raise ValueError(
+                "RViz config 'Visualization Manager' must be a mapping"
+            )
+
+        displays = visualization_manager.get("Displays")
+        if not isinstance(displays, list):
+            raise ValueError(
+                "RViz config 'Visualization Manager.Displays' must be a list"
+            )
+
+        found_classes = set()
+        _set_move_group_namespace(
+            displays,
+            namespace,
+            found_classes,
+        )
+        missing_classes = _MOVEIT_RVIZ_DISPLAY_CLASSES - found_classes
+        if missing_classes:
+            missing_list = ", ".join(sorted(missing_classes))
+            raise ValueError(f"RViz config is missing displays: {missing_list}")
+
+        with NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            suffix=".rviz",
+            delete=False,
+        ) as temporary_file:
+            temporary_path = Path(temporary_file.name)
+            yaml.safe_dump(
+                rviz_config,
+                temporary_file,
+                sort_keys=False,
+            )
+
+        def remove_temporary_config(_event, _context):
+            try:
+                temporary_path.unlink()
+            except FileNotFoundError:
+                pass
+
+        return [
+            SetLaunchConfiguration(
+                _GENERATED_RVIZ_CONFIG_KEY,
+                str(temporary_path),
+            ),
+            *[
+                RegisterEventHandler(
+                    OnProcessExit(
+                        target_action=rviz_node,
+                        on_exit=remove_temporary_config,
+                    )
+                )
+                for rviz_node in rviz_nodes
+            ],
+            RegisterEventHandler(
+                OnShutdown(on_shutdown=remove_temporary_config)
+            ),
+        ]
+    except Exception as error:
+        if temporary_path is not None:
+            try:
+                temporary_path.unlink()
+            except FileNotFoundError:
+                pass
+        raise RuntimeError(
+            f"Failed to prepare namespaced RViz config: {error}"
+        ) from error
 
 
 def load_file(package_name, file_path):
@@ -264,8 +397,11 @@ def generate_launch_description():
 
     # # RViz
     # tutorial_mode = LaunchConfiguration("rviz_tutorial")
-    rviz_base = os.path.join(get_package_share_directory("lebai_lm3_moveit_config"), "launch")
-    rviz_full_config = os.path.join(rviz_base, "moveit.rviz")
+    rviz_base = Path(
+        get_package_share_directory("lebai_lm3_moveit_config")
+    ) / "launch"
+    canonical_rviz_config = rviz_base / "moveit.rviz"
+    rviz_full_config = LaunchConfiguration(_GENERATED_RVIZ_CONFIG_KEY)
     # rviz_empty_config = os.path.join(rviz_base, "moveit_empty.rviz")
     # rviz_node_tutorial = Node(
     #     package="rviz2",
@@ -315,6 +451,13 @@ def generate_launch_description():
         planning_scene_monitor_parameters,
         rviz_full_config,
     )
+    prepare_rviz_config = OpaqueFunction(
+        function=_prepare_rviz_config,
+        args=[
+            canonical_rviz_config,
+            [gripper_nodes[2], arm_nodes[2]],
+        ],
+    )
 
     # Static TF
     static_tf = Node(
@@ -332,6 +475,7 @@ def generate_launch_description():
             simulator_arg,
             namespace_arg,
             has_gripper_arg,
+            prepare_rviz_config,
             static_tf,
             *gripper_nodes,
             *arm_nodes,
