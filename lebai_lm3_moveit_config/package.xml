@@ -16,6 +16,7 @@
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
   <exec_depend>xacro</exec_depend>
   <exec_depend>lebai_driver</exec_depend>
   <exec_depend>lebai_lm3_support</exec_depend>
