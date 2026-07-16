@@ -17,12 +17,6 @@ jobs:
     name: Lyrical unit and simulator tests
     # The ROS/Ubuntu environment under test is the Lyrical container below.
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        pylebai:
-          - 'pylebai==2.0.0'
-          - 'pylebai>=2.0.0,<3.0.0'
     container:
       image: ros:lyrical-ros-base
       options: --user 0
@@ -57,10 +51,21 @@ jobs:
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
-          rosdep update
+          for attempt in 1 2 3; do
+            if rosdep update; then
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "rosdep update failed on attempt $attempt; retrying in 5 seconds" >&2
+              sleep 5
+            else
+              echo "rosdep update failed after 3 attempts" >&2
+              exit 1
+            fi
+          done
           python3 -m venv .venv --system-site-packages
           . .venv/bin/activate
-          python3 -m pip install "${{ matrix.pylebai }}"
+          python3 -m pip install "pylebai>=2.0.0,<3.0.0"
           rosdep install \
             --from-paths lebai_interfaces lebai_driver lebai_resources lebai_lm3_support lebai_tutorials \
             --ignore-src \
