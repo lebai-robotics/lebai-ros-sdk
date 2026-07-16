@@ -16,12 +16,6 @@ jobs:
   humble:
     name: Humble unit and simulator tests
     runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        pylebai:
-          - 'pylebai==2.0.0'
-          - 'pylebai>=2.0.0,<3.0.0'
     container:
       image: ros:humble-ros-base
       options: --user 0
@@ -55,8 +49,18 @@ jobs:
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
             rosdep init
           fi
-          rosdep update
-          python3 -m pip install "${{ matrix.pylebai }}"
+          for attempt in 1 2 3; do
+            if rosdep update; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "rosdep update failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "rosdep update failed on attempt $attempt; retrying in 5 seconds" >&2
+            sleep 5
+          done
+          python3 -m pip install "pylebai>=2.0.0,<3.0.0"
           rosdep install \
             --from-paths . \
             --ignore-src \
