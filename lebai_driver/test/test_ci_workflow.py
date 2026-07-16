@@ -88,6 +88,18 @@ def test_ci_installs_latest_compatible_released_pylebai():
     assert 'matrix.pylebai' not in install
 
 
+def test_install_dependencies_enables_strict_shell_error_handling():
+    assert _install_script().startswith('set -eo pipefail\n')
+
+
+def test_rosdep_update_stops_after_success():
+    result = _run_rosdep_retry(failures=0)
+
+    assert result.returncode == 0
+    assert result.stdout.splitlines() == ['attempt=1']
+    assert result.stderr == ''
+
+
 def test_rosdep_update_retries_twice_before_succeeding():
     result = _run_rosdep_retry(failures=2)
 
