@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from pathlib import Path
+import subprocess
 
 import pytest
 import yaml
@@ -26,9 +27,105 @@ WORKFLOW_PATH = next(
 
 
 def _workflow_steps():
+    return _workflow_job()['steps']
+
+
+def _workflow_job():
     workflow = yaml.safe_load(WORKFLOW_PATH.read_text(encoding='utf-8'))
-    job = next(iter(workflow['jobs'].values()))
-    return job['steps']
+    return next(iter(workflow['jobs'].values()))
+
+
+def _install_script():
+    steps = {step.get('name'): step for step in _workflow_steps()}
+    return steps['Install dependencies']['run']
+
+
+def _rosdep_retry_script():
+    install = _install_script()
+    start_marker = 'for attempt in 1 2 3; do'
+    assert start_marker in install, 'rosdep update must have a bounded retry loop'
+    start = install.index(start_marker)
+    end = install.index('\ndone', start) + len('\ndone')
+    return install[start:end]
+
+
+def _run_rosdep_retry(failures):
+    script = f'''\
+set -eo pipefail
+call_count=0
+rosdep() {{
+  call_count=$((call_count + 1))
+  printf 'attempt=%s\\n' "$call_count"
+  if [ "$call_count" -le {failures} ]; then
+    return 1
+  fi
+}}
+sleep() {{
+  printf 'sleep=%s\\n' "$1"
+}}
+{_rosdep_retry_script()}
+'''
+    return subprocess.run(
+        ['bash'],
+        input=script,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def test_ci_has_one_job_without_a_pylebai_version_matrix():
+    workflow = yaml.safe_load(WORKFLOW_PATH.read_text(encoding='utf-8'))
+
+    assert len(workflow['jobs']) == 1
+    assert 'strategy' not in _workflow_job()
+
+
+def test_ci_installs_latest_compatible_released_pylebai():
+    install = _install_script()
+
+    assert 'python3 -m pip install "pylebai>=2.0.0,<3.0.0"' in install
+    assert 'matrix.pylebai' not in install
+
+
+def test_install_dependencies_enables_strict_shell_error_handling():
+    assert _install_script().startswith('set -eo pipefail\n')
+
+
+def test_rosdep_update_stops_after_success():
+    result = _run_rosdep_retry(failures=0)
+
+    assert result.returncode == 0
+    assert result.stdout.splitlines() == ['attempt=1']
+    assert result.stderr == ''
+
+
+def test_rosdep_update_retries_twice_before_succeeding():
+    result = _run_rosdep_retry(failures=2)
+
+    assert result.returncode == 0
+    assert result.stdout.splitlines() == [
+        'attempt=1',
+        'sleep=5',
+        'attempt=2',
+        'sleep=5',
+        'attempt=3',
+    ]
+    assert result.stderr.count('retrying in 5 seconds') == 2
+
+
+def test_rosdep_update_exits_after_the_third_failure():
+    result = _run_rosdep_retry(failures=3)
+
+    assert result.returncode != 0
+    assert result.stdout.splitlines() == [
+        'attempt=1',
+        'sleep=5',
+        'attempt=2',
+        'sleep=5',
+        'attempt=3',
+    ]
+    assert 'rosdep update failed after 3 attempts' in result.stderr
 
 
 def test_container_trusts_checked_out_workspace_before_linting():
