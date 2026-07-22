@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>话题 Topics &mdash; Lebai ROS2 SDK 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=4ba62e59"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/translations.js?v=beaddf03"></script>
+        <script src="../_static/version-switcher.js?v=5e7e00d0"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="服务 Services" href="services.html" />
+    <link rel="prev" title="节点和参数" href="../architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lebai-ros-sdk
+          </a>
+              <div class="version">
+                ROS2 Jazzy
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">节点和参数</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">话题 Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">服务 Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">话题 Topics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/interfaces/topics.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="topics">
+<h1>话题 Topics<a class="headerlink" href="#topics" title="Link to this heading"></a></h1>
+<p>以下表格是当前 runtime 的完整 topic 清单。除 TF 外，topic 名称在 node 中是
+相对名称，并在默认 <code class="docutils literal notranslate"><span class="pre">/lebai</span></code> 命名空间下解析为表中路径。修改 <code class="docutils literal notranslate"><span class="pre">namespace</span></code>
+启动参数后，这些 topic 的前缀会随之变化。</p>
+<section id="id1">
+<h2>机器人状态<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Topic</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/status/robot</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/RobotState</span></code></p></td>
+<td><p>读取控制器状态、急停原因和连接状态。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_states</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code></p></td>
+<td><p>读取机器人本体关节位置、速度和力矩。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_motion</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/JointMotion</span></code></p></td>
+<td><p>读取实际和目标关节/TCP 运动数据。</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">JointMotion</span></code> 的 <code class="docutils literal notranslate"><span class="pre">actual_tcp_pose</span></code>、<code class="docutils literal notranslate"><span class="pre">target_tcp_pose</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">actual_flange_pose</span></code> 字段均为 <code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Pose</span></code>。位置使用
+<code class="docutils literal notranslate"><span class="pre">position</span></code>，姿态使用归一化四元数 <code class="docutils literal notranslate"><span class="pre">orientation</span></code>；驱动会按控制器的
+Euler ZYX 定义 <code class="docutils literal notranslate"><span class="pre">Rz(rz)</span> <span class="pre">*</span> <span class="pre">Ry(ry)</span> <span class="pre">*</span> <span class="pre">Rx(rx)</span></code> 转换 <code class="docutils literal notranslate"><span class="pre">rx</span></code>、<code class="docutils literal notranslate"><span class="pre">ry</span></code>、<code class="docutils literal notranslate"><span class="pre">rz</span></code>。</p>
+<p><code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_states</span></code> 和 <code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_motion</span></code> 使用固定的
+机械臂关节顺序 <code class="docutils literal notranslate"><span class="pre">joint_1</span></code> 到 <code class="docutils literal notranslate"><span class="pre">joint_6</span></code>；这些名称不是运行时参数。</p>
+<p>常用命令：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/status/robot
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/status/joint_states
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/status/joint_motion
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>机器人模型<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Topic</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/model/joint_states</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code></p></td>
+<td><p>给 <code class="docutils literal notranslate"><span class="pre">robot_state_publisher</span></code> 使用的组合关节状态。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/robot_description</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">std_msgs/msg/String</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">robot_state_publisher</span></code> 以 transient-local QoS 发布的 URDF 描述。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/tf</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tf2_msgs/msg/TFMessage</span></code></p></td>
+<td><p>机器人动态 TF。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/tf_static</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tf2_msgs/msg/TFMessage</span></code></p></td>
+<td><p>机器人静态 TF。</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">/lebai/model/joint_states</span></code> 会包含机器人本体关节和 claw 映射出的 gripper
+源关节，用于 RViz 显示。</p>
+<p>默认 <code class="docutils literal notranslate"><span class="pre">driver.launch.py</span></code> 在驱动命名空间中启动
+<code class="docutils literal notranslate"><span class="pre">robot_state_publisher</span></code>，由该 node 发布相对 topic
+<code class="docutils literal notranslate"><span class="pre">robot_description</span></code>；默认路径因此是 <code class="docutils literal notranslate"><span class="pre">/lebai/robot_description</span></code>。只有
+<code class="docutils literal notranslate"><span class="pre">publish_robot_description:=true</span></code> 时才会启动该 node 并发布这个
+transient-local URDF topic；设为 <code class="docutils literal notranslate"><span class="pre">false</span></code> 时该 topic 不存在。</p>
+<p><code class="docutils literal notranslate"><span class="pre">/tf</span></code> 和 <code class="docutils literal notranslate"><span class="pre">/tf_static</span></code> 是 ROS 2 标准全局传输，不随驱动 <code class="docutils literal notranslate"><span class="pre">namespace</span></code>
+添加前缀。命名空间也不会自动修改 <code class="docutils literal notranslate"><span class="pre">world</span></code>、<code class="docutils literal notranslate"><span class="pre">base_link</span></code> 等 frame ID；
+同时运行多套模型时需要由系统集成方规划 frame 命名。</p>
+</section>
+<section id="io">
+<h2>IO 状态<a class="headerlink" href="#io" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Topic</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/state</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/IOState</span></code></p></td>
+<td><p>读取指定设备的 IO 快照。</p></td>
+</tr>
+</tbody>
+</table>
+<p>启动时需要设置 IO device 和数量参数，否则该 topic 不会轮询具体引脚：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_driver<span class="w"> </span>driver.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>io_state_device:<span class="o">=</span>ROBOT<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>io_state_digital_input_count:<span class="o">=</span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>io_state_digital_output_count:<span class="o">=</span><span class="m">8</span>
+</pre></div>
+</div>
+<p>当前参数是字符串。请使用 released SDK 的大写规范名；未知值或小写值可能
+回退到 <code class="docutils literal notranslate"><span class="pre">ROBOT</span></code>。强类型 device enum 仍需要协调 SDK 和 ROS 接口发布。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/io/state
+</pre></div>
+</div>
+</section>
+<section id="claw">
+<h2>Claw 状态<a class="headerlink" href="#claw" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Topic</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/state</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/ClawState</span></code></p></td>
+<td><p>读取机器人内置 claw 的力、开合幅度和保持状态。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/joint_states</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sensor_msgs/msg/JointState</span></code></p></td>
+<td><p>读取 claw 幅度映射出的单关节状态。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/claw/state
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/claw/joint_states
+</pre></div>
+</div>
+</section>
+<section id="gripper">
+<h2>独立 gripper 状态<a class="headerlink" href="#gripper" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Topic</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/state</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/GripperState</span></code></p></td>
+<td><p>读取独立串口 gripper 的位置、力、速度和标定状态。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/gripper/state
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="../architecture.html" class="btn btn-neutral float-left" title="节点和参数" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="services.html" class="btn btn-neutral float-right" title="服务 Services" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2026, Lebai Robotics。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+[
+  {
+    "label": "ROS2 Humble",
+    "path": "humble",
+    "branch": "humble-dev",
+    "status": "active",
+    "ubuntu": "22.04"
+  },
+  {
+    "label": "ROS2 Jazzy",
+    "path": "jazzy",
+    "branch": "jazzy-dev",
+    "status": "active",
+    "ubuntu": "24.04"
+  },
+  {
+    "label": "ROS2 Lyrical",
+    "path": "lyrical",
+    "branch": "lyrical-dev",
+    "status": "active",
+    "ubuntu": "26.04"
+  },
+  {
+    "label": "ROS Noetic",
+    "path": "noetic",
+    "branch": "noetic-dev",
+    "status": "legacy"
+  },
+  {
+    "label": "ROS2 Galactic",
+    "path": "galactic",
+    "branch": "galactic-dev",
+    "status": "legacy"
+  },
+  {
+    "label": "ROS Melodic",
+    "path": "melodic",
+    "branch": "melodic-dev",
+    "status": "legacy"
+  }
+]

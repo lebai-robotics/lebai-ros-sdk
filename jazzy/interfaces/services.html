@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>服务 Services &mdash; Lebai ROS2 SDK 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=4ba62e59"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/translations.js?v=beaddf03"></script>
+        <script src="../_static/version-switcher.js?v=5e7e00d0"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="MoveIt" href="../moveit.html" />
+    <link rel="prev" title="话题 Topics" href="topics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lebai-ros-sdk
+          </a>
+              <div class="version">
+                ROS2 Jazzy
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topics.html">话题 Topics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">服务 Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">服务 Services</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/interfaces/services.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="services">
+<h1>服务 Services<a class="headerlink" href="#services" title="Link to this heading"></a></h1>
+<p>以下表格是当前 runtime 的完整 service 清单，使用默认 <code class="docutils literal notranslate"><span class="pre">/lebai</span></code> 命名空间。
+名称在 node 中是相对名称；修改对应 launch 的 <code class="docutils literal notranslate"><span class="pre">namespace</span></code> 参数后，前缀会
+随之变化。每个响应都包含 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/msg/Result</span></code>：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>bool success
+int32 code
+string message
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">success</span></code> 为 <code class="docutils literal notranslate"><span class="pre">true</span></code> 表示调用成功。调用失败时，<code class="docutils literal notranslate"><span class="pre">message</span></code> 会包含错误信息。</p>
+<section id="start-stop">
+<h2>启动停止 start_stop<a class="headerlink" href="#start-stop" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/start_sys</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>启动系统。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/stop_sys</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>停止系统。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/powerdown</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>关机。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/stop</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>停止机器人。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/estop</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>急停。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/start_teach_mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>进入示教模式。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/end_teach_mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>退出示教模式。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/pause_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>暂停运动。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/resume_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>恢复运动。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/reboot</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>重启控制器。</p></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/start_sys<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/stop_sys<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/powerdown<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/stop<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/estop<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/start_teach_mode<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/end_teach_mode<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/pause_move<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/resume_move<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/start_stop/reboot<span class="w"> </span>lebai_interfaces/srv/Command
+</pre></div>
+</div>
+</section>
+<section id="motion">
+<h2>运动 motion<a class="headerlink" href="#motion" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/movej</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/MoveJoint</span></code></p></td>
+<td><p>关节运动。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/movel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/MoveLinear</span></code></p></td>
+<td><p>直线运动。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/movec</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/MoveCircular</span></code></p></td>
+<td><p>圆弧运动。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/speedj</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SpeedJoint</span></code></p></td>
+<td><p>关节速度控制。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/speedl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SpeedLinear</span></code></p></td>
+<td><p>TCP 速度控制。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/move_pvat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/MovePvat</span></code></p></td>
+<td><p>PVAT 运动。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/wait_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/WaitMove</span></code></p></td>
+<td><p>等待指定运动完成。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/stop_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>停止当前运动。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/skip_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>跳过当前运动。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/get_running_motion</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetRunningMotion</span></code></p></td>
+<td><p>获取当前运动 ID。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/motion/get_motion_state</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetMotionState</span></code></p></td>
+<td><p>获取指定运动状态。</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">MotionTarget.cartesian_pose</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SpeedLinear.reference</span></code> 使用
+<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Pose</span></code>。<code class="docutils literal notranslate"><span class="pre">SpeedLinear.velocity</span></code> 使用
+<code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/Twist</span></code>：<code class="docutils literal notranslate"><span class="pre">linear</span></code> 对应 TCP 线速度，<code class="docutils literal notranslate"><span class="pre">angular</span></code> 对应
+角速度。所有 <code class="docutils literal notranslate"><span class="pre">Pose.orientation</span></code> 都必须是有限的非零四元数；驱动会先
+归一化，再按控制器的 Euler ZYX 定义
+<code class="docutils literal notranslate"><span class="pre">Rz(rz)</span> <span class="pre">*</span> <span class="pre">Ry(ry)</span> <span class="pre">*</span> <span class="pre">Rx(rx)</span></code> 转换。</p>
+<p><code class="docutils literal notranslate"><span class="pre">MovePvat</span></code> 的 <code class="docutils literal notranslate"><span class="pre">positions</span></code>、<code class="docutils literal notranslate"><span class="pre">velocities</span></code> 和 <code class="docutils literal notranslate"><span class="pre">accelerations</span></code> 必须各含
+6 个有限数值，<code class="docutils literal notranslate"><span class="pre">duration</span></code> 必须是大于零的有限秒数。无效请求会在进入
+<code class="docutils literal notranslate"><span class="pre">pylebai</span></code> 前返回失败。</p>
+<p><code class="docutils literal notranslate"><span class="pre">WaitMove.motion_id</span></code> 必须大于 0；ID 0 的“等待整个运动缓冲区”语义不能用
+非阻塞状态查询等价实现，因此会被拒绝。<code class="docutils literal notranslate"><span class="pre">timeout_sec</span></code> 为 0 时无限等待，
+大于 0 时使用单调时钟限制最长等待秒数。驱动每 0.05 秒查询一次运动状态，
+不会调用阻塞式 SDK <code class="docutils literal notranslate"><span class="pre">wait_move</span></code>，因此等待期间仍可处理 <code class="docutils literal notranslate"><span class="pre">stop_move</span></code> 和
+急停请求。同一驱动实例仅允许一个活动的等待请求，并发等待会立即返回失败，
+避免耗尽执行器线程。超时、无效参数、未知状态或后端错误都会返回失败结果。</p>
+<p>关节运动示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/movej<span class="w"> </span>lebai_interfaces/srv/MoveJoint<span class="w"> </span><span class="s2">&quot;{</span>
+<span class="s2">  target: {</span>
+<span class="s2">    is_joint_pose: true,</span>
+<span class="s2">    joint_positions: [0.0, -0.5, 0.5, 0.0, 0.5, 0.0]</span>
+<span class="s2">  },</span>
+<span class="s2">  params: {</span>
+<span class="s2">    acceleration: 0.5,</span>
+<span class="s2">    velocity: 0.5,</span>
+<span class="s2">    time: 0.0,</span>
+<span class="s2">    blend_radius: 0.0</span>
+<span class="s2">  }</span>
+<span class="s2">}&quot;</span>
+</pre></div>
+</div>
+<p>直线运动示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/movel<span class="w"> </span>lebai_interfaces/srv/MoveLinear<span class="w"> </span><span class="s2">&quot;{</span>
+<span class="s2">  target: {</span>
+<span class="s2">    is_joint_pose: false,</span>
+<span class="s2">    cartesian_pose: {</span>
+<span class="s2">      position: {x: 0.3, y: 0.0, z: 0.4},</span>
+<span class="s2">      orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}</span>
+<span class="s2">    }</span>
+<span class="s2">  },</span>
+<span class="s2">  params: {</span>
+<span class="s2">    acceleration: 0.5,</span>
+<span class="s2">    velocity: 0.2,</span>
+<span class="s2">    time: 0.0,</span>
+<span class="s2">    blend_radius: 0.0</span>
+<span class="s2">  }</span>
+<span class="s2">}&quot;</span>
+</pre></div>
+</div>
+<p>圆弧、速度和 PVAT 运动示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/movec<span class="w"> </span>lebai_interfaces/srv/MoveCircular<span class="w"> </span><span class="s2">&quot;{via: {is_joint_pose: true, joint_positions: [0.0, -0.4, 0.4, 0.0, 0.4, 0.0]}, target: {is_joint_pose: true, joint_positions: [0.0, -0.5, 0.5, 0.0, 0.5, 0.0]}, rad: 1.5708, params: {acceleration: 0.5, velocity: 0.2, time: 0.0, blend_radius: 0.0}}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/speedj<span class="w"> </span>lebai_interfaces/srv/SpeedJoint<span class="w"> </span><span class="s2">&quot;{acceleration: 0.5, velocities: [0.1, 0.0, 0.0, 0.0, 0.0, 0.0], time: 1.0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/speedl<span class="w"> </span>lebai_interfaces/srv/SpeedLinear<span class="w"> </span><span class="s2">&quot;{acceleration: 0.5, velocity: {linear: {x: 0.01, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}, time: 1.0, reference: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/move_pvat<span class="w"> </span>lebai_interfaces/srv/MovePvat<span class="w"> </span><span class="s2">&quot;{positions: [0.0, -0.5, 0.5, 0.0, 0.5, 0.0], velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], accelerations: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], duration: 0.1}&quot;</span>
+</pre></div>
+</div>
+<p>运动控制和状态查询示例（将 <code class="docutils literal notranslate"><span class="pre">motion_id</span></code> 替换为运动 service 返回的 ID）：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/wait_move<span class="w"> </span>lebai_interfaces/srv/WaitMove<span class="w"> </span><span class="s2">&quot;{motion_id: 1, timeout_sec: 5.0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/stop_move<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/skip_move<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/get_running_motion<span class="w"> </span>lebai_interfaces/srv/GetRunningMotion
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/motion/get_motion_state<span class="w"> </span>lebai_interfaces/srv/GetMotionState<span class="w"> </span><span class="s2">&quot;{motion_id: 1}&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="led-signal">
+<h2>LED 和 signal<a class="headerlink" href="#led-signal" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/led/set_led</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetLed</span></code></p></td>
+<td><p>设置控制器 LED。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/signal/get_signals</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetSignals</span></code></p></td>
+<td><p>读取连续 signal 值。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/signal/set_signals</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetSignals</span></code></p></td>
+<td><p>写入连续 signal 值。</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">SetLed.mode</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">MODE_UNCHANGED</span></code>、<code class="docutils literal notranslate"><span class="pre">MODE_OFF</span></code>、<code class="docutils literal notranslate"><span class="pre">MODE_STEADY</span></code>、
+<code class="docutils literal notranslate"><span class="pre">MODE_BREATH</span></code>、<code class="docutils literal notranslate"><span class="pre">MODE_ROTATE_SEGMENTED</span></code>、<code class="docutils literal notranslate"><span class="pre">MODE_ROTATE_SOLID</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">MODE_FLASH</span></code>，对应数值范围 0 至 6。<code class="docutils literal notranslate"><span class="pre">SetLed.speed</span></code> 使用
+<code class="docutils literal notranslate"><span class="pre">SPEED_UNSPECIFIED</span></code>、<code class="docutils literal notranslate"><span class="pre">SPEED_FAST</span></code>、<code class="docutils literal notranslate"><span class="pre">SPEED_NORMAL</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SPEED_SLOW</span></code>，
+对应数值范围 0 至 3；数值 0 表示控制器/protobuf 的未指定速度，不是快速、
+正常或慢速，数值 1、2、3 分别表示快速、正常、慢速。<code class="docutils literal notranslate"><span class="pre">color</span></code> 可含 0 至 4
+个数值为 0 至 15 的调色板索引。</p>
+<p>LED 参数不满足上述范围时，驱动不会调用 SDK，并在 <code class="docutils literal notranslate"><span class="pre">Result</span></code> 中返回失败；
+设置成功时响应只包含成功的 <code class="docutils literal notranslate"><span class="pre">Result</span></code>。</p>
+<p><code class="docutils literal notranslate"><span class="pre">GetSignals.index</span></code> 是连续读取的起始 signal 索引，<code class="docutils literal notranslate"><span class="pre">length</span></code> 是读取数量，
+响应的 <code class="docutils literal notranslate"><span class="pre">values</span></code> 是 <code class="docutils literal notranslate"><span class="pre">int32</span></code> 数组。<code class="docutils literal notranslate"><span class="pre">SetSignals.index</span></code> 是连续写入的起始
+索引，<code class="docutils literal notranslate"><span class="pre">values</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">int32</span></code> 值按顺序写入。索引和读取数量是 <code class="docutils literal notranslate"><span class="pre">uint32</span></code>；
+驱动不增加额外范围限制，而由控制器检查实际 signal 范围。设置响应只包含
+<code class="docutils literal notranslate"><span class="pre">Result</span></code>，后端调用失败时返回失败。</p>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/led/set_led<span class="w"> </span>lebai_interfaces/srv/SetLed<span class="w"> </span><span class="s2">&quot;{mode: 2, speed: 0, color: [3]}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/signal/get_signals<span class="w"> </span>lebai_interfaces/srv/GetSignals<span class="w"> </span><span class="s2">&quot;{index: 0, length: 2}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/signal/set_signals<span class="w"> </span>lebai_interfaces/srv/SetSignals<span class="w"> </span><span class="s2">&quot;{index: 0, values: [100, -100]}&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="io">
+<h2>IO<a class="headerlink" href="#io" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/set_do</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetDigitalOutput</span></code></p></td>
+<td><p>设置数字输出。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_di</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetDigitalInput</span></code></p></td>
+<td><p>读取数字输入。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_do</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetDigitalOutput</span></code></p></td>
+<td><p>读取数字输出。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/set_dos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetDigitalOutputs</span></code></p></td>
+<td><p>连续设置多个数字输出。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_dis</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetDigitalInputs</span></code></p></td>
+<td><p>连续读取多个数字输入。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_dos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetDigitalOutputs</span></code></p></td>
+<td><p>连续读取多个数字输出。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/set_ao</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetAnalogOutput</span></code></p></td>
+<td><p>设置模拟输出。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_ai</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetAnalogInput</span></code></p></td>
+<td><p>读取模拟输入。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_ao</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetAnalogOutput</span></code></p></td>
+<td><p>读取模拟输出。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/set_aos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetAnalogOutputs</span></code></p></td>
+<td><p>连续设置多个模拟输出。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_ais</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetAnalogInputs</span></code></p></td>
+<td><p>连续读取多个模拟输入。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_aos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetAnalogOutputs</span></code></p></td>
+<td><p>连续读取多个模拟输出。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/set_dio_mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetDioMode</span></code></p></td>
+<td><p>设置 DIO 模式。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/io/get_dio_mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetDioMode</span></code></p></td>
+<td><p>读取 DIO 模式。</p></td>
+</tr>
+</tbody>
+</table>
+<p>批量 IO 请求使用 <code class="docutils literal notranslate"><span class="pre">device</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pin</span></code> 指定设备与连续范围的起始引脚。
+<code class="docutils literal notranslate"><span class="pre">SetDigitalOutputs.values</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SetAnalogOutputs.values</span></code> 按引脚顺序写入；
+<code class="docutils literal notranslate"><span class="pre">GetDigitalInputs</span></code>、<code class="docutils literal notranslate"><span class="pre">GetDigitalOutputs</span></code>、<code class="docutils literal notranslate"><span class="pre">GetAnalogInputs</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">GetAnalogOutputs</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">num</span></code> 指定读取数量，并分别在 <code class="docutils literal notranslate"><span class="pre">values</span></code> 中返回
+<code class="docutils literal notranslate"><span class="pre">bool</span></code> 或 <code class="docutils literal notranslate"><span class="pre">float64</span></code> 数组。<code class="docutils literal notranslate"><span class="pre">pin</span></code> 和 <code class="docutils literal notranslate"><span class="pre">num</span></code> 是 <code class="docutils literal notranslate"><span class="pre">uint32</span></code>。ROS 驱动将
+<code class="docutils literal notranslate"><span class="pre">device</span></code> 字符串原样传给 SDK；released lebai-sdk 使用大写规范名
+<code class="docutils literal notranslate"><span class="pre">ROBOT</span></code>、<code class="docutils literal notranslate"><span class="pre">FLANGE</span></code>、<code class="docutils literal notranslate"><span class="pre">EXTRA</span></code>、<code class="docutils literal notranslate"><span class="pre">ROBOT_BTN</span></code>、<code class="docutils literal notranslate"><span class="pre">SHOULDER</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">FLANGE_BTN</span></code>。其他任何拼写（包括小写和拼写错误）都会映射到 <code class="docutils literal notranslate"><span class="pre">ROBOT</span></code>，
+而不是返回错误，因此调用方应始终使用大写规范名。驱动不增加 device 名称
+校验；控制器继续检查有效引脚范围。设置响应只包含 <code class="docutils literal notranslate"><span class="pre">Result</span></code>，后端调用失败
+时返回失败。</p>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/set_do<span class="w"> </span>lebai_interfaces/srv/SetDigitalOutput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, value: true}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_di<span class="w"> </span>lebai_interfaces/srv/GetDigitalInput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_do<span class="w"> </span>lebai_interfaces/srv/GetDigitalOutput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/set_dos<span class="w"> </span>lebai_interfaces/srv/SetDigitalOutputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, values: [true, false]}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_dis<span class="w"> </span>lebai_interfaces/srv/GetDigitalInputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, num: 2}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_dos<span class="w"> </span>lebai_interfaces/srv/GetDigitalOutputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, num: 2}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/set_ao<span class="w"> </span>lebai_interfaces/srv/SetAnalogOutput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, value: 1.0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_ai<span class="w"> </span>lebai_interfaces/srv/GetAnalogInput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_ao<span class="w"> </span>lebai_interfaces/srv/GetAnalogOutput<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/set_aos<span class="w"> </span>lebai_interfaces/srv/SetAnalogOutputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, values: [1.0, 2.0]}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_ais<span class="w"> </span>lebai_interfaces/srv/GetAnalogInputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, num: 2}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_aos<span class="w"> </span>lebai_interfaces/srv/GetAnalogOutputs<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, num: 2}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/set_dio_mode<span class="w"> </span>lebai_interfaces/srv/SetDioMode<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0, is_output: true}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/io/get_dio_mode<span class="w"> </span>lebai_interfaces/srv/GetDioMode<span class="w"> </span><span class="s2">&quot;{device: ROBOT, pin: 0}&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="config">
+<h2>配置 config<a class="headerlink" href="#config" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/config/load_tcp_list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/LoadResourceList</span></code></p></td>
+<td><p>读取控制器中的 TCP 名称列表。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/config/load_pose_list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/LoadResourceList</span></code></p></td>
+<td><p>读取控制器中的位姿名称列表。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/config/load_frame_list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/LoadResourceList</span></code></p></td>
+<td><p>读取控制器中的坐标系名称列表。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/config/load_trajectory_list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/LoadResourceList</span></code></p></td>
+<td><p>读取控制器中的轨迹名称列表。</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">directory</span></code> 是任意字符串，用于指定控制器上的资源目录；空字符串表示
+控制器默认的根目录，驱动不增加路径格式限制。响应的 <code class="docutils literal notranslate"><span class="pre">names</span></code> 是该目录下
+的名称字符串数组。SDK 调用失败时，响应的 <code class="docutils literal notranslate"><span class="pre">Result</span></code> 返回失败。</p>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/config/load_tcp_list<span class="w"> </span>lebai_interfaces/srv/LoadResourceList<span class="w"> </span><span class="s2">&quot;{directory: tools}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/config/load_pose_list<span class="w"> </span>lebai_interfaces/srv/LoadResourceList<span class="w"> </span><span class="s2">&quot;{directory: waypoints}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/config/load_frame_list<span class="w"> </span>lebai_interfaces/srv/LoadResourceList<span class="w"> </span><span class="s2">&quot;{directory: fixtures}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/config/load_trajectory_list<span class="w"> </span>lebai_interfaces/srv/LoadResourceList<span class="w"> </span><span class="s2">&quot;{directory: jobs}&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="claw">
+<h2>内置夹爪 claw<a class="headerlink" href="#claw" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/init_claw</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>初始化内置 claw。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/set_claw</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetClaw</span></code></p></td>
+<td><p>设置 claw 力和开合幅度。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/get_claw</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/GetClaw</span></code></p></td>
+<td><p>读取 claw 状态。</p></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/claw/init_claw<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/claw/set_claw<span class="w"> </span>lebai_interfaces/srv/SetClaw<span class="w"> </span><span class="s2">&quot;{amplitude: 40.0, force: 50.0}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/claw/get_claw<span class="w"> </span>lebai_interfaces/srv/GetClaw
+</pre></div>
+</div>
+</section>
+<section id="discovery">
+<h2>发现 discovery<a class="headerlink" href="#discovery" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/discovery/resolve</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/ResolveControllers</span></code></p></td>
+<td><p>发现局域网中的 Lebai 控制器。</p></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/discovery/resolve<span class="w"> </span>lebai_interfaces/srv/ResolveControllers
+</pre></div>
+</div>
+</section>
+<section id="gripper">
+<h2>独立夹爪 gripper<a class="headerlink" href="#gripper" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>类型</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/set_position</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetGripperPosition</span></code></p></td>
+<td><p>设置 gripper 位置。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/set_force</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetGripperForce</span></code></p></td>
+<td><p>设置 gripper 力。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/set_velocity</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/SetGripperVelocity</span></code></p></td>
+<td><p>设置 gripper 速度。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/do_calibration</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>执行标定。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/turn_on_auto_calibration</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>开启自动标定。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/lebai/gripper/turn_off_auto_calibration</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lebai_interfaces/srv/Command</span></code></p></td>
+<td><p>关闭自动标定。</p></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/set_position<span class="w"> </span>lebai_interfaces/srv/SetGripperPosition<span class="w"> </span><span class="s2">&quot;{position: 50}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/set_force<span class="w"> </span>lebai_interfaces/srv/SetGripperForce<span class="w"> </span><span class="s2">&quot;{force: 50}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/set_velocity<span class="w"> </span>lebai_interfaces/srv/SetGripperVelocity<span class="w"> </span><span class="s2">&quot;{velocity: 50, persistent: false}&quot;</span>
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/do_calibration<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/turn_on_auto_calibration<span class="w"> </span>lebai_interfaces/srv/Command
+ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/lebai/gripper/turn_off_auto_calibration<span class="w"> </span>lebai_interfaces/srv/Command
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="topics.html" class="btn btn-neutral float-left" title="话题 Topics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="../moveit.html" class="btn btn-neutral float-right" title="MoveIt" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2026, Lebai Robotics。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>安装 &mdash; Lebai ROS2 SDK 文档</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6dc4231a"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=beaddf03"></script>
+        <script src="_static/version-switcher.js?v=5e7e00d0"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="快速开始" href="quickstart.html" />
+    <link rel="prev" title="Lebai ROS2 SDK" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            lebai-ros-sdk
+          </a>
+              <div class="version">
+                ROS2 Humble
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/topics.html">话题 Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/services.html">服务 Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">安装</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/install.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>安装<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>环境要求<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>当前文档面向 Ubuntu 22.04 和 ROS2 Humble：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Ubuntu 22.04
+ROS2 Humble
+Python 3
+</pre></div>
+</div>
+<p>安装 ROS2 后，先加载 ROS 环境：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>创建工作空间<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/lebai_ws/src
+<span class="nb">cd</span><span class="w"> </span>~/lebai_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span>humble-dev<span class="w"> </span>https://github.com/lebai-robotics/lebai-ros-sdk.git
+<span class="nb">cd</span><span class="w"> </span>~/lebai_ws
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2>安装依赖<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>安装 Python SDK：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pylebai&gt;=2.0.0,&lt;3.0.0&quot;</span>
+</pre></div>
+</div>
+<p>安装 ROS 包依赖：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update
+rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span>--rosdistro<span class="w"> </span>humble<span class="w"> </span>-y<span class="w"> </span>--skip-keys<span class="w"> </span>pylebai
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h2>构建<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h2>检查安装<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>查看驱动 launch 文件：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_driver<span class="w"> </span>driver.launch.py<span class="w"> </span>--show-args
+</pre></div>
+</div>
+<p>查看可用接口：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>interface<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>lebai_interfaces
+</pre></div>
+</div>
+<p>安装后还可以确认三个驱动 launch、两个 MoveIt launch 和模型显示 launch：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_driver<span class="w"> </span>discovery.launch.py<span class="w"> </span>--show-args
+ros2<span class="w"> </span>launch<span class="w"> </span>lebai_driver<span class="w"> </span>serial_gripper.launch.py<span class="w"> </span>--show-args
+ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span>--show-args
+ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3_l1.launch.py<span class="w"> </span>--show-args
+ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_support<span class="w"> </span>standalone_lm3.launch.py<span class="w"> </span>--show-args
+</pre></div>
+</div>
+<p>完整的公开 launch 清单和用途见 <a class="reference internal" href="architecture.html"><span class="doc">节点和参数</span></a>。</p>
+</section>
+<section id="id7">
+<h2>常用包<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">lebai_driver</span></code></dt><dd><p>启动机器人驱动、控制器发现和独立 gripper 节点。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lebai_interfaces</span></code></dt><dd><p>提供 ROS2 message 和 service 类型。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lebai_tutorials</span></code></dt><dd><p>提供可直接运行的 Python 示例。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lebai_lm3_support</span></code></dt><dd><p>提供 LM3/LM3-L1 模型、资源和独立 RViz display launch。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lebai_lm3_moveit_config</span></code></dt><dd><p>提供 LM3/LM3-L1 的 MoveIt 规划、RViz 和执行 launch。</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="index.html" class="btn btn-neutral float-left" title="Lebai ROS2 SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="快速开始" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2026, Lebai Robotics。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

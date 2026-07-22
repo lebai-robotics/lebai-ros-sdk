@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lebai ROS2 SDK &mdash; Lebai ROS2 SDK 文档</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=4ba62e59"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=beaddf03"></script>
+        <script src="_static/version-switcher.js?v=5e7e00d0"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="安装" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            lebai-ros-sdk
+          </a>
+              <div class="version">
+                ROS2 Jazzy
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/topics.html">话题 Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/services.html">服务 Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Lebai ROS2 SDK</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lebai-ros2-sdk">
+<h1>Lebai ROS2 SDK<a class="headerlink" href="#lebai-ros2-sdk" title="Link to this heading"></a></h1>
+<p>本项目提供 Lebai 机器人 ROS2 驱动。用户可以在 ROS2 中连接真实控制器或
+本地仿真控制器，读取机器人状态，调用运动、IO、夹爪和发现服务，并在 RViz
+中显示机器人模型与 TF。</p>
+<p>你可以使用本驱动完成：</p>
+<ul class="simple">
+<li><p>启动机器人驱动节点。</p></li>
+<li><p>连接真实机器人控制器或本地仿真控制器。</p></li>
+<li><p>读取机器人状态、关节状态、IO 状态、claw 状态和 gripper 状态。</p></li>
+<li><p>调用 <code class="docutils literal notranslate"><span class="pre">start_stop</span></code>、<code class="docutils literal notranslate"><span class="pre">motion</span></code>、<code class="docutils literal notranslate"><span class="pre">io</span></code>、<code class="docutils literal notranslate"><span class="pre">claw</span></code>、<code class="docutils literal notranslate"><span class="pre">discovery</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">gripper</span></code> 服务。</p></li>
+<li><p>发布机器人模型和 TF，用于 RViz 显示。</p></li>
+<li><p>发现局域网中的 Lebai 控制器。</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">安装</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id2">环境要求</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id3">创建工作空间</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id4">安装依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id5">构建</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id6">检查安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#id7">常用包</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速开始</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id2">启动仿真控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id3">启动真实控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id4">查看机器人状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#tf">查看模型关节状态和 TF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id5">只显示模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id6">调用启停服务</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#claw">控制内置 claw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#io">控制 IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id7">启动控制器发现</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#gripper">启动独立 gripper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#id8">运行示例</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">节点和参数</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#id2">驱动节点</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#id3">常用参数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#id4">状态发布频率参数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#io">IO 状态参数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#tf">机器人模型和 TF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#launch">公开 launch 文件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#id5">发现节点</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#gripper">独立 gripper 节点</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/topics.html">话题 Topics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/topics.html#id1">机器人状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/topics.html#id2">机器人模型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/topics.html#io">IO 状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/topics.html#claw">Claw 状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/topics.html#gripper">独立 gripper 状态</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/services.html">服务 Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#start-stop">启动停止 start_stop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#motion">运动 motion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#led-signal">LED 和 signal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#io">IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#config">配置 config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#claw">内置夹爪 claw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#discovery">发现 discovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces/services.html#gripper">独立夹爪 gripper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="moveit.html">MoveIt</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="moveit.html#id1">准备工作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moveit.html#id2">启动 MoveIt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moveit.html#rviz">RViz 中的操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moveit.html#id3">检查连接</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id2">基础驱动示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#moveit">MoveIt 示例准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#id3">机械臂 MoveIt 示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#gripper-moveit">gripper MoveIt 示例</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="install.html" class="btn btn-neutral float-right" title="安装" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2026, Lebai Robotics。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

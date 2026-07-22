@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoveIt &mdash; Lebai ROS2 SDK 文档</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d4c9f2f8"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=beaddf03"></script>
+        <script src="_static/version-switcher.js?v=5e7e00d0"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="示例" href="examples.html" />
+    <link rel="prev" title="服务 Services" href="interfaces/services.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            lebai-ros-sdk
+          </a>
+              <div class="version">
+                ROS2 Lyrical
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/topics.html">话题 Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/services.html">服务 Services</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lebai-ros-sdk</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MoveIt</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/moveit.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="moveit">
+<h1>MoveIt<a class="headerlink" href="#moveit" title="Link to this heading"></a></h1>
+<p>本页说明如何启动 LM3/LM3-L1 的 MoveIt 配置，并通过 RViz 做规划和执行。</p>
+<section id="id1">
+<h2>准备工作<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>先在工作空间根目录构建源码包：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/lebai/lebai_ws
+<span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>启动 MoveIt<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>两个公开 launch 默认把驱动、MoveIt、RViz、robot_state_publisher 和静态 TF
+节点放在 <code class="docutils literal notranslate"><span class="pre">lebai</span></code> 命名空间中，也就是使用 <code class="docutils literal notranslate"><span class="pre">namespace:=lebai</span></code>。因此默认的
+MoveIt 相对 action <code class="docutils literal notranslate"><span class="pre">move_action</span></code> 解析为 <code class="docutils literal notranslate"><span class="pre">/lebai/move_action</span></code>。驱动也注册
+两个相对 action
+<code class="docutils literal notranslate"><span class="pre">lebai_trajectory_controller/follow_joint_trajectory</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">lebai_gripper_controller/gripper_cmd</span></code>，默认分别解析为
+<code class="docutils literal notranslate"><span class="pre">/lebai/lebai_trajectory_controller/follow_joint_trajectory</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">/lebai/lebai_gripper_controller/gripper_cmd</span></code>。</p>
+<p>机械臂状态、MoveIt controller 配置和 <code class="docutils literal notranslate"><span class="pre">FollowJointTrajectory</span></code> action 使用
+固定关节名 <code class="docutils literal notranslate"><span class="pre">joint_1</span></code> 到 <code class="docutils literal notranslate"><span class="pre">joint_6</span></code>；这些名称不能通过 launch 参数重映射。</p>
+<p>连接仿真控制器时，将 <code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> 指向仿真控制器所在主机。下面示例使用本机
+<code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>robot_ip:<span class="o">=</span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>simulator:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>连接真实控制器时，从终端读取实际控制器 IP，并省略 <code class="docutils literal notranslate"><span class="pre">simulator:=true</span></code>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;Controller IP: &quot;</span><span class="w"> </span>ROBOT_IP
+ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>robot_ip:<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$ROBOT_IP</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>启动 LM3-L1 MoveIt：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3_l1.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>robot_ip:<span class="o">=</span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>simulator:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>需要启动另一套命名空间时，显式传入 <code class="docutils literal notranslate"><span class="pre">namespace</span></code>。例如：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>namespace:<span class="o">=</span>robot_1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>robot_ip:<span class="o">=</span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>simulator:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>此时对应的 action 为 <code class="docutils literal notranslate"><span class="pre">/robot_1/move_action</span></code>、
+<code class="docutils literal notranslate"><span class="pre">/robot_1/lebai_trajectory_controller/follow_joint_trajectory</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">/robot_1/lebai_gripper_controller/gripper_cmd</span></code>。MoveIt 教程脚本同样接受
+<code class="docutils literal notranslate"><span class="pre">--namespace</span> <span class="pre">robot_1</span></code>；它们的 action 名称默认保持相对形式，会解析到所选
+命名空间。</p>
+<p>默认会加载带 gripper 的配置。只使用机械臂本体时，设置
+<code class="docutils literal notranslate"><span class="pre">has_gripper:=false</span></code>：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>robot_ip:<span class="o">=</span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>simulator:<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>has_gripper:<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+</section>
+<section id="rviz">
+<h2>RViz 中的操作<a class="headerlink" href="#rviz" title="Link to this heading"></a></h2>
+<p>启动后，在 RViz 的 MotionPlanning 面板中选择 planning group：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">manipulator</span></code>：拖动末端交互 marker，点击 <code class="docutils literal notranslate"><span class="pre">Plan</span></code> 做机械臂规划，点击
+<code class="docutils literal notranslate"><span class="pre">Execute</span></code> 执行轨迹。执行前需要先启动机械臂。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gripper</span></code>：选择 <code class="docutils literal notranslate"><span class="pre">open</span></code> 或 <code class="docutils literal notranslate"><span class="pre">closed</span></code> 命名状态，再执行 gripper action。</p></li>
+</ul>
+<p>点击 <code class="docutils literal notranslate"><span class="pre">Execute</span></code> 后，MoveIt 会通过驱动执行机械臂轨迹或 claw 开合命令。</p>
+</section>
+<section id="id3">
+<h2>检查连接<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>启动后可以检查 joint states、MoveIt 控制 action 和 TF：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/status/joint_states<span class="w"> </span>--once
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/lebai/model/joint_states<span class="w"> </span>--once
+ros2<span class="w"> </span>action<span class="w"> </span>info<span class="w"> </span>/lebai/move_action
+ros2<span class="w"> </span>action<span class="w"> </span>info<span class="w"> </span>/lebai/lebai_trajectory_controller/follow_joint_trajectory
+ros2<span class="w"> </span>action<span class="w"> </span>info<span class="w"> </span>/lebai/lebai_gripper_controller/gripper_cmd
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>/tf<span class="w"> </span>--once
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">info</span></code> 应该显示 MoveIt action client 和驱动 action server 都存在。
+如果只有 client、没有 server，通常说明 <code class="docutils literal notranslate"><span class="pre">lebai_driver</span></code> 没有正常启动或工作空间
+没有重新构建并 source。</p>
+<p>这些 launch 仅保证其配置的驱动和 MoveIt 自有 node、topic、service 和 action
+接口使用所选命名空间；不承诺 legacy RViz 工具 topic 或第三方接口也随之隔离。
+TF 仍使用 ROS 2 标准的全局 <code class="docutils literal notranslate"><span class="pre">/tf</span></code> 和 <code class="docutils literal notranslate"><span class="pre">/tf_static</span></code> 传输。这里不承诺 TF
+frame ID 隔离，同时启动多套具有相同 <code class="docutils literal notranslate"><span class="pre">world</span></code>、<code class="docutils literal notranslate"><span class="pre">base_link</span></code> 等 frame ID 的
+模型时，需要由系统集成方另行规划 frame 命名。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="interfaces/services.html" class="btn btn-neutral float-left" title="服务 Services" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="示例" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2026, Lebai Robotics。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
