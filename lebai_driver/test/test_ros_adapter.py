@@ -25,6 +25,19 @@ def test_service_adapter_constructs_and_returns_generated_response(fake_rospy):
     assert service.handler(request) is not first_response
 
 
+def test_service_adapter_returns_populated_response_when_callback_returns_none(fake_rospy):
+    from lebai_driver.ros_adapter import RosNodeAdapter
+
+    def callback(_request, response):
+        response.result.message = 'done'
+
+    service = RosNodeAdapter(fake_rospy).create_service(Command, 'test/command', callback)
+    response = service.handler(CommandRequest())
+
+    assert isinstance(response, CommandResponse)
+    assert response.result.message == 'done'
+
+
 def test_timer_discards_ros_event_and_stops_dispatch_after_shutdown(fake_rospy):
     from lebai_driver.ros_adapter import RosNodeAdapter
 

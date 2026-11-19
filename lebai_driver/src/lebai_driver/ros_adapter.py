@@ -10,7 +10,9 @@ class RosNodeAdapter:
 
     def create_service(self, srv_type, name, callback):
         def handle_request(request):
-            return callback(request, srv_type._response_class())
+            response = srv_type._response_class()
+            callback(request, response)
+            return response
 
         return self._rospy.Service(name, srv_type, handle_request)
 
