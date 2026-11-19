@@ -7,10 +7,11 @@
 
 请根据你的 Ubuntu 和 ROS 发行版选择对应分支。
 
-## 当前 ROS2 分支
+## 当前 ROS 和 ROS2 分支
 
 | ROS 发行版 | Ubuntu | 代码分支 | 文档 |
 | --- | --- | --- | --- |
+| ROS Noetic | Ubuntu 20.04 | `noetic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/noetic/> |
 | ROS2 Humble | Ubuntu 22.04 | `humble-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/humble/> |
 | ROS2 Jazzy | Ubuntu 24.04 | `jazzy-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/jazzy/> |
 | ROS2 Lyrical | Ubuntu 26.04 | `lyrical-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/lyrical/> |
@@ -21,6 +22,5 @@
 
 | ROS 发行版 | Ubuntu | 代码分支 | 文档 |
 | --- | --- | --- | --- |
-| ROS Noetic | Ubuntu 20.04 | `noetic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/noetic/> |
 | ROS2 Galactic | Ubuntu 20.04 | `galactic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/galactic/> |
 | ROS Melodic | Ubuntu 18.04 | `melodic-dev` | <https://lebai-robotics.github.io/lebai-ros-sdk/melodic/> |

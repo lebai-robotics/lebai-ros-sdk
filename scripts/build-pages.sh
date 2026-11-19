@@ -55,9 +55,29 @@ EOF
 }
 
 write_legacy_redirects() {
-  write_legacy_redirect noetic Noetic.html "ROS Noetic 历史文档"
   write_legacy_redirect galactic Galactic.html "ROS2 Galactic 历史文档"
   write_legacy_redirect melodic Melodic.html "ROS Melodic 历史文档"
+}
+
+write_compatibility_redirect() {
+  local filename="$1"
+  local target="$2"
+  local title="$3"
+
+  cat > "$SITE_DIR/$filename" <<EOF
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=$target">
+    <link rel="canonical" href="$target">
+    <title>$title</title>
+  </head>
+  <body>
+    <p><a href="$target">$title</a></p>
+  </body>
+</html>
+EOF
 }
 
 build_branch_docs() {
@@ -83,7 +103,9 @@ build_branch_docs() {
 prepare_site_root
 build_landing_docs
 write_legacy_redirects
+write_compatibility_redirect Noetic.html noetic/ "ROS Noetic 当前文档"
 
+build_branch_docs noetic
 build_branch_docs humble
 build_branch_docs jazzy
 build_branch_docs lyrical

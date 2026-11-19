@@ -6,8 +6,8 @@ Lebai ROS SDK 文档
 ``main`` 分支只作为项目入口和文档发布分支，不用于构建机器人驱动。使用前请
 根据你的 Ubuntu 和 ROS 版本选择对应分支。
 
-当前 ROS2 文档
---------------
+当前 ROS 和 ROS2 文档
+---------------------
 
 .. list-table::
    :header-rows: 1
@@ -16,6 +16,10 @@ Lebai ROS SDK 文档
      - Ubuntu
      - 代码分支
      - 文档
+   * - ROS Noetic
+     - 20.04
+     - ``noetic-dev``
+     - `打开 Noetic 文档 <noetic/>`__
    * - ROS2 Humble
      - 22.04
      - ``humble-dev``
@@ -40,9 +44,6 @@ Lebai ROS SDK 文档
    * - ROS 发行版
      - 代码分支
      - 文档
-   * - ROS Noetic
-     - ``noetic-dev``
-     - `打开 Noetic 历史文档 <noetic/>`__
    * - ROS2 Galactic
      - ``galactic-dev``
      - `打开 Galactic 历史文档 <galactic/>`__

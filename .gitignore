@@ -1,6 +1,7 @@
 # Generated documentation output
 /site/
 /.docs-branches/
+/.superpowers/
 
 # Python caches
 __pycache__/
