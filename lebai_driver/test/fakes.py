@@ -1,5 +1,7 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 
+from actionlib_msgs.msg import GoalID
 from genpy import Duration, Time
 
 
@@ -16,6 +18,41 @@ class FakeRobotFactory:
     def __call__(self, robot_ip, simulator=False):
         self.calls.append((robot_ip, simulator))
         return FakeRobot(robot_ip=robot_ip, simulator=simulator)
+
+
+class ActionHarness:
+    """Capture ActionServer callbacks and defer each worker until its test runs it."""
+
+    def __init__(self):
+        self.jobs = []
+        self.start_count = 0
+
+    def server_factory(self, name, ActionSpec, goal_cb, cancel_cb, auto_start):
+        assert auto_start is False
+        self.name = name
+        self.action_type = ActionSpec
+        self.goal_cb = goal_cb
+        self.cancel_cb = cancel_cb
+        return self
+
+    def start(self):
+        self.start_count += 1
+
+    def worker_factory(self, target, args, daemon):
+        return SimpleNamespace(start=lambda: self.jobs.append(lambda: target(*args)))
+
+    def submit(self, goal, goal_id='g1'):
+        handle = self.handle(goal, goal_id)
+        self.goal_cb(handle)
+        return handle
+
+    @staticmethod
+    def handle(goal, goal_id):
+        handle = Mock(spec=['get_goal', 'get_goal_id', 'set_accepted', 'set_rejected',
+                            'set_aborted', 'set_succeeded', 'set_canceled'])
+        handle.get_goal.return_value = goal
+        handle.get_goal_id.return_value = GoalID(id=goal_id)
+        return handle
 
 
 class FakeRospy:
