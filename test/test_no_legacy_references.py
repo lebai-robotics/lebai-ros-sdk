@@ -18,11 +18,11 @@ RETIRED_LAUNCHES = tuple(name + '.launch' for name in (
     'io_service', 'motion_service', 'robot_state', 'system_service', 'robot_interface',
     'two_robot_interface', 'test_param_utils', 'test_lebai_driver',
 ))
-PACKAGE_PREFIX = '(?:' + '|'.join(map(re.escape, RETIRED_PACKAGES)) + ')_'
 REFERENCE = re.compile(
     r'\b(?:' + '|'.join(map(re.escape, RETIRED + RETIRED_LAUNCHES)) + r')\b'
-    + r'|\$\{?' + PACKAGE_PREFIX + r'\w+'  # Shell and CMake variable references.
-    + r'|\b' + PACKAGE_PREFIX + r'[A-Z]\w*'  # Bare Catkin variables in set() and if().
+    # Standard Catkin variable suffixes are uppercase. Lowercase components
+    # before the suffix belong to the package name.
+    + r'|\b(?:' + '|'.join(map(re.escape, RETIRED_PACKAGES)) + r')_[A-Z][A-Z0-9_]*\b'
 )
 IMPORT_ALIAS = r'[\w.]+(?:\s+as\s+\w+)?'
 TEXT_IMPORT = re.compile(
@@ -73,6 +73,20 @@ def remove_negative_control_literals(tree, path, lines):
                 lines[i] = (line[:literal.col_offset] + blank + line[literal.end_col_offset:]).decode('utf-8')
 
 
+def logical_lines(lines):
+    start = 1
+    parts = []
+    for number, line in enumerate(lines, 1):
+        if line.endswith('\\'):
+            parts.append(line[:-1])
+            continue
+        yield start, ''.join(parts) + line
+        parts.clear()
+        start = number + 1
+    if parts:
+        yield start, ''.join(parts)
+
+
 def repository_problems(repo):
     files = subprocess.check_output(['git', 'ls-files', '-z'], cwd=repo)
     problems = []
@@ -99,16 +113,19 @@ def repository_problems(repo):
             problems.extend(legacy_imports(tree, path))
             remove_negative_control_literals(tree, path, lines)
         history = migration_table_lines(lines) if path == Path('docs/architecture.rst') else ()
-        for number, line in enumerate(lines):
-            if number in history:
-                continue
+        for index in history:
+            lines[index] = ''
+        for number, line in enumerate(lines, 1):
             for match in REFERENCE.finditer(line):
-                problems.append(f'{path}:{number + 1}: {match.group()}')
+                problems.append(f'{path}:{number}: {match.group()}')
+        for number, line in logical_lines(lines):
             for match in TEXT_IMPORT.finditer(line):
+                if match[2] and re.match(r'\s+\w', line[match.end():]):
+                    continue  # Plain prose continues after the apparent module list.
                 # Check the module after "from" or each module in a plain import list.
                 modules = (match[1] or match[2]).split(',')
                 if any(module.split()[0].split('.')[0] == 'lebai' for module in modules):
-                    problems.append(f'{path}:{number + 1}: {match.group()}')
+                    problems.append(f'{path}:{number}: {match.group()}')
     return problems
 
 
@@ -137,7 +154,7 @@ def test_retired_package_variables(scan_tracked_file):
     contents = (
         'add_dependencies(node ${%s_EXPORTED_TARGETS})\n'
         'target_link_libraries(node ${%s_LIBRARIES})\n'
-        'echo "$%s_custom"\n'
+        'echo "$%s_VERSION"\n'
         'if(%s_FOUND)\n'
     ) % (LEGACY_PACKAGE, LEGACY_CPP_PACKAGE, LEGACY_PACKAGE, LEGACY_CPP_PACKAGE)
     problems = scan_tracked_file('CMakeLists.txt', contents)
@@ -145,7 +162,9 @@ def test_retired_package_variables(scan_tracked_file):
 
     valid = ('add_dependencies(node ${lebai_interfaces_EXPORTED_TARGETS})\n'
              'target_link_libraries(node ${rospy_LIBRARIES})\n'
-             'moveit_commander.roscpp_initialize(argv)\n')
+             'moveit_commander.roscpp_initialize(argv)\n'
+             'include_directories(${%s_serialization_INCLUDE_DIRS})\n'
+             'echo "$%s_serialization_LIBRARIES"\n') % (LEGACY_CPP_PACKAGE, LEGACY_CPP_PACKAGE)
     assert scan_tracked_file('CMakeLists.txt', valid) == []
 
 
@@ -154,14 +173,24 @@ def test_documented_imports_use_the_new_sdk(scan_tracked_file):
     contents = ('.. code-block:: python\n\n'
                 '   from %s.type import JointPose\n'
                 '   import %s as sdk\n'
-                '   import os, %s.robot\n') % (old_sdk, old_sdk, old_sdk)
+                '   import os, %s.robot\n'
+                '   import os, \\\n'
+                '       %s.type\n') % (old_sdk, old_sdk, old_sdk, old_sdk)
     problems = scan_tracked_file('docs/install.rst', contents)
-    assert [problem.split(':')[1] for problem in problems] == ['3', '4', '5']
+    assert [problem.split(':')[1] for problem in problems] == ['3', '4', '5', '6']
 
     valid = ('   from lebai_interfaces import msg\n'
              '   from pylebai import Robot\n'
              '   import lebai_driver, lebai_interfaces\n'
-             '   from local_helpers import lebai\n')
+             '   from local_helpers import lebai\n'
+             '   import os, \\\n'
+             '       lebai_interfaces.msg\n'
+             '   from local_helpers import \\\n'
+             '       lebai\n'
+             '\nA plain paragraph lists items to import locally,\n'
+             'lebai.type metadata among them.\n'
+             'Another paragraph lists items to import locally, \\\n'
+             'lebai.type metadata among them.\n')
     assert scan_tracked_file('docs/install.rst', valid) == []
     history = ('.. BEGIN LEGACY MIGRATION\n\n.. list-table::\n\n'
                '   * - ``from %s.type import JointPose``\n\n.. END LEGACY MIGRATION\n') % old_sdk
