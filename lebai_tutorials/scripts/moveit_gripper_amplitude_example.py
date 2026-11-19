@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import math
 
 import actionlib
 import rospy
@@ -17,6 +18,9 @@ def main():
     parser.add_argument('--max-effort', type=float, default=50.0)
     parser.add_argument('--action-name', default='/lebai_gripper_controller/gripper_cmd')
     args = parser.parse_args(rospy.myargv()[1:])
+    if not math.isfinite(args.max_effort):
+        parser.error('--max-effort must be finite')
+
     try:
         position = amplitude_to_gripper_joint(args.amplitude)
     except ValueError as exc:

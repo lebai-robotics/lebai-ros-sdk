@@ -3,8 +3,12 @@ import runpy
 import sys
 from pathlib import Path
 from types import ModuleType
+from unittest.mock import Mock
 
+import actionlib
 import pytest
+import rospy
+from control_msgs.msg import GripperCommandResult
 from lebai_interfaces.msg import Result
 from lebai_interfaces.srv import MoveJointResponse
 
@@ -86,3 +90,41 @@ def test_checked_response_keeps_sdk_error_details():
     failure = MoveJointResponse(result=Result(success=False, code=2, message='unavailable'))
     with pytest.raises(RuntimeError, match=r'/lebai/motion/movej failed \(2\): unavailable'):
         checked_response('/lebai/motion/movej', failure)
+
+
+@pytest.fixture
+def run_gripper_example(monkeypatch):
+    script = SCRIPTS / 'moveit_gripper_amplitude_example.py'
+    monkeypatch.syspath_prepend(str(SCRIPTS))
+    monkeypatch.setattr(rospy, 'init_node', Mock())
+    client = Mock(spec=actionlib.SimpleActionClient)
+    client.wait_for_server.return_value = True
+    client.wait_for_result.return_value = True
+    client.get_result.return_value = GripperCommandResult(reached_goal=True)
+    create_client = Mock(return_value=client)
+    monkeypatch.setattr(actionlib, 'SimpleActionClient', create_client)
+
+    def run(max_effort):
+        monkeypatch.setattr(sys, 'argv', [str(script), '--amplitude', '50', f'--max-effort={max_effort}'])
+        with pytest.raises(SystemExit) as exit_status:
+            runpy.run_path(str(script), run_name='__main__')
+        return exit_status.value.code, create_client, client
+
+    return run
+
+
+@pytest.mark.parametrize('max_effort', ['nan', 'inf', '-inf'])
+def test_gripper_example_rejects_nonfinite_max_effort(run_gripper_example, capsys, max_effort):
+    exit_code, create_client, client = run_gripper_example(max_effort)
+    create_client.assert_not_called()
+    client.send_goal.assert_not_called()
+    assert exit_code == 2
+    assert '--max-effort must be finite' in capsys.readouterr().err
+
+
+@pytest.mark.parametrize('max_effort', ['0', '-1'])
+def test_gripper_example_passes_through_nonpositive_finite_effort(run_gripper_example, max_effort):
+    exit_code, _, client = run_gripper_example(max_effort)
+    assert exit_code == 0
+    client.send_goal.assert_called_once()
+    assert client.send_goal.call_args.args[0].command.max_effort == float(max_effort)
