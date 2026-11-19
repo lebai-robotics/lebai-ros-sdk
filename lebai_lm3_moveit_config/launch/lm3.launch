@@ -1,6 +1,6 @@
 <launch>
   <arg name="has_gripper" default="true"/>
-  <arg name="robot_ip" default="127.0.0.1"/>
+  <arg name="robot_ip" doc="Controller address when starting the driver"/>
   <arg name="simulator" default="false"/>
   <arg name="launch_driver" default="true"/>
   <arg name="use_rviz" default="true"/>

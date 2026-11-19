@@ -123,6 +123,11 @@ def test_launch_selects_consistent_assets(has_gripper, model, semantic, topic, c
         assert dict(node.remap_args)["joint_states"] == topic
 
 
+def test_starting_driver_requires_an_explicit_controller_address():
+    with pytest.raises(roslaunch.RLException, match="robot_ip"):
+        launch_config()
+
+
 def test_default_launch_starts_driver_forwards_connection_and_selects_gripper():
     config = launch_config("robot_ip:=192.0.2.33", "simulator:=true")
     assert sorted(node.package for node in config.nodes) == [

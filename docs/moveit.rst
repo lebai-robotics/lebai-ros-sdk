@@ -17,10 +17,10 @@ configures the ``manipulator`` and ``gripper`` groups, and consumes
 mode loads the ``manipulator`` group and consumes
 ``/lebai/status/joint_states``.
 
-``lm3.launch`` starts the driver and RViz by default. Set
-``use_rviz:=false`` for a headless run. To connect to a running simulator,
-pass ``simulator:=true`` and use the simulator controller address as
-``robot_ip`` (default ``127.0.0.1``).
+``lm3.launch`` starts the driver and RViz by default and requires
+``robot_ip`` when it starts the driver. Set ``use_rviz:=false`` for a
+headless run. For a simulator running on the same host, pass
+``simulator:=true robot_ip:=127.0.0.1``.
 
 If a driver is already running, set ``launch_driver:=false``. The default
 MoveIt configuration expects the driver's ``/lebai`` joint state paths and
