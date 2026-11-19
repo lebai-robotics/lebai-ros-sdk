@@ -61,6 +61,8 @@ jobs:
             docs/test_docs_native_version.py test
 
       - name: Exercise ROS graph and MoveIt execution
+        env:
+          ROS_HOSTNAME: 127.0.0.1
         run: |
           source devel/setup.bash
           rostest lebai_driver driver_interfaces.test
