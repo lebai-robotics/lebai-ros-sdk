@@ -6,19 +6,35 @@ SITE_DIR="${1:-$ROOT/site}"
 BRANCH_ROOT="${2:-$ROOT/.docs-branches}"
 LEGACY_ROOT="${3:-}"
 
+validate_legacy_archive() {
+  if [[ -z "$LEGACY_ROOT" || ! -d "$LEGACY_ROOT" ]]; then
+    echo "Missing legacy Pages archive directory: ${LEGACY_ROOT:-<not provided>}" >&2
+    return 1
+  fi
+
+  local entry
+  for entry in Galactic.html Melodic.html; do
+    if [[ ! -f "$LEGACY_ROOT/$entry" ]]; then
+      echo "Missing legacy Pages archive entry: $LEGACY_ROOT/$entry" >&2
+      return 1
+    fi
+  done
+}
+
 prepare_site_root() {
   rm -rf "$SITE_DIR"
   mkdir -p "$SITE_DIR"
 
-  if [[ -n "$LEGACY_ROOT" && -d "$LEGACY_ROOT" ]]; then
-    (
-      shopt -s dotglob nullglob
-      for item in "$LEGACY_ROOT"/*; do
-        [[ "$(basename "$item")" == ".git" ]] && continue
-        cp -a "$item" "$SITE_DIR/"
-      done
-    )
-  fi
+  (
+    shopt -s dotglob nullglob
+    for item in "$LEGACY_ROOT"/*; do
+      [[ "$(basename "$item")" == ".git" ]] && continue
+      cp -a "$item" "$SITE_DIR/"
+    done
+  )
+
+  rm -f "$SITE_DIR/_sources/Noetic.rst.txt"
+  rm -rf "$SITE_DIR/_sources/noetic"
 
   touch "$SITE_DIR/.nojekyll"
 }
@@ -55,9 +71,29 @@ EOF
 }
 
 write_legacy_redirects() {
-  write_legacy_redirect noetic Noetic.html "ROS Noetic 历史文档"
   write_legacy_redirect galactic Galactic.html "ROS2 Galactic 历史文档"
   write_legacy_redirect melodic Melodic.html "ROS Melodic 历史文档"
+}
+
+write_compatibility_redirect() {
+  local filename="$1"
+  local target="$2"
+  local title="$3"
+
+  cat > "$SITE_DIR/$filename" <<EOF
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=$target">
+    <link rel="canonical" href="$target">
+    <title>$title</title>
+  </head>
+  <body>
+    <p><a href="$target">$title</a></p>
+  </body>
+</html>
+EOF
 }
 
 build_branch_docs() {
@@ -80,10 +116,13 @@ build_branch_docs() {
   cp -a "$branch_dir/site" "$output_dir"
 }
 
+validate_legacy_archive
 prepare_site_root
 build_landing_docs
 write_legacy_redirects
+write_compatibility_redirect Noetic.html noetic/ "ROS Noetic 当前文档"
 
+build_branch_docs noetic
 build_branch_docs humble
 build_branch_docs jazzy
 build_branch_docs lyrical

@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      noetic_ref:
+        description: Git ref to use for Noetic docs
+        required: false
+        default: noetic-dev
       humble_ref:
         description: Git ref to use for Humble docs
         required: false
@@ -31,6 +35,7 @@ jobs:
     name: Build and publish documentation site
     runs-on: ubuntu-latest
     env:
+      NOETIC_REF: ${{ inputs.noetic_ref || 'noetic-dev' }}
       HUMBLE_REF: ${{ inputs.humble_ref || 'humble-dev' }}
       JAZZY_REF: ${{ inputs.jazzy_ref || 'jazzy-dev' }}
       LYRICAL_REF: ${{ inputs.lyrical_ref || 'lyrical-dev' }}
@@ -39,6 +44,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: main
+
+      - name: Checkout Noetic docs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.NOETIC_REF }}
+          path: branches/noetic
 
       - name: Checkout Humble docs
         uses: actions/checkout@v4
@@ -60,7 +71,6 @@ jobs:
 
       - name: Checkout existing Pages archive
         uses: actions/checkout@v4
-        continue-on-error: true
         with:
           ref: gh-pages
           path: legacy-pages
@@ -77,9 +87,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install \
             -r main/docs/requirements.txt \
+            -r branches/noetic/docs/requirements.txt \
             -r branches/humble/docs/requirements.txt \
             -r branches/jazzy/docs/requirements.txt \
             -r branches/lyrical/docs/requirements.txt
+
+      - name: Test Pages publisher
+        run: |
+          . .venv/bin/activate
+          python -m unittest discover -s main/tests -v
 
       - name: Build combined site
         run: |

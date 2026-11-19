@@ -1,5 +1,12 @@
 [
   {
+    "label": "ROS Noetic",
+    "path": "noetic",
+    "branch": "noetic-dev",
+    "status": "active",
+    "ubuntu": "20.04"
+  },
+  {
     "label": "ROS2 Humble",
     "path": "humble",
     "branch": "humble-dev",
@@ -19,12 +26,6 @@
     "branch": "lyrical-dev",
     "status": "active",
     "ubuntu": "26.04"
-  },
-  {
-    "label": "ROS Noetic",
-    "path": "noetic",
-    "branch": "noetic-dev",
-    "status": "legacy"
   },
   {
     "label": "ROS2 Galactic",
