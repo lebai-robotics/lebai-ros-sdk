@@ -6,19 +6,35 @@ SITE_DIR="${1:-$ROOT/site}"
 BRANCH_ROOT="${2:-$ROOT/.docs-branches}"
 LEGACY_ROOT="${3:-}"
 
+validate_legacy_archive() {
+  if [[ -z "$LEGACY_ROOT" || ! -d "$LEGACY_ROOT" ]]; then
+    echo "Missing legacy Pages archive directory: ${LEGACY_ROOT:-<not provided>}" >&2
+    return 1
+  fi
+
+  local entry
+  for entry in Galactic.html Melodic.html; do
+    if [[ ! -f "$LEGACY_ROOT/$entry" ]]; then
+      echo "Missing legacy Pages archive entry: $LEGACY_ROOT/$entry" >&2
+      return 1
+    fi
+  done
+}
+
 prepare_site_root() {
   rm -rf "$SITE_DIR"
   mkdir -p "$SITE_DIR"
 
-  if [[ -n "$LEGACY_ROOT" && -d "$LEGACY_ROOT" ]]; then
-    (
-      shopt -s dotglob nullglob
-      for item in "$LEGACY_ROOT"/*; do
-        [[ "$(basename "$item")" == ".git" ]] && continue
-        cp -a "$item" "$SITE_DIR/"
-      done
-    )
-  fi
+  (
+    shopt -s dotglob nullglob
+    for item in "$LEGACY_ROOT"/*; do
+      [[ "$(basename "$item")" == ".git" ]] && continue
+      cp -a "$item" "$SITE_DIR/"
+    done
+  )
+
+  rm -f "$SITE_DIR/_sources/Noetic.rst.txt"
+  rm -rf "$SITE_DIR/_sources/noetic"
 
   touch "$SITE_DIR/.nojekyll"
 }
@@ -100,6 +116,7 @@ build_branch_docs() {
   cp -a "$branch_dir/site" "$output_dir"
 }
 
+validate_legacy_archive
 prepare_site_root
 build_landing_docs
 write_legacy_redirects

@@ -75,6 +75,7 @@ class PagesPublishingTests(unittest.TestCase):
         ):
             with self.subTest(required=required):
                 self.assertIn(required, workflow)
+        self.assertNotIn("continue-on-error: true", workflow)
 
     def test_combined_builder_replaces_legacy_noetic(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -105,6 +106,14 @@ class PagesPublishingTests(unittest.TestCase):
                 "old-noetic-obsolete-page", encoding="utf-8"
             )
             (legacy / "Noetic.html").write_text("old-noetic-root", encoding="utf-8")
+            (legacy / "_sources/noetic").mkdir(parents=True)
+            (legacy / "_sources/Noetic.rst.txt").write_text(
+                "old-noetic-root-source", encoding="utf-8"
+            )
+            for name in ("AppDemo", "Execution", "Install", "Interface"):
+                (legacy / f"_sources/noetic/{name}.rst.txt").write_text(
+                    f"old-noetic-{name}-source", encoding="utf-8"
+                )
             (legacy / "Galactic.html").write_text(
                 "preserved-galactic-archive", encoding="utf-8"
             )
@@ -131,6 +140,8 @@ class PagesPublishingTests(unittest.TestCase):
                 "new-noetic-docs",
             )
             self.assertFalse((output / "noetic/obsolete.html").exists())
+            self.assertFalse((output / "_sources/Noetic.rst.txt").exists())
+            self.assertFalse((output / "_sources/noetic").exists())
             noetic_redirect = (output / "Noetic.html").read_text(encoding="utf-8")
             self.assertIn('content="0; url=noetic/"', noetic_redirect)
             self.assertIn('href="noetic/"', noetic_redirect)
@@ -143,6 +154,40 @@ class PagesPublishingTests(unittest.TestCase):
                 (output / "Melodic.html").read_text(encoding="utf-8"),
                 "preserved-melodic-archive",
             )
+
+    def test_combined_builder_rejects_missing_or_incomplete_legacy_archive(self):
+        for case in ("missing", "incomplete"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as temporary:
+                temporary = Path(temporary)
+                output = temporary / "site"
+                output.mkdir()
+                sentinel = output / "existing-site-marker"
+                sentinel.write_text("keep on validation failure", encoding="utf-8")
+                legacy = temporary / "legacy"
+                if case == "incomplete":
+                    legacy.mkdir()
+                    (legacy / "Galactic.html").write_text(
+                        "galactic archive", encoding="utf-8"
+                    )
+
+                completed = subprocess.run(
+                    [
+                        "bash",
+                        str(ROOT / "scripts/build-pages.sh"),
+                        str(output),
+                        str(temporary / "branches"),
+                        str(legacy),
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+
+                self.assertNotEqual(completed.returncode, 0)
+                self.assertIn(
+                    "legacy Pages archive", completed.stdout + completed.stderr
+                )
+                self.assertTrue(sentinel.exists())
 
 
 if __name__ == "__main__":

@@ -26,8 +26,12 @@ driver changes belong on the active distro branches, not directly here.
 Run from the repository root:
 
 ```bash
-bash scripts/build-pages.sh /tmp/lebai-pages-site /tmp/lebai-doc-branches
+bash scripts/build-pages.sh \
+  /tmp/lebai-pages-site \
+  /tmp/lebai-doc-branches \
+  /tmp/lebai-legacy-pages
 ```
 
 That command expects `/tmp/lebai-doc-branches` to contain `noetic`, `humble`,
-`jazzy`, and `lyrical` checkouts with each branch's `scripts/build-docs.sh`.
+`jazzy`, and `lyrical` checkouts with each branch's `scripts/build-docs.sh`,
+and `/tmp/lebai-legacy-pages` to contain the existing `gh-pages` archive.

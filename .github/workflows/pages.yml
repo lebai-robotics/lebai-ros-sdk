@@ -71,7 +71,6 @@ jobs:
 
       - name: Checkout existing Pages archive
         uses: actions/checkout@v4
-        continue-on-error: true
         with:
           ref: gh-pages
           path: legacy-pages
