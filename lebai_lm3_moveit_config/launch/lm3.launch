@@ -11,7 +11,12 @@
     <arg name="publish_robot_description" value="false"/>
   </include>
 
-  <remap from="joint_states" to="/lebai/model/joint_states" if="$(arg has_gripper)"/>
+  <node if="$(arg has_gripper)" name="model_joint_states" pkg="lebai_lm3_moveit_config"
+        type="model_joint_states.py" required="true">
+    <remap from="input" to="/lebai/model/joint_states"/>
+    <remap from="output" to="/lebai_moveit/joint_states"/>
+  </node>
+  <remap from="joint_states" to="/lebai_moveit/joint_states" if="$(arg has_gripper)"/>
   <remap from="joint_states" to="/lebai/status/joint_states" unless="$(arg has_gripper)"/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
   <include file="$(find lebai_lm3_moveit_config)/launch/move_group.launch">

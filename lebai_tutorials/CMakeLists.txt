@@ -3,6 +3,7 @@ project(lebai_tutorials)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
+  actionlib_msgs
   control_msgs
   lebai_interfaces
   moveit_commander

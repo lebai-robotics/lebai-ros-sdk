@@ -5,6 +5,7 @@ import math
 
 import actionlib
 import rospy
+from actionlib_msgs.msg import GoalStatus
 from control_msgs.msg import GripperCommandAction, GripperCommandGoal
 
 from lebai_tutorials_common import amplitude_to_gripper_joint
@@ -42,7 +43,7 @@ def main():
         return 1
 
     result = client.get_result()
-    if result is None or not result.reached_goal:
+    if client.get_state() != GoalStatus.SUCCEEDED or result is None or not result.reached_goal:
         rospy.logerr('The claw did not reach the requested amplitude')
         return 1
     rospy.loginfo('Claw joint reached %.3f rad with effort %.1f', result.position, result.effort)

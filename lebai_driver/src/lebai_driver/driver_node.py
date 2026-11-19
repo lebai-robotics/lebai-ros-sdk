@@ -27,7 +27,8 @@ class LebaiDriverNode:
         trajectory_name = parameter('trajectory_action_name')
         gripper_name = parameter('gripper_action_name')
 
-        gate = StatusServiceGate()
+        self._admission = node.admission
+        gate = StatusServiceGate(self._admission)
         self.status_publishers = register_status_publishers(node, self.connection, sdk_gate=gate)
         self.services = []
         for register in (register_start_stop_services, register_motion_services,
@@ -36,15 +37,13 @@ class LebaiDriverNode:
             self.services.extend(register(node, self.connection, sdk_gate=gate))
 
         self.trajectory_action = register_trajectory_action(self.connection, joint_names,
-                                                            action_name=trajectory_name)
-        self.gripper_action = register_gripper_action(self.connection, action_name=gripper_name)
-        node.on_shutdown(self.shutdown)
+                                                            action_name=trajectory_name,
+                                                            admission=self._admission)
+        self.gripper_action = register_gripper_action(self.connection, action_name=gripper_name,
+                                                     admission=self._admission)
 
     def shutdown(self):
-        try:
-            self.trajectory_action.shutdown()
-        finally:
-            self.gripper_action.shutdown()
+        self._admission.shutdown()
 
 
 def main():

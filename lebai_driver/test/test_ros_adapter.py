@@ -109,4 +109,4 @@ def test_on_shutdown_registers_callback(fake_rospy):
 
     node.on_shutdown(callback)
 
-    assert fake_rospy.shutdown_callbacks == [callback]
+    assert fake_rospy.shutdown_callbacks == [node.admission.shutdown, callback]

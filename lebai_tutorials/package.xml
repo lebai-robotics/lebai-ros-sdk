@@ -8,6 +8,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend>
   <depend>control_msgs</depend>
   <depend>lebai_interfaces</depend>
   <depend>moveit_commander</depend>

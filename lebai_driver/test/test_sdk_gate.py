@@ -77,3 +77,50 @@ def test_exclusive_access_accepts_missing_gate():
 
     with exclusive_access(None) as access:
         assert access is None
+
+
+def test_shutdown_drains_active_service_and_rejects_waiters(monkeypatch):
+    from lebai_driver.sdk_gate import StatusServiceGate
+
+    gate = StatusServiceGate()
+    sdk_lock = gate._sdk_lock
+    active, release, waiting = Event(), Event(), Event()
+    calls = []
+
+    class TrackedLock:
+        def acquire(self, blocking=True):
+            if active.is_set():
+                waiting.set()
+            return sdk_lock.acquire(blocking)
+
+        def release(self):
+            sdk_lock.release()
+
+    def first():
+        with gate.exclusive_access():
+            active.set()
+            assert release.wait(4)
+
+    def second():
+        with gate.exclusive_access():
+            calls.append('SDK command')
+
+    monkeypatch.setattr(gate, '_sdk_lock', TrackedLock())
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        initial = pool.submit(first)
+        assert active.wait(3)
+        queued = pool.submit(second)
+        assert waiting.wait(3)
+        closing = pool.submit(gate.admission.shutdown)
+        try:
+            assert gate.admission.closed.wait(3)
+            assert not closing.done()
+            with pytest.raises(RuntimeError, match='shutting down'):
+                pool.submit(second).result(timeout=1)
+        finally:
+            release.set()
+        with pytest.raises(RuntimeError, match='shutting down'):
+            queued.result(timeout=3)
+        initial.result(timeout=3)
+        closing.result(timeout=3)
+    assert calls == []

@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from threading import Event
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from genpy import Time
@@ -124,6 +125,18 @@ def test_status_publishers_stamp_each_message_at_poll_time(status_rospy, status_
     assert messages['status/joint_motion'].connected is True
     assert messages['io/state'].connected is True
     assert messages['claw/state'].connected is True
+
+
+def test_three_joint_timers_publish_configured_names(status_rospy, status_robot):
+    arm = ['axis_' + str(i) for i in range(6)]
+    status_rospy.parameters.update({'~joint_names': arm, '~gripper_joint_name': 'finger'})
+    handles = _register(status_rospy, CountingConnection(status_robot))
+    for publisher, timer in handles[:3]:
+        _tick(timer)
+    assert {p.name: p.messages[0].name for p, _ in handles[:3]} == {
+        'status/joint_states': arm, 'claw/joint_states': ['finger'],
+        'model/joint_states': arm + ['finger'],
+    }
 
 
 def test_status_publishers_share_configured_arm_and_gripper_rates(status_rospy):
@@ -306,3 +319,29 @@ def test_timer_callback_does_not_touch_sdk_after_shutdown(status_rospy, status_r
 
     assert connection.robot_accesses == 7
     assert all(len(publisher.messages) == 1 for publisher, _timer in handles)
+
+
+def test_shutdown_during_position_read_does_not_start_velocity_read(status_rospy, status_robot):
+    active, release = Event(), Event()
+    gate = StatusServiceGate()
+
+    def read_positions():
+        active.set()
+        assert release.wait(3)
+        return [0.] * 6
+
+    status_robot.get_actual_joint_positions = read_positions
+    status_robot.get_actual_joint_speed = Mock(return_value=[0.] * 6)
+    handles = _register(status_rospy, CountingConnection(status_robot), gate)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        poll = pool.submit(_tick, handles[0][1])
+        assert active.wait(3)
+        closing = pool.submit(gate.admission.shutdown)
+        try:
+            assert gate.admission.closed.wait(3)
+            assert not closing.done()
+        finally:
+            release.set()
+        closing.result(3)
+        poll.result(3)
+    status_robot.get_actual_joint_speed.assert_not_called()

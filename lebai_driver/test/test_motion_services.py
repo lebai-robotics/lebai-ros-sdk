@@ -92,14 +92,23 @@ def test_motion_services_register_sdk_category_names(fake_rospy):
     pytest.param(
         'movec',
         MoveCircularRequest(
-            via=MotionTarget(is_joint_pose=True, joint_positions=(1, 2, 3, 4, 5, 6)),
+            via=MotionTarget(cartesian_pose=CartesianPose(1, 2, 3, 4, 5, 6)),
             target=MotionTarget(cartesian_pose=CartesianPose(0.1, 0.2, 0.3, 0.4, 0.5, 0.6)),
             rad=1.57,
             params=MotionParams(acceleration=1.0, velocity=0.2, time=0.3, blend_radius=0.4),
         ),
-        ([1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        ({'x': 1.0, 'y': 2.0, 'z': 3.0, 'rx': 4.0, 'ry': 5.0, 'rz': 6.0},
          {'x': 0.1, 'y': 0.2, 'z': 0.3, 'rx': 0.4, 'ry': 0.5, 'rz': 0.6}, 1.57, 1.0, 0.2, 0.3, 0.4),
-        str(MAX_MOTION_ID), {'motion_id': MAX_MOTION_ID}, id='movec',
+        str(MAX_MOTION_ID), {'motion_id': MAX_MOTION_ID}, id='movec-cartesian',
+    ),
+    pytest.param(
+        'movec',
+        MoveCircularRequest(
+            via=MotionTarget(is_joint_pose=True, joint_positions=(1, 2, 3, 4, 5, 6)),
+            target=MotionTarget(is_joint_pose=True, joint_positions=(6, 5, 4, 3, 2, 1)),
+        ),
+        ([1., 2., 3., 4., 5., 6.], [6., 5., 4., 3., 2., 1.], 0., 0., 0., 0., 0.),
+        str(MAX_MOTION_ID), {'motion_id': MAX_MOTION_ID}, id='movec-joint',
     ),
     pytest.param(
         'speedj', SpeedJointRequest(acceleration=1.0, velocities=(0.1, 0.2), time=0.3),
@@ -152,6 +161,19 @@ def test_motion_service_maps_sdk_arguments_and_generated_response(
         wire = BytesIO()
         response.serialize(wire)
         assert response_type().deserialize(wire.getvalue()).motion_id == MAX_MOTION_ID
+
+
+@pytest.mark.parametrize('joint_via', [False, True])
+def test_movec_rejects_mixed_coordinate_types_before_sdk_call(fake_rospy, joint_via):
+    robot = Mock(spec=['movec'])
+    robot.movec.return_value = 12
+    handlers = _handlers(_register(fake_rospy, robot))
+    request = MoveCircularRequest(via=MotionTarget(is_joint_pose=joint_via),
+                                  target=MotionTarget(is_joint_pose=not joint_via))
+    result = handlers['motion/movec'](request).result
+    assert not result.success and result.code == 1
+    assert 'type' in result.message
+    robot.movec.assert_not_called()
 
 
 @pytest.mark.parametrize('motion_id', [-1, MAX_MOTION_ID + 1])

@@ -43,3 +43,14 @@ def test_sdk_discovery_is_imported_on_request(fake_rospy, monkeypatch):
     monkeypatch.setitem(sys.modules, 'pylebai.zeroconf', SimpleNamespace(Discovery=factory))
     assert fake_rospy.services[0].handler(ResolveControllers._request_class()).result.success
     factory.assert_called_once_with()
+
+
+def test_discovery_does_not_open_sdk_after_shutdown_request(fake_rospy):
+    from lebai_driver.discovery_node import LebaiDiscoveryNode
+
+    factory = Mock()
+    adapter = RosNodeAdapter(fake_rospy)
+    node = LebaiDiscoveryNode(adapter, discovery_factory=factory)
+    fake_rospy.shutdown = True
+    assert not node.service.handler(ResolveControllers._request_class()).result.success
+    factory.assert_not_called()

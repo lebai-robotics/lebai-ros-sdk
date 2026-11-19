@@ -14,19 +14,20 @@ TIMEOUT_SCALE = 1.25
 
 
 def register_trajectory_action(connection, joint_names, action_name=ACTION_NAME,
-                               server_factory=None, worker_factory=None):
-    return TrajectoryActionBridge(connection, joint_names, action_name, server_factory, worker_factory)
+                               server_factory=None, worker_factory=None, admission=None):
+    return TrajectoryActionBridge(connection, joint_names, action_name, server_factory, worker_factory,
+                                  admission)
 
 
 class TrajectoryActionBridge(ActionBridge):
     action_type = FollowJointTrajectoryAction
     result_type = FollowJointTrajectoryResult
 
-    def __init__(self, connection, joint_names, action_name, server_factory, worker_factory):
+    def __init__(self, connection, joint_names, action_name, server_factory, worker_factory, admission=None):
         self.joint_names = list(joint_names)
         if len(self.joint_names) != 6:
             raise ValueError('trajectory action requires exactly six configured joints')
-        super().__init__(connection, action_name, server_factory, worker_factory)
+        super().__init__(connection, action_name, server_factory, worker_factory, admission)
 
     def _rejection(self, goal):
         if not goal.trajectory.points:

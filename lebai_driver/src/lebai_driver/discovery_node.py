@@ -9,12 +9,15 @@ from lebai_driver.ros_adapter import RosNodeAdapter
 
 class LebaiDiscoveryNode:
     def __init__(self, node, discovery_factory=None):
+        self._admission = node.admission
         self._factory = discovery_factory or _default_discovery_factory
         self.service = node.create_service(ResolveControllers, 'discovery/resolve', self.resolve)
 
     def resolve(self, request, response):
         try:
-            response.controllers = [_controller_info(item) for item in self._factory().resolve()]
+            with self._admission.command():
+                discovery = self._admission.methods(self._factory())
+                response.controllers = [_controller_info(item) for item in discovery.resolve()]
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

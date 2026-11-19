@@ -103,6 +103,23 @@ def test_joint_motion_maps_actual_and_target_readings(motion_robot):
     assert message.message == ''
 
 
+def test_native_borrowed_flange_pose_is_copied_while_kin_data_is_alive(motion_robot):
+    from pylebai.l_master import JointMotionData
+    from lebai_driver.conversions import joint_motion_from_sdk
+
+    def read_kin_data():
+        owner = JointMotionData()
+        pose = owner.actual_flange_pose
+        assert not pose.thisown
+        for index, field in enumerate(POSE_FIELDS, 1):
+            pose[field] = index + 0.25
+        return owner
+
+    motion_robot.get_kin_data = read_kin_data
+    message = _round_trip(joint_motion_from_sdk(motion_robot), JointMotion)
+    assert _pose_values(message.actual_flange_pose) == tuple(i + 0.25 for i in range(1, 7))
+
+
 def test_io_state_maps_sdk_pins():
     from lebai_driver.conversions import io_state_from_sdk
 

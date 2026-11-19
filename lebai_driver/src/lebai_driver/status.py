@@ -110,7 +110,7 @@ def _make_publish_callback(node, connection, publisher, registration, sdk_gate):
             with sdk_gate.status_access() as enabled:
                 if not enabled:
                     return
-                _publish_status(node, connection, publisher, registration)
+                _publish_status(node, connection, publisher, registration, sdk_gate.admission)
             return
 
         _publish_status(node, connection, publisher, registration)
@@ -118,9 +118,10 @@ def _make_publish_callback(node, connection, publisher, registration, sdk_gate):
     return callback
 
 
-def _publish_status(node, connection, publisher, registration):
+def _publish_status(node, connection, publisher, registration, admission=None):
     try:
-        message = registration.build_message(connection.robot)
+        robot = connection.robot
+        message = registration.build_message(admission.methods(robot) if admission is not None else robot)
     except Exception as exc:
         message = registration.build_error_message(exc)
     message.header.stamp = node.now()

@@ -118,9 +118,17 @@ def test_launch_selects_consistent_assets(has_gripper, model, semantic, topic, c
         limit = "/robot_description_planning/joint_limits/gripper_r_joint1/"
         assert params[limit + "has_velocity_limits"] is True
         assert params[limit + "max_velocity"] == 1.0
-    assert {node.type for node in config.nodes} == {"robot_state_publisher", "move_group"}
-    for node in config.nodes:
-        assert dict(node.remap_args)["joint_states"] == topic
+    consumers = [n for n in config.nodes if n.type in ("robot_state_publisher", "move_group")]
+    assert len(consumers) == 2
+    source = topic
+    if has_gripper:
+        relay, = [n for n in config.nodes if n.type == "model_joint_states.py"]
+        assert dict(relay.remap_args)["input"] == topic
+        source = dict(relay.remap_args)["output"]
+        assert source != topic
+    assert len(config.nodes) == (3 if has_gripper else 2)
+    for node in consumers:
+        assert dict(node.remap_args)["joint_states"] == source
 
 
 def test_starting_driver_requires_an_explicit_controller_address():
@@ -131,7 +139,7 @@ def test_starting_driver_requires_an_explicit_controller_address():
 def test_default_launch_starts_driver_forwards_connection_and_selects_gripper():
     config = launch_config("robot_ip:=192.0.2.33", "simulator:=true")
     assert sorted(node.package for node in config.nodes) == [
-        "lebai_driver", "moveit_ros_move_group", "robot_state_publisher", "rviz"]
+        "lebai_driver", "lebai_lm3_moveit_config", "moveit_ros_move_group", "robot_state_publisher", "rviz"]
     assert config.params["/lebai/lebai_driver/robot_ip"].value == "192.0.2.33"
     assert config.params["/lebai/lebai_driver/simulator"].value is True
     assert len(config.params["/move_group/controller_list"].value) == 2

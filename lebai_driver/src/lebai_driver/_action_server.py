@@ -2,9 +2,11 @@
 
 from concurrent.futures import Future
 from contextlib import contextmanager
-from threading import Condition, Event, Thread
+from threading import Event, Lock, Thread
 
 from actionlib import ActionServer
+
+from lebai_driver.sdk_gate import SdkAdmission
 
 
 class _GoalCanceled(Exception):
@@ -18,37 +20,25 @@ class _Cancellation:
 
 
 class ActionBridge:
-    def __init__(self, connection, action_name, server_factory, worker_factory):
+    def __init__(self, connection, action_name, server_factory, worker_factory, admission=None):
         self.connection = connection
         self._worker_factory = worker_factory or Thread
-        self._shutdown = Event()
-        self._state = Condition()
-        self._active_calls = 0
+        self._admission = admission or SdkAdmission()
+        self._state = Lock()
         self._cancellations = {}
         self.server = (server_factory or ActionServer)(
             action_name, self.action_type, self._goal, self._cancel, auto_start=False)
         self.server.start()
 
     def shutdown(self):
-        with self._state:
-            self._shutdown.set()
-            self._state.wait_for(lambda: self._active_calls == 0)
+        self._admission.shutdown()
 
     @contextmanager
     def _admit_call(self, canceled=None):
-        # Count from before method lookup until the call has returned. Workers
-        # release the condition while inside the SDK and may enter concurrently.
-        with self._state:
-            if self._shutdown.is_set() or (canceled is not None and canceled.is_set()):
+        with self._admission.access() as admitted:
+            if not admitted or (canceled is not None and canceled.is_set()):
                 raise _GoalCanceled()
-            self._active_calls += 1
-        try:
             yield
-        finally:
-            with self._state:
-                self._active_calls -= 1
-                if self._active_calls == 0 and self._shutdown.is_set():
-                    self._state.notify_all()
 
     def _goal(self, handle):
         goal = handle.get_goal()
@@ -56,7 +46,7 @@ class ActionBridge:
         rejection = self._rejection(goal)
         cancellation = _Cancellation()
         with self._state:
-            if self._shutdown.is_set():
+            if self._admission.is_closed():
                 rejection = self.result_type()
             if rejection is None:
                 self._cancellations[goal_id] = cancellation
@@ -80,7 +70,7 @@ class ActionBridge:
         goal_id = handle.get_goal_id().id
         with self._state:
             cancellation = self._cancellations.get(goal_id)
-            if cancellation is None or self._shutdown.is_set() or cancellation.requested.is_set():
+            if cancellation is None or self._admission.is_closed() or cancellation.requested.is_set():
                 return
             cancellation.requested.set()
         try:
@@ -95,7 +85,7 @@ class ActionBridge:
     def _run(self, handle, goal_id, goal, cancellation):
         result = self.result_type()
         try:
-            if self._shutdown.is_set() or cancellation.requested.is_set():
+            if self._admission.is_closed() or cancellation.requested.is_set():
                 raise _GoalCanceled()
             success = self._execute(goal, result, cancellation.requested)
         except _GoalCanceled:
@@ -106,7 +96,7 @@ class ActionBridge:
 
         with self._state:
             self._cancellations.pop(goal_id)
-            shutting_down = self._shutdown.is_set()
+            shutting_down = self._admission.is_closed()
             cancel_requested = cancellation.requested.is_set()
 
         if cancel_requested and not shutting_down:

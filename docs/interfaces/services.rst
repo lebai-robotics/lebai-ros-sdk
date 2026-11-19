@@ -59,6 +59,9 @@ The motion services use the ``/lebai/motion/`` prefix.
 
 ``movej``, ``movel``, ``movec``, ``speedj``, ``speedl``, and
 ``get_running_motion`` return an unsigned ``motion_id``.
+``movec`` requires both ``via`` and ``target`` to use joint coordinates,
+or both to use Cartesian coordinates. A mixed pair returns failure code
+``1`` before the driver calls the SDK motion method.
 ``get_motion_state`` accepts a motion ID and returns a state string.
 ``wait_move`` waits in the SDK for the supplied motion ID and blocks other
 driver services during that wait. See :doc:`../architecture`.

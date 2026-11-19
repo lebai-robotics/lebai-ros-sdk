@@ -7,8 +7,9 @@ from control_msgs.msg import GripperCommand
 import moveit_commander
 import rospy
 import rostest
+from moveit_msgs.msg import RobotTrajectory
 from sensor_msgs.msg import JointState
-from trajectory_msgs.msg import JointTrajectory
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
 class MoveItExecution(unittest.TestCase):
@@ -47,11 +48,33 @@ class MoveItExecution(unittest.TestCase):
             self.assertAlmostEqual(command.position, math.pi / 3, delta=0.002)
             rospy.loginfo("Named open executed at /lebai_gripper_controller/gripper_cmd, position=%.6f",
                           command.position)
+            self.check_claw_read_failure_blocks_execution(arm)
         else:
             controllers = rospy.get_param("/move_group/controller_list")
             self.assertEqual([c["name"] for c in controllers], ["/lebai_trajectory_controller"])
             topics = dict(rospy.get_published_topics())
             self.assertNotIn("/lebai_gripper_controller/gripper_cmd/status", topics)
+
+    def check_claw_read_failure_blocks_execution(self, arm):
+        rospy.set_param("/fake_moveit_controllers/fail_claw", True)
+        for _ in range(5):
+            raw = rospy.wait_for_message("/lebai/model/joint_states", JointState, timeout=3)
+            if not raw.velocity:
+                break
+        self.assertEqual(list(raw.position), [0.0] * 7)
+        self.assertFalse(raw.velocity)
+        actual = rospy.wait_for_message("/lebai/status/joint_states", JointState, timeout=3)
+        self.assertAlmostEqual(actual.position[0], 0.12, delta=0.002)
+        # Send a trajectory whose start matches the fallback but differs from the arm.
+        plan = RobotTrajectory()
+        plan.joint_trajectory.joint_names = list(actual.name)
+        for seconds, first in ((0, 0.0), (1, 0.2)):
+            plan.joint_trajectory.points.append(JointTrajectoryPoint(
+                positions=[first] + [0.0] * 5, velocities=[0.0] * 6,
+                accelerations=[0.0] * 6, time_from_start=rospy.Duration(seconds)))
+        count = rospy.get_param("/fake_moveit_controllers/arm_goals")
+        self.assertFalse(arm.execute(plan, wait=True), "MoveIt executed from the model fallback")
+        self.assertEqual(rospy.get_param("/fake_moveit_controllers/arm_goals"), count)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ from lebai_interfaces.srv import Command
 
 from lebai_driver.errors import exception_message
 from lebai_driver.result import fail, ok
-from lebai_driver.sdk_gate import exclusive_access
+from lebai_driver.sdk_gate import service_robot
 
 
 _COMMANDS = [
@@ -36,8 +36,8 @@ def _make_command_callback(connection, method_name, sdk_gate=None):
     def callback(request, response):
         del request
         try:
-            with exclusive_access(sdk_gate):
-                getattr(connection.robot, method_name)()
+            with service_robot(connection, sdk_gate) as robot:
+                getattr(robot, method_name)()
         except Exception as exc:
             response.result = fail(exception_message(exc))
         else:

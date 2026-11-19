@@ -17,8 +17,8 @@ TIMEOUT_SEC = 5.0
 
 
 def register_gripper_action(connection, action_name=ACTION_NAME, server_factory=None,
-                            worker_factory=None):
-    return GripperActionBridge(connection, action_name, server_factory, worker_factory)
+                            worker_factory=None, admission=None):
+    return GripperActionBridge(connection, action_name, server_factory, worker_factory, admission)
 
 
 class GripperActionBridge(ActionBridge):

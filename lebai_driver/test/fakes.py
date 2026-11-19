@@ -87,7 +87,7 @@ def assert_shutdown_drains_command(server, robot, bridge, goal, method):
             assert lookup.wait(3)
             closing = pool.submit(shutdown)
             try:
-                assert bridge._shutdown.wait(3)
+                assert bridge._admission.closed.wait(3)
                 earlier_calls = len(robot.mock_calls)
                 with pytest.raises(TimeoutError):
                     closing.result(timeout=0.05)
@@ -140,6 +140,9 @@ class FakeRospy:
         return timer
 
     def is_shutdown(self):
+        return self.shutdown
+
+    def is_shutdown_requested(self):
         return self.shutdown
 
     def on_shutdown(self, callback):

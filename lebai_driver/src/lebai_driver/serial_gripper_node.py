@@ -38,13 +38,14 @@ class LebaiSerialGripperNode:
     def _get_gripper(self):
         if self._gripper is None:
             self._gripper = self._factory(self._port)
-        return self._gripper
+        return self._node.admission.methods(self._gripper)
 
     def _command(self, method, fields):
         def callback(request, response):
             try:
                 args = [getattr(request, field) for field in fields]
-                with self._lock:
+                self._node.admission.require_open()
+                with self._lock, self._node.admission.command():
                     getattr(self._get_gripper(), method)(*args)
             except Exception as exc:
                 response.result = fail(exception_message(exc))
@@ -56,7 +57,9 @@ class LebaiSerialGripperNode:
 
     def _publish_state(self):
         try:
-            with self._lock:
+            with self._lock, self._node.admission.access() as admitted:
+                if not admitted:
+                    return
                 gripper = self._get_gripper()
                 state = GripperState(connected=True,
                                      position=float(gripper.get_current_position()),

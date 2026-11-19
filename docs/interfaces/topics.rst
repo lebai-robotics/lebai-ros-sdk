@@ -51,5 +51,12 @@ Driver and serial status messages with a ``connected`` field report
 ``connected: false`` and populate ``message`` when an SDK read fails.
 For arm-only LM3, use ``/lebai/status/joint_states`` without the claw data.
 
+If any arm or claw read fails, ``/lebai/model/joint_states`` publishes all
+seven names, seven zero positions, and empty velocity and effort arrays.
+The timestamp records the publication time even on failure. Treat this
+sample as unavailable measurement data. The default MoveIt launch accepts
+only complete measurements for the combined model. A fresh stamp or a
+``connected`` flag on a different topic cannot authorize motion.
+
 See :doc:`../quickstart` to change the publish rates or I/O pin counts.
 The controller actions are listed in :doc:`../architecture`.

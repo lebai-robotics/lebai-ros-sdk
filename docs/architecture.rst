@@ -27,11 +27,13 @@ The robot driver hosts two ROS 1 action servers.
 
 The defaults are absolute. To run multiple drivers on one ROS master, give
 each a distinct namespace and distinct absolute action names. Configure each
-action client to use the corresponding action name.
+action client to use the corresponding action name. Disable the default
+robot state publisher on each driver to avoid duplicate global TF frames.
 
 .. code-block:: bash
 
    roslaunch lebai_driver driver.launch namespace:=arm_a robot_ip:=192.168.1.104 \
+     publish_robot_description:=false \
      trajectory_action_name:=/arm_a/trajectory \
      gripper_action_name:=/arm_a/gripper_cmd
 
@@ -63,8 +65,9 @@ need status updates or other driver services to remain responsive.
 Migrating existing Noetic clients
 ---------------------------------
 
-This is a breaking release. Update message imports, ROS names, and request
-and response handling together.
+Driver 2.0.0 replaces the 0.0.2 driver and its ROS interfaces. The Catkin
+packages in this repository have independent versions. Update message imports,
+ROS names, and request and response handling together.
 
 .. BEGIN LEGACY MIGRATION
 

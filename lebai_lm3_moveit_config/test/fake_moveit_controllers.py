@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Advertise the driver action endpoints and publish the resulting joint state."""
 
+import math
 import threading
 
 import actionlib
 from control_msgs.msg import (FollowJointTrajectoryAction, FollowJointTrajectoryResult,
                               GripperCommand, GripperCommandAction, GripperCommandResult)
 import rospy
-from sensor_msgs.msg import JointState
+from lebai_driver.ros_adapter import RosNodeAdapter
+from lebai_driver.status import register_status_publishers
 from trajectory_msgs.msg import JointTrajectory
 
 
@@ -18,7 +20,7 @@ class FakeControllers:
             names.append("gripper_r_joint1")
         self.positions = dict.fromkeys(names, 0.0)
         self.lock = threading.Lock()
-        self.states = rospy.Publisher("joint_states", JointState, queue_size=1)
+        self.arm_goals = 0
         self.arm_goal = rospy.Publisher("~arm_goal", JointTrajectory, queue_size=1, latch=True)
         self.arm = actionlib.SimpleActionServer("/lebai_trajectory_controller",
                                                 FollowJointTrajectoryAction, self.move_arm,
@@ -30,21 +32,36 @@ class FakeControllers:
                                                         GripperCommandAction, self.move_gripper,
                                                         auto_start=False)
             self.gripper.start()
-        self.timer = rospy.Timer(rospy.Duration(0.02), self.publish_state)
+        self.status = register_status_publishers(RosNodeAdapter(), self)
 
-    def publish_state(self, _event):
-        state = JointState()
-        state.header.stamp = rospy.Time.now()
+    @property
+    def robot(self):
+        return self
+
+    def get_actual_joint_positions(self):
         with self.lock:
-            state.name = list(self.positions)
-            state.position = list(self.positions.values())
-        self.states.publish(state)
+            return list(self.positions.values())[:6]
+
+    def get_actual_joint_speed(self):
+        return [0.0] * 6
+
+    def get_actual_joint_torques(self):
+        return [0.0] * 6
+
+    def get_claw(self):
+        if rospy.get_param_cached("~fail_claw", False):
+            raise RuntimeError("claw read failed")
+        with self.lock:
+            amplitude = self.positions.get("gripper_r_joint1", 0.0) * 300.0 / math.pi
+        return (0.0, amplitude, False)
 
     def move_arm(self, goal):
         trajectory = goal.trajectory
         self.arm_goal.publish(trajectory)
         with self.lock:
             self.positions.update(zip(trajectory.joint_names, trajectory.points[-1].positions))
+            self.arm_goals += 1
+            rospy.set_param("~arm_goals", self.arm_goals)
         self.arm.set_succeeded(FollowJointTrajectoryResult())
 
     def move_gripper(self, goal):

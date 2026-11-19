@@ -13,7 +13,7 @@ from lebai_interfaces.srv import (
 
 from lebai_driver.errors import UNSUPPORTED, exception_message
 from lebai_driver.result import fail, ok
-from lebai_driver.sdk_gate import exclusive_access
+from lebai_driver.sdk_gate import service_robot
 
 
 _UNSUPPORTED_MESSAGE = 'unsupported by installed pylebai'
@@ -49,8 +49,8 @@ def register_motion_services(node, connection, sdk_gate=None):
 def _make_motion_callback(connection, handler, sdk_gate=None):
     def callback(request, response):
         try:
-            with exclusive_access(sdk_gate):
-                handler(connection.robot, request, response)
+            with service_robot(connection, sdk_gate) as robot:
+                handler(robot, request, response)
         except _UnsupportedMethod:
             response.result = fail(_UNSUPPORTED_MESSAGE, code=UNSUPPORTED)
         except Exception as exc:
@@ -87,6 +87,8 @@ def _movel(robot, request, response):
 
 
 def _movec(robot, request, response):
+    if request.via.is_joint_pose != request.target.is_joint_pose:
+        raise ValueError('movec via and target must use the same pose type')
     response.motion_id = _motion_id(
         _sdk_method(robot, 'movec')(
             _motion_target(request.via),

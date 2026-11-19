@@ -1,9 +1,14 @@
+from lebai_driver.sdk_gate import SdkAdmission
+
+
 class RosNodeAdapter:
     def __init__(self, rospy_module=None):
         if rospy_module is None:
             import rospy as rospy_module
 
         self._rospy = rospy_module
+        self.admission = SdkAdmission(lambda: self._rospy.is_shutdown_requested() or self._rospy.is_shutdown())
+        self.on_shutdown(self.admission.shutdown)
 
     def parameter(self, name, default):
         return self._rospy.get_param(f'~{name}', default)
@@ -21,8 +26,9 @@ class RosNodeAdapter:
 
     def create_timer(self, period, callback):
         def handle_timer(_event):
-            if not self._rospy.is_shutdown():
-                callback()
+            with self.admission.access() as admitted:
+                if admitted:
+                    callback()
 
         return self._rospy.Timer(self._rospy.Duration.from_sec(period), handle_timer)
 

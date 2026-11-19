@@ -28,7 +28,7 @@ IMPORT_ALIAS = r'[\w.]+(?:\s+as\s+\w+)?'
 TEXT_IMPORT = re.compile(
     r'\bfrom\s+([\w.]+)\s+import\b|\bimport\s+(' + IMPORT_ALIAS + r'(?:\s*,\s*' + IMPORT_ALIAS + r')*)'
 )
-GENERATED_DIRS = {'build', 'devel', 'logs', 'site'}
+GENERATED_DIRS = {'build', 'devel', 'install', 'logs', 'site', '__pycache__'}
 NEGATIVE_CONTROL_ASSIGNMENTS = {
     Path('test/test_no_legacy_references.py'): {'LEGACY_PACKAGE', 'LEGACY_CPP_PACKAGE', 'RETIRED_PACKAGES', 'RETIRED'},
     Path('lebai_tutorials/test/test_examples.py'): {'forbidden'},
@@ -80,7 +80,8 @@ def logical_lines(lines):
         if parts and re.search(r'\w$', parts[-1]) and re.match(r'\w', line):
             parts.append(' ')
         if line.endswith('\\'):
-            parts.append(line[:-1])
+            if line[:-1]:
+                parts.append(line[:-1])
             continue
         yield start, ''.join(parts) + line
         parts.clear()
@@ -98,7 +99,7 @@ def repository_problems(repo):
         if not name:
             continue
         path = Path(os.fsdecode(name))
-        if (GENERATED_DIRS.intersection(path.parts) or path.suffix == '.whl'
+        if (GENERATED_DIRS.intersection(path.parts) or path.suffix in ('.whl', '.pyc')
                 or any(part.endswith('.egg-info') for part in path.parts)):
             problems.append(f'{path}: tracked build product')
             continue
@@ -168,6 +169,20 @@ def test_retired_package_variables(scan_tracked_file):
              'include_directories(${%s_serialization_INCLUDE_DIRS})\n'
              'echo "$%s_serialization_LIBRARIES"\n') % (LEGACY_CPP_PACKAGE, LEGACY_CPP_PACKAGE)
     assert scan_tracked_file('CMakeLists.txt', valid) == []
+
+
+@pytest.mark.parametrize('name', ['install/setup.bash', 'module/__pycache__/node.cpython-38.pyc',
+                                  'module/node.pyc'])
+def test_tracked_install_space_and_bytecode_are_reported(scan_tracked_file, name):
+    assert scan_tracked_file(name, '') == [name + ': tracked build product']
+
+
+def test_documented_import_with_empty_continuation_lines(scan_tracked_file):
+    code = 'import\\\n\\\n\\\n' + 'lebai.type\n'
+    ast.parse(code)
+    assert scan_tracked_file('docs/example.rst', code) == [
+        'docs/example.rst:1: import ' + 'lebai.type',
+    ]
 
 
 def test_documented_imports_use_the_new_sdk(scan_tracked_file):

@@ -8,6 +8,7 @@ from unittest.mock import Mock
 import actionlib
 import pytest
 import rospy
+from actionlib_msgs.msg import GoalStatus
 from control_msgs.msg import GripperCommandResult
 from lebai_interfaces.msg import Result
 from lebai_interfaces.srv import MoveJointResponse
@@ -104,13 +105,19 @@ def run_gripper_example(monkeypatch):
     create_client = Mock(return_value=client)
     monkeypatch.setattr(actionlib, 'SimpleActionClient', create_client)
 
-    def run(max_effort):
+    def run(max_effort, state=GoalStatus.SUCCEEDED):
+        client.get_state.return_value = state
         monkeypatch.setattr(sys, 'argv', [str(script), '--amplitude', '50', f'--max-effort={max_effort}'])
         with pytest.raises(SystemExit) as exit_status:
             runpy.run_path(str(script), run_name='__main__')
         return exit_status.value.code, create_client, client
 
     return run
+
+
+def test_preempted_gripper_goal_with_stale_reached_result_fails(run_gripper_example):
+    exit_code, _, _ = run_gripper_example('50', state=GoalStatus.PREEMPTED)
+    assert exit_code == 1
 
 
 @pytest.mark.parametrize('max_effort', ['nan', 'inf', '-inf'])

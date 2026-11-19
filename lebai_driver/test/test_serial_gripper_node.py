@@ -1,5 +1,7 @@
 from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 import sys
+from threading import Event
 from types import SimpleNamespace
 from unittest.mock import Mock, call
 
@@ -77,3 +79,32 @@ def test_default_gripper_factory_is_lazy_and_retries_failed_open(fake_rospy, mon
     assert not state.connected and state.message == 'port unavailable'
     assert state.header.stamp == fake_rospy.stamp
     assert factory.call_args_list == [call('/dev/ttyUSB0'), call('/dev/ttyUSB0')]
+
+
+def test_shutdown_during_serial_position_read_does_not_start_force_read(fake_rospy):
+    from lebai_driver.serial_gripper_node import LebaiSerialGripperNode
+
+    active, release = Event(), Event()
+    sdk = Mock()
+
+    def position():
+        active.set()
+        assert release.wait(3)
+        return 42.
+
+    sdk.get_current_position.side_effect = position
+    adapter = RosNodeAdapter(fake_rospy)
+    node = LebaiSerialGripperNode(adapter, gripper_factory=lambda _: sdk)
+    node.publisher.publish = Mock()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        poll = pool.submit(node.timer.callback, None)
+        assert active.wait(3)
+        closing = pool.submit(adapter.admission.shutdown)
+        try:
+            assert adapter.admission.closed.wait(3)
+            assert not closing.done()
+        finally:
+            release.set()
+        poll.result(3)
+        closing.result(3)
+    sdk.get_current_force.assert_not_called()

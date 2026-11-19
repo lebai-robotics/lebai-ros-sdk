@@ -11,6 +11,8 @@ _GRIPPER_MAX_ANGLE = math.pi / 3.0
 
 
 def cartesian_pose_from_sdk(data):
+    if hasattr(data, 'asdict'):
+        data = data.asdict()
     values = [_value(data, index, name, 0.0) for index, name in enumerate(_POSE_FIELDS)]
     return CartesianPose(
         x=float(values[0]),
@@ -68,7 +70,10 @@ def joint_motion_from_sdk(robot):
     message.target_joint_torques = _float_list(robot.get_target_joint_torques())
     message.actual_tcp_pose = cartesian_pose_from_sdk(robot.get_actual_tcp_pose())
     message.target_tcp_pose = cartesian_pose_from_sdk(robot.get_target_tcp_pose())
-    message.actual_flange_pose = cartesian_pose_from_sdk(_actual_flange_pose(robot))
+    # The native flange map borrows storage from JointMotionData. Keep its owner
+    # alive until the six named fields have been copied into the ROS message.
+    kin_data = robot.get_kin_data()
+    message.actual_flange_pose = cartesian_pose_from_sdk(_value(kin_data, 0, 'actual_flange_pose', {}))
     return message
 
 
@@ -159,11 +164,6 @@ def model_joint_state_error(exc, joint_names, gripper_joint_name):
     message.name.append(gripper_joint_name)
     message.position = [0.0 for _name in message.name]
     return message
-
-
-def _actual_flange_pose(robot):
-    data = robot.get_kin_data()
-    return _value(data, 0, 'actual_flange_pose', {})
 
 
 def _float_list(values):

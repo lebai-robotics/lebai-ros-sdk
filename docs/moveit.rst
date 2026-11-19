@@ -12,7 +12,11 @@ controller address.
 
 ``has_gripper:=true`` is the default. It loads the arm and gripper model,
 configures the ``manipulator`` and ``gripper`` groups, and consumes
-``/lebai/model/joint_states``. The gripper group commands
+``/lebai/model/joint_states`` through a filter that forwards complete
+measurements to ``/lebai_moveit/joint_states``. A failed claw read can
+produce seven zero positions on the public topic even while the arm is
+away from zero. Those samples have empty velocity and effort arrays and
+cannot refresh MoveIt's measured state. The gripper group commands
 ``gripper_r_joint1`` and the URDF derives its mimic joints. The arm-only
 mode loads the ``manipulator`` group and consumes
 ``/lebai/status/joint_states``.
@@ -22,8 +26,16 @@ mode loads the ``manipulator`` group and consumes
 headless run. For a simulator running on the same host, pass
 ``simulator:=true robot_ip:=127.0.0.1``.
 
-If a driver is already running, set ``launch_driver:=false``. The default
-MoveIt configuration expects the driver's ``/lebai`` joint state paths and
+To reuse an external driver, start it with its robot state publisher
+disabled. Start the two commands in separate terminals. MoveIt publishes
+TF from the model selected by ``has_gripper``.
+
+.. code-block:: bash
+
+   roslaunch lebai_driver driver.launch robot_ip:=192.168.1.104 publish_robot_description:=false
+   roslaunch lebai_lm3_moveit_config lm3.launch has_gripper:=false launch_driver:=false
+
+The default MoveIt configuration expects the driver's ``/lebai`` joint state paths and
 absolute controller action names. If you override an action name on the
 driver, update the corresponding controller's ``name`` and ``action_ns`` in
 ``lebai_lm3_moveit_config/config/controllers.yaml`` for gripper mode or
