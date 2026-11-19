@@ -24,15 +24,26 @@ MODES = [
 ]
 
 
-def expand(model):
-    return ET.fromstring(subprocess.check_output(["xacro", str(URDF / model)]))
+def expand(model_path):
+    return ET.fromstring(subprocess.check_output(["xacro", str(model_path)]))
 
 
 @pytest.mark.parametrize("has_gripper,model,semantic,topic,controllers", MODES)
 def test_semantic_model(has_gripper, model, semantic, topic, controllers):
     assert (CONFIG / semantic).is_file()
-    srdf = ET.parse(str(CONFIG / semantic)).getroot()
-    urdf = expand(model)
+    assert_semantic_model(expand(URDF / model), ET.parse(str(CONFIG / semantic)).getroot(), has_gripper)
+
+
+def test_setup_assistant_uses_consistent_arm_only_model():
+    metadata = yaml.safe_load((PACKAGE / ".setup_assistant").read_text())["moveit_setup_assistant_config"]
+    urdf = metadata["URDF"]
+    model_path = PACKAGE.parent / urdf["package"] / urdf["relative_path"]
+    assert model_path == URDF / "lm3.xacro"
+    semantic_path = PACKAGE / metadata["SRDF"]["relative_path"]
+    assert_semantic_model(expand(model_path), ET.parse(str(semantic_path)).getroot(), has_gripper=False)
+
+
+def assert_semantic_model(urdf, srdf, has_gripper):
     assert srdf.get("name") == urdf.get("name")
     links = {link.get("name") for link in urdf.findall("link")}
     active = {joint.get("name") for joint in urdf.findall("joint")
@@ -98,7 +109,7 @@ def test_launch_selects_consistent_assets(has_gripper, model, semantic, topic, c
     config = launch_config("has_gripper:=" + str(has_gripper).lower(),
                            "launch_driver:=false", "use_rviz:=false")
     params = {name: p.value for name, p in config.params.items()}
-    assert ET.tostring(ET.fromstring(params["/robot_description"])) == ET.tostring(expand(model))
+    assert ET.tostring(ET.fromstring(params["/robot_description"])) == ET.tostring(expand(URDF / model))
     assert ET.tostring(ET.fromstring(params["/robot_description_semantic"])) == ET.tostring(
         ET.parse(str(CONFIG / semantic)).getroot())
     assert params["/move_group/controller_list"] == yaml.safe_load(
