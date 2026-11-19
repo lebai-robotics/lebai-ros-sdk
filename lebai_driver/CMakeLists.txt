@@ -3,18 +3,15 @@ project(lebai_driver)
 
 
 find_package(catkin REQUIRED COMPONENTS
-   rospy
-   std_msgs
-   message_generation
+  lebai_interfaces
+  rospy
+  std_msgs
 )
 
 catkin_python_setup()
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES beginner_tutorials
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
-#  DEPENDS system_lib
+  CATKIN_DEPENDS lebai_interfaces rospy std_msgs
 )
 
 ###########
