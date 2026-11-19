@@ -30,6 +30,7 @@ devel_isolated/
 # Ignore generated docs
 *.dox
 *.wikidoc
+/docs/superpowers/
 
 # eclipse stuff
 .project
