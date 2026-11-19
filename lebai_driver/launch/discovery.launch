@@ -1,0 +1,6 @@
+<launch>
+  <arg name="namespace" default="lebai"/>
+  <group ns="$(arg namespace)">
+    <node pkg="lebai_driver" type="lebai_discovery_node.py" name="lebai_discovery" output="screen"/>
+  </group>
+</launch>

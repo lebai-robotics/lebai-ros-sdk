@@ -1,0 +1,11 @@
+<launch>
+  <arg name="namespace" default="lebai"/>
+  <arg name="port_name" default="/dev/ttyUSB0"/>
+  <arg name="gripper_state_publish_rate" default="10.0"/>
+  <group ns="$(arg namespace)">
+    <node pkg="lebai_driver" type="lebai_serial_gripper_node.py" name="lebai_serial_gripper" output="screen">
+      <param name="port_name" type="str" value="$(arg port_name)"/>
+      <param name="gripper_state_publish_rate" type="double" value="$(arg gripper_state_publish_rate)"/>
+    </node>
+  </group>
+</launch>

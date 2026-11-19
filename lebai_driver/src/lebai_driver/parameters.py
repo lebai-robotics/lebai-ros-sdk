@@ -12,6 +12,8 @@ DEFAULT_PARAMETERS = {
     'simulator': False,
     'joint_names': DEFAULT_JOINT_NAMES,
     'namespace': '',
+    'trajectory_action_name': '/lebai_trajectory_controller',
+    'gripper_action_name': '/lebai_gripper_controller/gripper_cmd',
     'joint_state_publish_rate': 20.0,
     'robot_state_publish_rate': 10.0,
     'joint_motion_publish_rate': 20.0,
