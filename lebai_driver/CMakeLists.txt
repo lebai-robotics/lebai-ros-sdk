@@ -48,10 +48,6 @@ catkin_install_python(PROGRAMS
   scripts/lebai_driver_node.py
   scripts/lebai_discovery_node.py
   scripts/lebai_serial_gripper_node.py
-  src/io_service_node.py
-  src/motion_service_node.py
-  src/robot_state_node.py
-  src/system_service_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -76,7 +72,13 @@ catkin_install_python(PROGRAMS
 #   PATTERN ".svn" EXCLUDE
 # )
 
-install(DIRECTORY config launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(FILES
+  launch/driver.launch
+  launch/discovery.launch
+  launch/serial_gripper.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

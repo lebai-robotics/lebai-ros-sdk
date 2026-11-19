@@ -8,5 +8,6 @@
     <arg name="io_state_publish_rate" value="0.001"/>
     <arg name="gripper_state_publish_rate" value="0.001"/>
   </include>
+  <!-- Allow 20 seconds for graph registration and five seconds for requested process exit. -->
   <test pkg="lebai_driver" type="test_driver_interfaces.py" test-name="driver_interfaces" time-limit="30"/>
 </launch>

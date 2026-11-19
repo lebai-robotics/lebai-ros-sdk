@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import os
 import time
 import unittest
+from xmlrpc.client import ServerProxy, Transport
 
 import rospy
 import rostest
@@ -18,12 +20,20 @@ SERVICES = {
 STATUS = ('status/joint_states', 'claw/joint_states', 'model/joint_states',
           'status/robot', 'status/joint_motion', 'io/state', 'claw/state')
 ACTIONS = ('/lebai_trajectory_controller', '/lebai_gripper_controller/gripper_cmd')
+SHUTDOWN_TIMEOUT = 5.0
+
+
+class NodeTransport(Transport):
+    def make_connection(self, host):
+        connection = super().make_connection(host)
+        connection.timeout = SHUTDOWN_TIMEOUT
+        return connection
 
 
 class DriverInterfaces(unittest.TestCase):
     __test__ = False  # rostest starts the ROS master and the node under test.
 
-    def test_driver_owns_expected_graph(self):
+    def test_driver_owns_expected_graph_and_exits_on_shutdown(self):
         driver = '/lebai/lebai_driver'
         publishers = {'/lebai/' + topic for topic in STATUS}
         publishers.update(base + '/' + suffix for base in ACTIONS for suffix in ('status', 'feedback', 'result'))
@@ -41,11 +51,38 @@ class DriverInterfaces(unittest.TestCase):
                 if absent:
                     missing[kind] = sorted(absent)
             if not missing:
-                return
+                break
             if time.monotonic() >= deadline:
                 self.fail('Missing driver registrations: %s' % missing)
             time.sleep(0.1)
-        self.fail('ROS shut down before driver registration')
+        else:
+            self.fail('ROS shut down before driver registration')
+
+        code, message, uri = rospy.get_master().lookupNode(driver)
+        self.assertEqual(code, 1, message)
+        with ServerProxy(uri, transport=NodeTransport()) as node:
+            caller = rospy.get_name()
+            code, message, pid = node.getPid(caller)
+            self.assertEqual(code, 1, message)
+            self.assertGreater(pid, 1)
+            os.kill(pid, 0)  # Confirm the launched process is alive before requesting shutdown.
+            started = time.monotonic()
+            try:
+                code, message, _ = node.shutdown(caller, 'driver_interfaces test complete')
+                self.assertEqual(code, 1, message)
+            except (ConnectionResetError, ConnectionRefusedError):
+                # The node can close its XMLRPC endpoint while sending the reply.
+                pass
+
+        while time.monotonic() - started < SHUTDOWN_TIMEOUT:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                rospy.loginfo('Driver PID %d exited %.3fs after the XMLRPC shutdown request',
+                              pid, time.monotonic() - started)
+                return
+            time.sleep(0.05)
+        self.fail('Driver PID %d still alive %.1fs after XMLRPC shutdown' % (pid, SHUTDOWN_TIMEOUT))
 
 
 if __name__ == '__main__':
