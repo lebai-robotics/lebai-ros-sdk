@@ -77,6 +77,8 @@ def logical_lines(lines):
     start = 1
     parts = []
     for number, line in enumerate(lines, 1):
+        if parts and re.search(r'\w$', parts[-1]) and re.match(r'\w', line):
+            parts.append(' ')
         if line.endswith('\\'):
             parts.append(line[:-1])
             continue
@@ -175,9 +177,11 @@ def test_documented_imports_use_the_new_sdk(scan_tracked_file):
                 '   import %s as sdk\n'
                 '   import os, %s.robot\n'
                 '   import os, \\\n'
-                '       %s.type\n') % (old_sdk, old_sdk, old_sdk, old_sdk)
+                '       %s.type\n'
+                'import\\\n'
+                '%s.type\n') % (old_sdk, old_sdk, old_sdk, old_sdk, old_sdk)
     problems = scan_tracked_file('docs/install.rst', contents)
-    assert [problem.split(':')[1] for problem in problems] == ['3', '4', '5', '6']
+    assert [problem.split(':')[1] for problem in problems] == ['3', '4', '5', '6', '8']
 
     valid = ('   from lebai_interfaces import msg\n'
              '   from pylebai import Robot\n'
