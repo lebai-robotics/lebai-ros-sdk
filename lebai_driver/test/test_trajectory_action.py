@@ -11,13 +11,16 @@ from control_msgs.msg import (
 from genpy import Duration, Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from fakes import ActionHarness
+from fakes import ActionHarness, assert_shutdown_drains_command
 from lebai_driver.connection import RobotConnection
 
 
-def goal(times=(0.25, 0.75, 1.5), joints=('axis',)):
+JOINT_NAMES = ('axis_1', 'axis_2', 'axis_3', 'axis_4', 'axis_5', 'axis_6')
+
+
+def goal(times=(0.25, 0.75, 1.5), joints=JOINT_NAMES):
     points = [
-        JointTrajectoryPoint(positions=[float(i)], velocities=[2.0], accelerations=[3.0],
+        JointTrajectoryPoint(positions=[float(i)] * 6, velocities=[2.0] * 6, accelerations=[3.0] * 6,
                              time_from_start=Duration.from_sec(t))
         for i, t in enumerate(times)
     ]
@@ -25,15 +28,15 @@ def goal(times=(0.25, 0.75, 1.5), joints=('axis',)):
                                                                points=points))
 
 
-def setup_bridge(**kwargs):
+def setup_bridge(joint_names=JOINT_NAMES, **kwargs):
     from lebai_driver.trajectory_action import register_trajectory_action
 
     server = ActionHarness()
     robot = Mock(spec=['move_pvat', 'stop_move', 'get_robot_state', 'get_actual_joint_positions'])
     robot.get_robot_state.return_value = 5
-    robot.get_actual_joint_positions.return_value = [2.0]
+    robot.get_actual_joint_positions.return_value = [2.0] * 6
     connection = RobotConnection('test', robot_factory=lambda *a, **kw: robot)
-    bridge = register_trajectory_action(connection, ['axis'], server_factory=server.server_factory,
+    bridge = register_trajectory_action(connection, joint_names, server_factory=server.server_factory,
                                         worker_factory=server.worker_factory, **kwargs)
     return server, robot, bridge
 
@@ -47,7 +50,14 @@ def test_registration(override, expected):
         expected, FollowJointTrajectoryAction, 1)
 
 
-@pytest.mark.parametrize('request_goal', [goal(times=()), goal(joints=['different'])])
+@pytest.mark.parametrize('count', [0, 1, 5, 7])
+def test_registration_requires_six_joints(count):
+    with pytest.raises(ValueError, match='six'):
+        setup_bridge(joint_names=['axis_' + str(i) for i in range(count)])
+
+
+@pytest.mark.parametrize('request_goal', [goal(times=()), goal(joints=['different']),
+                                          goal(joints=JOINT_NAMES[::-1])])
 def test_rejects_empty_or_wrong_joints_before_starting_worker(request_goal):
     server, robot, _ = setup_bridge()
     handle = server.submit(request_goal)
@@ -80,12 +90,12 @@ def test_pvat_deltas_running_states_and_final_position_tolerance(monkeypatch):
     monkeypatch.setattr(trajectory_action, 'time', SimpleNamespace(monotonic=lambda: 0, sleep=sleep))
     server, robot, _ = setup_bridge()
     robot.get_robot_state.side_effect = [6, 7, 5]
-    robot.get_actual_joint_positions.side_effect = [[], [2.011], [1.991]]
+    robot.get_actual_joint_positions.side_effect = [[], [2.011] * 6, [1.991] * 6]
     handle = server.submit(goal())
     server.jobs[0]()
     assert robot.mock_calls == [
-        call.move_pvat([1.0], [2.0], [3.0], 0.5),
-        call.move_pvat([2.0], [2.0], [3.0], 0.75),
+        call.move_pvat([1.0] * 6, [2.0] * 6, [3.0] * 6, 0.5),
+        call.move_pvat([2.0] * 6, [2.0] * 6, [3.0] * 6, 0.75),
         call.get_robot_state(), call.get_robot_state(), call.get_robot_state(),
         call.get_actual_joint_positions(), call.get_actual_joint_positions(),
         call.get_actual_joint_positions(),
@@ -103,7 +113,7 @@ def test_wire_goal_with_uint32_header_and_duration_crossing_zero():
     request.trajectory.header.stamp = Time(4294967295, 999999999)
     wire = BytesIO()
     request.serialize(wire)
-    robot.get_actual_joint_positions.return_value = [1.0]
+    robot.get_actual_joint_positions.return_value = [1.0] * 6
     handle = server.submit(FollowJointTrajectoryGoal().deserialize(wire.getvalue()))
     server.jobs[0]()
     assert robot.move_pvat.call_args[0][-1] == pytest.approx(2e-9, abs=1e-15)
@@ -116,7 +126,7 @@ def test_scaled_deadline_is_measured_from_before_pvat(monkeypatch):
     clock = Mock(side_effect=[20.0, 30.0, 30.0, 30.000001])
     monkeypatch.setattr(trajectory_action, 'time', SimpleNamespace(monotonic=clock, sleep=Mock()))
     server, robot, _ = setup_bridge()
-    robot.get_actual_joint_positions.return_value = [0.0]
+    robot.get_actual_joint_positions.return_value = [0.0] * 6
     handle = server.submit(goal(times=(0, 4)))
     server.jobs[0]()
     robot.get_actual_joint_positions.assert_called_once()
@@ -133,7 +143,7 @@ def test_sdk_error_aborts_with_invalid_goal():
     result = handle.set_aborted.call_args[0][0]
     assert (result.error_code, result.error_string) == (FollowJointTrajectoryResult.INVALID_GOAL,
                                                        'controller rejected segment')
-    assert robot.mock_calls == [call.move_pvat([1.0], [2.0], [3.0], 0.5)]
+    assert robot.mock_calls == [call.move_pvat([1.0] * 6, [2.0] * 6, [3.0] * 6, 0.5)]
 
 
 def test_overlap_workers_enter_sdk_together():
@@ -168,7 +178,26 @@ def test_cancel_stops_immediately_and_only_cancels_matching_goal_id():
     assert robot.stop_move.call_count == 2
 
 
-@pytest.mark.parametrize('phase', ['queued', 'after_state_read', 'between_polls'])
+def test_cancel_callback_stop_error_aborts_goal_cleanly():
+    server, robot, _ = setup_bridge()
+    handle = server.submit(goal())
+    robot.stop_move.side_effect = RuntimeError('controller could not stop')
+    server.cancel_cb(server.handle(handle.get_goal(), 'g1'))
+    server.jobs[0]()
+    handle.set_aborted.assert_called_once()
+    result = handle.set_aborted.call_args[0][0]
+    assert (result.error_code, result.error_string) == (result.INVALID_GOAL, 'controller could not stop')
+    handle.set_canceled.assert_not_called()
+    robot.move_pvat.assert_not_called()
+
+
+@pytest.mark.parametrize('method', ['move_pvat', 'get_robot_state'])
+def test_shutdown_drains_admitted_trajectory_call(method):
+    server, robot, bridge = setup_bridge()
+    assert_shutdown_drains_command(server, robot, bridge, goal(), method)
+
+
+@pytest.mark.parametrize('phase', ['queued', 'between_polls'])
 def test_shutdown_cancels_workers_and_rejects_new_goals(monkeypatch, phase):
     from lebai_driver import trajectory_action
     server, robot, bridge = setup_bridge()
@@ -177,17 +206,11 @@ def test_shutdown_cancels_workers_and_rejects_new_goals(monkeypatch, phase):
         bridge.shutdown()
         expected = []
     else:
-        expected = [call.move_pvat([1.0], [2.0], [3.0], 0.5),
-                    call.move_pvat([2.0], [2.0], [3.0], 0.75), call.get_robot_state()]
-        if phase == 'after_state_read':
-            def shutdown_while_reading():
-                bridge.shutdown()
-                return 5
-            robot.get_robot_state.side_effect = shutdown_while_reading
-        else:
-            robot.get_robot_state.return_value = 6
-            monkeypatch.setattr(trajectory_action, 'time',
-                                SimpleNamespace(monotonic=lambda: 0, sleep=lambda _: bridge.shutdown()))
+        expected = [call.move_pvat([1.0] * 6, [2.0] * 6, [3.0] * 6, 0.5),
+                    call.move_pvat([2.0] * 6, [2.0] * 6, [3.0] * 6, 0.75), call.get_robot_state()]
+        robot.get_robot_state.return_value = 6
+        monkeypatch.setattr(trajectory_action, 'time',
+                            SimpleNamespace(monotonic=lambda: 0, sleep=lambda _: bridge.shutdown()))
     server.jobs[0]()
     handle.set_canceled.assert_called_once()
     server.cancel_cb(server.handle(handle.get_goal(), 'g1'))

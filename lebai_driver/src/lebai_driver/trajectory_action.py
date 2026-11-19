@@ -24,6 +24,8 @@ class TrajectoryActionBridge(ActionBridge):
 
     def __init__(self, connection, joint_names, action_name, server_factory, worker_factory):
         self.joint_names = list(joint_names)
+        if len(self.joint_names) != 6:
+            raise ValueError('trajectory action requires exactly six configured joints')
         super().__init__(connection, action_name, server_factory, worker_factory)
 
     def _rejection(self, goal):
@@ -36,10 +38,9 @@ class TrajectoryActionBridge(ActionBridge):
         return None
 
     def _on_cancel(self):
-        if self._shutdown.is_set():
-            return
-        robot = self.connection.robot
-        if not self._shutdown.is_set():
+        with self._admit_call():
+            robot = self.connection.robot
+        with self._admit_call():
             robot.stop_move()
 
     def _error_result(self, exc):
@@ -59,34 +60,34 @@ class TrajectoryActionBridge(ActionBridge):
             previous_time = current_time
         return True
 
-    def _execute(self, goal, result, check_active):
+    def _execute(self, goal, result, canceled):
         points = goal.trajectory.points
         if not self._valid_points(points):
             result.error_code = result.INVALID_GOAL
             result.error_string = 'invalid trajectory'
             return False
 
-        check_active()
-        robot = self.connection.robot
+        with self._admit_call(canceled):
+            robot = self.connection.robot
         start = time.monotonic()
         previous_time = points[0].time_from_start.to_sec()
         for point in points[1:]:
             current_time = point.time_from_start.to_sec()
-            check_active()
-            robot.move_pvat(list(point.positions), list(point.velocities),
-                            list(point.accelerations), current_time - previous_time)
+            with self._admit_call(canceled):
+                robot.move_pvat(list(point.positions), list(point.velocities),
+                                list(point.accelerations), current_time - previous_time)
             previous_time = current_time
 
         deadline = start + max(TIMEOUT_MARGIN_SEC, previous_time * TIMEOUT_SCALE + TIMEOUT_MARGIN_SEC)
         target = points[-1].positions
         motion_finished = False
         while time.monotonic() <= deadline:
-            check_active()
             if not motion_finished:
-                motion_finished = int(robot.get_robot_state()) not in RUNNING_ROBOT_STATES
+                with self._admit_call(canceled):
+                    motion_finished = int(robot.get_robot_state()) not in RUNNING_ROBOT_STATES
             if motion_finished:
-                check_active()
-                actual = list(robot.get_actual_joint_positions())
+                with self._admit_call(canceled):
+                    actual = list(robot.get_actual_joint_positions())
                 if len(actual) == len(target) and all(
                         abs(a - b) <= GOAL_TOLERANCE for a, b in zip(actual, target)):
                     result.error_code = result.SUCCESSFUL

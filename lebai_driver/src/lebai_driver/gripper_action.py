@@ -28,21 +28,21 @@ class GripperActionBridge(ActionBridge):
     def _error_result(self, exc):
         return self.result_type(stalled=True)
 
-    def _execute(self, goal, result, check_active):
+    def _execute(self, goal, result, canceled):
         command = goal.command
         position = max(0.0, min(MAX_GRIPPER_POSITION, float(command.position)))
         amplitude = position * MAX_AMPLITUDE / MAX_GRIPPER_POSITION
         effort = float(command.max_effort)
         force = DEFAULT_FORCE if effort <= 0 else max(0.0, min(MAX_AMPLITUDE, effort))
 
-        check_active()
-        robot = self.connection.robot
-        check_active()
-        robot.set_claw(force, amplitude)
+        with self._admit_call(canceled):
+            robot = self.connection.robot
+        with self._admit_call(canceled):
+            robot.set_claw(force, amplitude)
         deadline = time.monotonic() + TIMEOUT_SEC
         while time.monotonic() <= deadline:
-            check_active()
-            data = robot.get_claw()
+            with self._admit_call(canceled):
+                data = robot.get_claw()
             result.position = _amplitude_to_gripper_angle(_value(data, 1, 'amplitude', 0.0))
             result.effort = float(_value(data, 0, 'force', 0.0))
             result.reached_goal = abs(result.position - position) <= GOAL_TOLERANCE

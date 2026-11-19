@@ -5,7 +5,7 @@ from unittest.mock import Mock, call
 import pytest
 from control_msgs.msg import GripperCommand, GripperCommandAction, GripperCommandGoal
 
-from fakes import ActionHarness
+from fakes import ActionHarness, assert_shutdown_drains_command
 from lebai_driver.connection import RobotConnection
 
 
@@ -86,6 +86,11 @@ def test_sdk_exception_aborts_with_stalled_result(failed_method):
     server.jobs[0]()
     result = handle.set_aborted.call_args[0][0]
     assert result.stalled and not result.reached_goal
+
+
+def test_shutdown_drains_already_admitted_claw_command():
+    server, robot, bridge = setup_bridge()
+    assert_shutdown_drains_command(server, robot, bridge, goal(), 'set_claw')
 
 
 @pytest.mark.parametrize('phase', ['queued', 'between_polls'])

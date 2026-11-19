@@ -1,6 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from threading import Event
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+import pytest
 from actionlib_msgs.msg import GoalID
 from genpy import Duration, Time
 
@@ -53,6 +56,53 @@ class ActionHarness:
         handle.get_goal.return_value = goal
         handle.get_goal_id.return_value = GoalID(id=goal_id)
         return handle
+
+
+def assert_shutdown_drains_command(server, robot, bridge, goal, method):
+    """Pause after the worker's final activity check, at SDK method lookup."""
+    lookup, resume = Event(), Event()
+    running, finish = Event(), Event()
+    order = []
+    command = getattr(robot, method)
+    def perform_command(*args):
+        order.append('command')
+        running.set()
+        assert finish.wait(3)
+        return command.return_value
+    command.side_effect = perform_command
+
+    def paused_lookup(_robot):
+        lookup.set()
+        assert resume.wait(3)
+        return command
+
+    def shutdown():
+        bridge.shutdown()
+        order.append('shutdown returned')
+
+    handle = server.submit(goal)
+    with patch.object(type(robot), method, property(paused_lookup), create=True):
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            worker = pool.submit(server.jobs[0])
+            assert lookup.wait(3)
+            closing = pool.submit(shutdown)
+            try:
+                assert bridge._shutdown.wait(3)
+                earlier_calls = len(robot.mock_calls)
+                with pytest.raises(TimeoutError):
+                    closing.result(timeout=0.05)
+                resume.set()
+                assert running.wait(3)
+                with pytest.raises(TimeoutError):
+                    closing.result(timeout=0.05)
+            finally:
+                resume.set()
+                finish.set()
+            closing.result(timeout=3)
+            worker.result(timeout=3)
+    assert order == ['command', 'shutdown returned']
+    assert len(robot.mock_calls) == earlier_calls + 1
+    handle.set_canceled.assert_called_once()
 
 
 class FakeRospy:
