@@ -1,0 +1,23 @@
+<launch>
+  <arg name="has_gripper" default="true"/>
+  <arg name="robot_ip" default="127.0.0.1"/>
+  <arg name="simulator" default="false"/>
+  <arg name="launch_driver" default="true"/>
+  <arg name="use_rviz" default="true"/>
+
+  <include if="$(arg launch_driver)" file="$(find lebai_driver)/launch/driver.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)"/>
+    <arg name="simulator" value="$(arg simulator)"/>
+    <arg name="publish_robot_description" value="false"/>
+  </include>
+
+  <remap from="joint_states" to="/lebai/model/joint_states" if="$(arg has_gripper)"/>
+  <remap from="joint_states" to="/lebai/status/joint_states" unless="$(arg has_gripper)"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <include file="$(find lebai_lm3_moveit_config)/launch/move_group.launch">
+    <arg name="has_gripper" value="$(arg has_gripper)"/>
+  </include>
+  <include if="$(arg use_rviz)" file="$(find lebai_lm3_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="rviz_config" value="$(find lebai_lm3_moveit_config)/launch/moveit.rviz"/>
+  </include>
+</launch>

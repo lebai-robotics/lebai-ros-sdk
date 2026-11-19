@@ -1,0 +1,16 @@
+<launch>
+  <arg name="has_gripper" value="true"/>
+  <include file="$(find lebai_lm3_moveit_config)/launch/lm3.launch">
+    <arg name="has_gripper" value="$(arg has_gripper)"/>
+    <arg name="launch_driver" value="false"/>
+    <arg name="use_rviz" value="false"/>
+  </include>
+
+  <remap from="joint_states" to="/lebai/model/joint_states"/>
+  <node pkg="lebai_lm3_moveit_config" type="fake_moveit_controllers.py" name="fake_moveit_controllers" required="true">
+    <param name="has_gripper" type="bool" value="$(arg has_gripper)"/>
+  </node>
+  <test pkg="lebai_lm3_moveit_config" type="test_moveit_execution.py" test-name="lm3_with_gripper" time-limit="90">
+    <param name="has_gripper" type="bool" value="$(arg has_gripper)"/>
+  </test>
+</launch>
