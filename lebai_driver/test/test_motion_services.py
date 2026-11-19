@@ -154,6 +154,25 @@ def test_motion_service_maps_sdk_arguments_and_generated_response(
         assert response_type().deserialize(wire.getvalue()).motion_id == MAX_MOTION_ID
 
 
+@pytest.mark.parametrize('motion_id', [-1, MAX_MOTION_ID + 1])
+def test_invalid_motion_id_serializes_as_failed_result(fake_rospy, motion_id):
+    robot = Mock(spec=['movej'])
+    robot.movej.return_value = motion_id
+    handlers = _handlers(_register(fake_rospy, robot))
+
+    response = handlers['motion/movej'](MoveJointRequest())
+    wire = BytesIO()
+    response.serialize(wire)
+    decoded = MoveJoint._response_class().deserialize(wire.getvalue())
+
+    assert decoded.motion_id == 0
+    assert decoded.result == Result(
+        success=False,
+        code=1,
+        message="The 'motion_id' field must be an unsigned integer in [0, 4294967295]",
+    )
+
+
 @pytest.mark.parametrize('name,srv_type', MOTION_SERVICES, ids=[name for name, _ in MOTION_SERVICES])
 def test_motion_service_returns_generated_response_on_sdk_exception(fake_rospy, name, srv_type):
     robot = Mock(spec=[name])

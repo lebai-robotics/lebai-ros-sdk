@@ -184,7 +184,11 @@ def _float_list(values):
 
 
 def _motion_id(value):
-    return int(value or 0)
+    motion_id = int(value or 0)
+    # ROS1 checks the uint32 field during serialization, after the callback.
+    if not 0 <= motion_id <= 4_294_967_295:
+        raise ValueError("The 'motion_id' field must be an unsigned integer in [0, 4294967295]")
+    return motion_id
 
 
 class _UnsupportedMethod(Exception):
