@@ -1,18 +1,23 @@
-# Lebai ROS SDK for Noetic
+# Lebai ROS Noetic SDK 文档
 
-Driver 2.0.0 is a breaking release for ROS Noetic on Ubuntu 20.04 with Python 3.8 and `pylebai>=2.0.8,<3`. Python 2 is unsupported. The driver exposes services and status using `lebai_interfaces` and supports MoveIt 1 for the LM3 arm with or without its integrated gripper.
+驱动 2.0.0 面向 Ubuntu 20.04 上的 ROS Noetic，需要 Python 3.8 和
+`pylebai>=2.0.8,<3`，不支持 Python 2。本次升级包含不兼容变更。驱动通过
+`lebai_interfaces` 提供服务和状态，并为 LM3 提供带内置夹爪和仅机械臂两种
+MoveIt 1 配置。
 
-- [Install the SDK and build the Catkin workspace](docs/install.rst)
-- [Launch the driver, discovery, or serial gripper](docs/quickstart.rst)
-- [Review the migration table and driver behavior](docs/architecture.rst)
-- [Run the Python tutorials](docs/examples.rst)
-- [Configure LM3 for MoveIt 1](docs/moveit.rst)
+- [安装 SDK 并构建 Catkin 工作空间](docs/install.rst)
+- [快速开始](docs/quickstart.rst)
+- [节点和参数](docs/architecture.rst)
+- [话题](docs/interfaces/topics.rst)
+- [服务](docs/interfaces/services.rst)
+- [为 LM3 配置 MoveIt 1](docs/moveit.rst)
+- [运行 Python 示例](docs/examples.rst)
 
-Build the HTML documentation from the repository root.
+在仓库根目录构建 HTML 文档。
 
 ```bash
 python3 -m pip install --user -r docs/requirements.txt
 ./scripts/build-docs.sh
 ```
 
-Open `site/index.html` after the build.
+构建完成后，在浏览器中打开 `site/index.html`。

@@ -26,11 +26,10 @@ def test_both_lm3_moveit_modes_are_documented():
         assert 'roslaunch lebai_lm3_moveit_config lm3.launch ' + mode in contents
 
 
-def test_external_driver_examples_disable_duplicate_tf():
-    for page in ('moveit.rst', 'architecture.rst'):
-        text = (DOCS / page).read_text().replace('\\\n', '')
-        commands = [line for line in text.splitlines() if 'roslaunch lebai_driver driver.launch' in line]
-        assert commands and all('publish_robot_description:=false' in line for line in commands)
+def test_moveit_external_driver_example_disables_duplicate_tf():
+    text = (DOCS / 'moveit.rst').read_text(encoding='utf-8').replace('\\\n', '')
+    commands = [line for line in text.splitlines() if 'roslaunch lebai_driver driver.launch' in line]
+    assert commands and all('publish_robot_description:=false' in line for line in commands)
 
 
 def test_breaking_driver_version_matches_release_documentation():
@@ -38,7 +37,7 @@ def test_breaking_driver_version_matches_release_documentation():
     version = ET.parse(str(repo / 'lebai_driver/package.xml')).findtext('version')
     assert version == '2.0.0'
     assert runpy.run_path(str(DOCS / 'conf.py'))['release'] == version
-    for page in (repo / 'README.md', DOCS / 'architecture.rst'):
+    for page in (repo / 'README.md', DOCS / 'install.rst'):
         assert version in page.read_text()
 
 
@@ -69,6 +68,9 @@ def test_build_script_creates_pages_artifact():
     assert "document.querySelector('.wy-nav-content')" in switcher_text
     index = (site / 'index.html').read_text(encoding='utf-8')
     assert 'class="wy-nav-content"' in index
-    assert 'Lebai ROS SDK for Noetic' in index
+    assert 'lang="zh-CN"' in index
+    assert 'placeholder="搜索文档"' in index
+    assert 'Lebai ROS Noetic SDK 文档' in index
+    assert '文档版本' in switcher_text
     assert '2.0.0' in index
     assert 'version-switcher.js' in index

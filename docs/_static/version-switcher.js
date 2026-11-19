@@ -7,7 +7,7 @@
     mount.style.margin = '1rem 0';
 
     const label = document.createElement('label');
-    label.textContent = 'Docs version: ';
+    label.textContent = '文档版本 ';
     label.setAttribute('for', 'docs-version-select');
 
     const select = document.createElement('select');
@@ -43,7 +43,7 @@
 
   function start() {
     createVersionSwitcher().catch((error) => {
-      console.error('Unable to load documentation versions', error);
+      console.error('加载文档版本列表失败', error);
     });
   }
 

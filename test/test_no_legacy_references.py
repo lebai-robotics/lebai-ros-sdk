@@ -35,15 +35,6 @@ NEGATIVE_CONTROL_ASSIGNMENTS = {
 }
 
 
-def migration_table_lines(lines):
-    start, end = '.. BEGIN LEGACY MIGRATION', '.. END LEGACY MIGRATION'
-    assert lines.count(start) == lines.count(end) == 1, 'Expected one bounded migration table'
-    first, last = lines.index(start), lines.index(end)
-    assert first < last and lines[first + 2] == '.. list-table::'
-    assert all(not line.strip() or line.startswith('   ') for line in lines[first + 3:last])
-    return range(first + 3, last)
-
-
 def legacy_imports(tree, path):
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -115,9 +106,6 @@ def repository_problems(repo):
             tree = ast.parse(source, filename=str(path))
             problems.extend(legacy_imports(tree, path))
             remove_negative_control_literals(tree, path, lines)
-        history = migration_table_lines(lines) if path == Path('docs/architecture.rst') else ()
-        for index in history:
-            lines[index] = ''
         for number, line in enumerate(lines, 1):
             for match in REFERENCE.finditer(line):
                 problems.append(f'{path}:{number}: {match.group()}')
@@ -211,6 +199,3 @@ def test_documented_imports_use_the_new_sdk(scan_tracked_file):
              'Another paragraph lists items to import locally, \\\n'
              'lebai.type metadata among them.\n')
     assert scan_tracked_file('docs/install.rst', valid) == []
-    history = ('.. BEGIN LEGACY MIGRATION\n\n.. list-table::\n\n'
-               '   * - ``from %s.type import JointPose``\n\n.. END LEGACY MIGRATION\n') % old_sdk
-    assert scan_tracked_file('docs/architecture.rst', history) == []
