@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>话题 &mdash; Lebai ROS Noetic SDK 2.0.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/launch-parameters.css?v=d450eb4f" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a8665c39"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/translations.js?v=beaddf03"></script>
+        <script src="../_static/version-switcher.js?v=6daa4937"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="服务" href="services.html" />
+    <link rel="prev" title="节点和参数" href="../architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Lebai ROS Noetic SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">节点和参数</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">话题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">服务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Lebai ROS Noetic SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">话题</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/interfaces/topics.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>话题<a class="headerlink" href="#id1" title="此标题的永久链接"></a></h1>
+<p>参照 <a class="reference internal" href="../quickstart.html"><span class="doc">快速开始</span></a> 加载工作空间环境并启动驱动。以下示例使用默认
+命名空间 <code class="docutils literal notranslate"><span class="pre">lebai</span></code>。修改启动参数 <code class="docutils literal notranslate"><span class="pre">namespace</span></code> 后，请替换命令中的
+<code class="docutils literal notranslate"><span class="pre">/lebai</span></code> 前缀。<code class="docutils literal notranslate"><span class="pre">/tf</span></code> 和 <code class="docutils literal notranslate"><span class="pre">/tf_static</span></code> 使用全局路径。</p>
+<p><code class="docutils literal notranslate"><span class="pre">rostopic</span> <span class="pre">echo</span> <span class="pre">-n</span> <span class="pre">1</span></code> 收到一条消息后退出。持续查看时可去掉 <code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">1</span></code>。
+带有 <code class="docutils literal notranslate"><span class="pre">connected</span></code> 字段的状态消息在 SDK 读取失败时将其设为 <code class="docutils literal notranslate"><span class="pre">false</span></code>，
+错误信息见 <code class="docutils literal notranslate"><span class="pre">message</span></code> 字段。驱动状态的发布频率可通过
+<a class="reference internal" href="../architecture.html#driver-status-rates"><span class="std std-ref">状态发布频率参数</span></a> 配置。</p>
+<section id="id2">
+<h2>机器人状态<a class="headerlink" href="#id2" title="此标题的永久链接"></a></h2>
+<section id="id3">
+<h3>控制器状态<a class="headerlink" href="#id3" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/status/robot</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/RobotState</span></code>，默认 10 Hz。
+它提供控制器状态、急停原因和连接标志。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/status/robot
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>机械臂关节状态<a class="headerlink" href="#id4" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_states</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">sensor_msgs/JointState</span></code>，默认 20 Hz。
+它提供机械臂的关节名称及实测位置、速度和力矩。仅有机械臂的 LM3 也使用此话题。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/status/joint_states
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>关节运动状态<a class="headerlink" href="#id5" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_motion</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/JointMotion</span></code>，
+默认 20 Hz。它提供实际和目标关节位置、速度、力矩及 TCP 位姿，以及实际法兰位姿。
+TCP 和法兰位姿使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/CartesianPose</span></code>，字段包括
+<code class="docutils literal notranslate"><span class="pre">x</span></code>、<code class="docutils literal notranslate"><span class="pre">y</span></code>、<code class="docutils literal notranslate"><span class="pre">z</span></code>、<code class="docutils literal notranslate"><span class="pre">rx</span></code>、<code class="docutils literal notranslate"><span class="pre">ry</span></code> 和 <code class="docutils literal notranslate"><span class="pre">rz</span></code>。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/status/joint_motion
+</pre></div>
+</div>
+</section>
+</section>
+<section id="tf">
+<h2>机器人模型与 TF<a class="headerlink" href="#tf" title="此标题的永久链接"></a></h2>
+<section id="id6">
+<h3>组合模型关节状态<a class="headerlink" href="#id6" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/model/joint_states</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">sensor_msgs/JointState</span></code>，默认 20 Hz。
+它将机械臂与内置夹爪的主动关节状态合为一条消息，供机器人模型使用。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/model/joint_states
+</pre></div>
+</div>
+<p>只要机械臂或夹爪的任一读取失败，驱动就会发布七个关节名、七个零位置以及空的
+速度和力矩数组。此时时间戳仍表示发布时间，应把这条消息视为测量数据不可用。
+默认的 MoveIt 启动配置仅接收组合模型的完整测量数据。仅凭新的时间戳或其他话题
+的 <code class="docutils literal notranslate"><span class="pre">connected</span></code> 标志，无法确认机械臂具备执行条件。</p>
+</section>
+<section id="id7">
+<h3>动态 TF<a class="headerlink" href="#id7" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/tf</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">tf2_msgs/TFMessage</span></code>。默认启动的 <code class="docutils literal notranslate"><span class="pre">robot_state_publisher</span></code>
+根据关节状态发布动态坐标变换。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/tf
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>静态 TF<a class="headerlink" href="#id8" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/tf_static</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">tf2_msgs/TFMessage</span></code>，用于发布模型中固定关节的
+坐标变换。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/tf_static
+</pre></div>
+</div>
+</section>
+<section id="urdf">
+<h3>URDF 参数<a class="headerlink" href="#urdf" title="此标题的永久链接"></a></h3>
+<p>使用默认的 <code class="docutils literal notranslate"><span class="pre">driver.launch</span></code> 时，可以通过 ROS 参数读取 URDF 模型。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosparam<span class="w"> </span>get<span class="w"> </span>/lebai/robot_description
+</pre></div>
+</div>
+</section>
+</section>
+<section id="i-o">
+<h2>I/O 状态<a class="headerlink" href="#i-o" title="此标题的永久链接"></a></h2>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/io/state</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/IOState</span></code>，默认 10 Hz。
+它提供所选设备的数字 I/O、模拟 I/O 和 DIO 模式。各组引脚数默认为 0，
+此时对应的状态数组为空。可在 <a class="reference internal" href="../architecture.html#driver-io-parameters"><span class="std std-ref">I/O 状态参数</span></a> 中查看设备和
+引脚数量参数。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/io/state
+</pre></div>
+</div>
+</section>
+<section id="id9">
+<h2>内置夹爪<a class="headerlink" href="#id9" title="此标题的永久链接"></a></h2>
+<section id="id10">
+<h3>夹爪状态<a class="headerlink" href="#id10" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/claw/state</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/ClawState</span></code>，默认 10 Hz。
+它提供内置夹爪的力、开合幅度和夹持标志。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/claw/state
+</pre></div>
+</div>
+</section>
+<section id="id11">
+<h3>夹爪关节状态<a class="headerlink" href="#id11" title="此标题的永久链接"></a></h3>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/claw/joint_states</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">sensor_msgs/JointState</span></code>，默认 10 Hz。
+它将内置夹爪的开合幅度转换为模型主动关节的位置。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/claw/joint_states
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id12">
+<h2>串口夹爪状态<a class="headerlink" href="#id12" title="此标题的永久链接"></a></h2>
+<p>话题 <code class="docutils literal notranslate"><span class="pre">/lebai/gripper/state</span></code> 使用 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces/GripperState</span></code>，默认
+10 Hz。它由独立的串口夹爪节点发布，提供位置、力、速度和标定状态。
+先按 <a class="reference internal" href="../quickstart.html"><span class="doc">快速开始</span></a> 启动 <code class="docutils literal notranslate"><span class="pre">serial_gripper.launch</span></code>，再查看状态。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/gripper/state
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="../architecture.html" class="btn btn-neutral float-left" title="节点和参数" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="services.html" class="btn btn-neutral float-right" title="服务" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

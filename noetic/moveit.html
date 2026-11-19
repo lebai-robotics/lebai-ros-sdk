@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoveIt &mdash; Lebai ROS Noetic SDK 2.0.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/launch-parameters.css?v=d450eb4f" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=a8665c39"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/translations.js?v=beaddf03"></script>
+        <script src="_static/version-switcher.js?v=6daa4937"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="示例" href="examples.html" />
+    <link rel="prev" title="服务" href="interfaces/services.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lebai ROS Noetic SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/topics.html">话题</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces/services.html">服务</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lebai ROS Noetic SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MoveIt</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/moveit.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="moveit">
+<h1>MoveIt<a class="headerlink" href="#moveit" title="此标题的永久链接"></a></h1>
+<p>本页说明如何为 LM3 启动 MoveIt 1，并在 RViz 中规划和执行。</p>
+<section id="id1">
+<h2>准备工作<a class="headerlink" href="#id1" title="此标题的永久链接"></a></h2>
+<p>按 <a class="reference internal" href="install.html"><span class="doc">安装</span></a> 构建并加载 Catkin 工作空间环境。连接真实控制器时，将示例 IP
+换成控制器的实际地址。</p>
+</section>
+<section id="id2">
+<h2>启动 MoveIt<a class="headerlink" href="#id2" title="此标题的永久链接"></a></h2>
+<p>根据机械臂是否安装夹爪选择启动模式。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch<span class="w"> </span>has_gripper:<span class="o">=</span><span class="nb">true</span><span class="w"> </span>robot_ip:<span class="o">=</span><span class="m">192</span>.168.1.104
+roslaunch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch<span class="w"> </span>has_gripper:<span class="o">=</span><span class="nb">false</span><span class="w"> </span>robot_ip:<span class="o">=</span><span class="m">192</span>.168.1.104
+</pre></div>
+</div>
+<p>默认设置为 <code class="docutils literal notranslate"><span class="pre">has_gripper:=true</span></code>。启动时会加载机械臂和夹爪模型，配置
+<code class="docutils literal notranslate"><span class="pre">manipulator</span></code> 和 <code class="docutils literal notranslate"><span class="pre">gripper</span></code> 规划组，并通过过滤器将
+<code class="docutils literal notranslate"><span class="pre">/lebai/model/joint_states</span></code> 中完整的测量数据转发到
+<code class="docutils literal notranslate"><span class="pre">/lebai_moveit/joint_states</span></code>。读取夹爪失败时，即使机械臂的实际位置不为零，
+公开话题也可能发布七个零位置。此时消息的速度和力矩数组为空，MoveIt 不会用这些
+消息更新实测状态。夹爪规划组控制 <code class="docutils literal notranslate"><span class="pre">gripper_r_joint1</span></code>，其余关节按 URDF 中的
+<code class="docutils literal notranslate"><span class="pre">mimic</span></code> 定义随之运动。仅机械臂模式加载 <code class="docutils literal notranslate"><span class="pre">manipulator</span></code> 规划组，并订阅
+<code class="docutils literal notranslate"><span class="pre">/lebai/status/joint_states</span></code>。</p>
+<p><code class="docutils literal notranslate"><span class="pre">lm3.launch</span></code> 默认启动驱动和 RViz。由它启动驱动时，必须提供 <code class="docutils literal notranslate"><span class="pre">robot_ip</span></code>。
+在无界面环境运行时，设置 <code class="docutils literal notranslate"><span class="pre">use_rviz:=false</span></code>。连接本机仿真控制器时，传入
+<code class="docutils literal notranslate"><span class="pre">simulator:=true</span> <span class="pre">robot_ip:=127.0.0.1</span></code>。</p>
+<p>要复用单独启动的驱动，请关闭该驱动的机器人状态发布器。分别在两个终端运行下方
+命令。MoveIt 会根据 <code class="docutils literal notranslate"><span class="pre">has_gripper</span></code> 选择模型并发布 TF。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>roslaunch<span class="w"> </span>lebai_driver<span class="w"> </span>driver.launch<span class="w"> </span>robot_ip:<span class="o">=</span><span class="m">192</span>.168.1.104<span class="w"> </span>publish_robot_description:<span class="o">=</span><span class="nb">false</span>
+roslaunch<span class="w"> </span>lebai_lm3_moveit_config<span class="w"> </span>lm3.launch<span class="w"> </span>has_gripper:<span class="o">=</span><span class="nb">false</span><span class="w"> </span>launch_driver:<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+<p>默认的 MoveIt 配置使用驱动在 <code class="docutils literal notranslate"><span class="pre">/lebai</span></code> 下发布的关节状态话题和控制器 action
+的绝对名称。如果在驱动端修改了 action 名称，请同步修改相应控制器的 <code class="docutils literal notranslate"><span class="pre">name</span></code>
+和 <code class="docutils literal notranslate"><span class="pre">action_ns</span></code>，使拼接后的路径与驱动端一致。带夹爪模式修改
+<code class="docutils literal notranslate"><span class="pre">lebai_lm3_moveit_config/config/controllers.yaml</span></code>，仅机械臂模式修改
+<code class="docutils literal notranslate"><span class="pre">lebai_lm3_moveit_config/config/controllers_arm_only.yaml</span></code>。</p>
+</section>
+<section id="rviz">
+<h2>RViz 中的操作<a class="headerlink" href="#rviz" title="此标题的永久链接"></a></h2>
+<p>在 RViz 的 <code class="docutils literal notranslate"><span class="pre">MotionPlanning</span></code> 面板中选择 <code class="docutils literal notranslate"><span class="pre">manipulator</span></code>，设置目标姿态后点击
+<code class="docutils literal notranslate"><span class="pre">Plan</span></code>。确认规划轨迹后，按 <a class="reference internal" href="quickstart.html"><span class="doc">快速开始</span></a> 调用
+<code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/start_sys</span></code> 使能机器人，再点击 <code class="docutils literal notranslate"><span class="pre">Execute</span></code>。
+带夹爪模式还可以选择 <code class="docutils literal notranslate"><span class="pre">gripper</span></code> 规划组。</p>
+</section>
+<section id="id3">
+<h2>检查连接<a class="headerlink" href="#id3" title="此标题的永久链接"></a></h2>
+<p>查看驱动是否发布关节状态和轨迹控制器的 action 状态。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rostopic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/lebai/status/joint_states
+rostopic<span class="w"> </span>info<span class="w"> </span>/lebai_trajectory_controller/status
+</pre></div>
+</div>
+<p>带夹爪模式还可查看 <code class="docutils literal notranslate"><span class="pre">/lebai/model/joint_states</span></code>。各话题的查询命令见
+<a class="reference internal" href="interfaces/topics.html"><span class="doc">话题</span></a>，Python 示例见 <a class="reference internal" href="examples.html"><span class="doc">示例</span></a>。</p>
+</section>
+<section id="id4">
+<h2>直接调用控制器<a class="headerlink" href="#id4" title="此标题的永久链接"></a></h2>
+<p>默认 action 名称见 <a class="reference internal" href="architecture.html#node-launch-parameters"><span class="std std-ref">常用参数</span></a>。</p>
+<ul class="simple">
+<li><p>机械臂使用 <code class="docutils literal notranslate"><span class="pre">control_msgs/FollowJointTrajectoryAction</span></code>。请求中的六个关节名
+必须与驱动配置的顺序一致，并至少提供两个轨迹点。每个轨迹点分别包含六个位置、
+速度和加速度值，<code class="docutils literal notranslate"><span class="pre">time_from_start</span></code> 必须严格递增。第一个点的时间作为计算
+后续轨迹段时长的起点。</p></li>
+<li><p>内置夹爪使用 <code class="docutils literal notranslate"><span class="pre">control_msgs/GripperCommandAction</span></code>。关节目标位置从 0 到
+π/3 弧度，对应 0% 到 100% 的开合幅度。<code class="docutils literal notranslate"><span class="pre">max_effort</span></code> 小于或等于 0 时，
+使用默认力值 100。</p></li>
+</ul>
+<p>驱动可并行处理直接提交的 action 目标，取消轨迹会调用控制器的 <code class="docutils literal notranslate"><span class="pre">stop_move</span></code>，
+可能影响其他运动。请在客户端协调 action、MoveIt 和运动服务，确保同一时刻只有
+一个来源发出机械臂运动指令。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="interfaces/services.html" class="btn btn-neutral float-left" title="服务" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="示例" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

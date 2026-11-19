@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>服务 &mdash; Lebai ROS Noetic SDK 2.0.0 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/launch-parameters.css?v=d450eb4f" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=a8665c39"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/translations.js?v=beaddf03"></script>
+        <script src="../_static/version-switcher.js?v=6daa4937"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="MoveIt" href="../moveit.html" />
+    <link rel="prev" title="话题" href="topics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Lebai ROS Noetic SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="搜索文档" aria-label="搜索文档" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="导航菜单">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">快速开始</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">节点和参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topics.html">话题</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">服务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../moveit.html">MoveIt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">示例</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="移动版导航菜单" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Lebai ROS Noetic SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="页面导航">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">服务</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/interfaces/services.rst.txt" rel="nofollow"> 查看页面源码</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>服务<a class="headerlink" href="#id1" title="此标题的永久链接"></a></h1>
+<p>下列路径使用默认的 <code class="docutils literal notranslate"><span class="pre">/lebai</span></code> 命名空间，服务类型均来自 <code class="docutils literal notranslate"><span class="pre">lebai_interfaces</span></code>。
+每个响应包含 <code class="docutils literal notranslate"><span class="pre">result</span></code>，其中有 <code class="docutils literal notranslate"><span class="pre">success</span></code>、<code class="docutils literal notranslate"><span class="pre">code</span></code> 和 <code class="docutils literal notranslate"><span class="pre">message</span></code> 三个字段。
+结果码 <code class="docutils literal notranslate"><span class="pre">0</span></code> 表示成功，<code class="docutils literal notranslate"><span class="pre">1</span></code> 表示 SDK 错误。运动服务在已安装的 SDK 缺少
+所请求的方法时返回 <code class="docutils literal notranslate"><span class="pre">2</span></code>。使用返回数据前请先检查 <code class="docutils literal notranslate"><span class="pre">result.success</span></code>。</p>
+<p>可通过正在运行的服务查看其请求和响应字段。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosservice<span class="w"> </span><span class="nb">type</span><span class="w"> </span>/lebai/motion/movej
+rossrv<span class="w"> </span>show<span class="w"> </span>lebai_interfaces/MoveJoint
+</pre></div>
+</div>
+<section id="id2">
+<h2>启停与系统管理<a class="headerlink" href="#id2" title="此标题的永久链接"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">/lebai/start_stop/</span></code> 下的服务类型均为 <code class="docutils literal notranslate"><span class="pre">Command</span></code>，请求为空。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">start_sys</span></code>、<code class="docutils literal notranslate"><span class="pre">stop_sys</span></code>、<code class="docutils literal notranslate"><span class="pre">powerdown</span></code>、<code class="docutils literal notranslate"><span class="pre">stop</span></code>、<code class="docutils literal notranslate"><span class="pre">estop</span></code> 和 <code class="docutils literal notranslate"><span class="pre">reboot</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_teach_mode</span></code> 和 <code class="docutils literal notranslate"><span class="pre">end_teach_mode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pause_move</span></code> 和 <code class="docutils literal notranslate"><span class="pre">resume_move</span></code></p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>运动<a class="headerlink" href="#id3" title="此标题的永久链接"></a></h2>
+<p>运动服务使用 <code class="docutils literal notranslate"><span class="pre">/lebai/motion/</span></code> 前缀。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>服务</p></th>
+<th class="head"><p>类型</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">movej</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MoveJoint</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">movel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MoveLinear</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">movec</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MoveCircular</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">speedj</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SpeedJoint</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">speedl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SpeedLinear</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">move_pvat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MovePvat</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wait_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WaitMove</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stop_move</span></code>, <code class="docutils literal notranslate"><span class="pre">skip_move</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Command</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_running_motion</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetRunningMotion</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_motion_state</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetMotionState</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">movej</span></code>、<code class="docutils literal notranslate"><span class="pre">movel</span></code>、<code class="docutils literal notranslate"><span class="pre">movec</span></code>、<code class="docutils literal notranslate"><span class="pre">speedj</span></code>、<code class="docutils literal notranslate"><span class="pre">speedl</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">get_running_motion</span></code> 返回无符号的 <code class="docutils literal notranslate"><span class="pre">motion_id</span></code>。
+<code class="docutils literal notranslate"><span class="pre">movec</span></code> 要求 <code class="docutils literal notranslate"><span class="pre">via</span></code> 和 <code class="docutils literal notranslate"><span class="pre">target</span></code> 同时使用关节坐标，或同时使用笛卡尔坐标。
+混用两种坐标时，驱动在调用 SDK 运动方法前返回错误码 <code class="docutils literal notranslate"><span class="pre">1</span></code>。
+<code class="docutils literal notranslate"><span class="pre">get_motion_state</span></code> 接收运动 ID 并返回状态字符串。</p>
+<p><code class="docutils literal notranslate"><span class="pre">wait_move</span></code> 在 SDK 中阻塞等待指定运动完成。等待期间，其他驱动服务（包括
+<code class="docutils literal notranslate"><span class="pre">stop_move</span></code>）也会等待，状态话题会跳过更新。ROS 服务端未设置等待超时。
+如果需要持续读取状态或调用其他服务，可以轮询 <code class="docutils literal notranslate"><span class="pre">get_motion_state</span></code>。</p>
+</section>
+<section id="i-o">
+<h2>I/O<a class="headerlink" href="#i-o" title="此标题的永久链接"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">/lebai/io/</span></code> 下的每个请求都指定设备 <code class="docutils literal notranslate"><span class="pre">device</span></code> 和起始引脚 <code class="docutils literal notranslate"><span class="pre">pin</span></code>。
+批量读取时用 <code class="docutils literal notranslate"><span class="pre">num</span></code> 指定引脚数量，批量写入时提供 <code class="docutils literal notranslate"><span class="pre">values</span></code> 数组。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>服务</p></th>
+<th class="head"><p>类型</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_di</span></code>, <code class="docutils literal notranslate"><span class="pre">get_do</span></code>, <code class="docutils literal notranslate"><span class="pre">set_do</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetDigitalInput</span></code>, <code class="docutils literal notranslate"><span class="pre">GetDigitalOutput</span></code>, <code class="docutils literal notranslate"><span class="pre">SetDigitalOutput</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_dis</span></code>, <code class="docutils literal notranslate"><span class="pre">get_dos</span></code>, <code class="docutils literal notranslate"><span class="pre">set_dos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetDigitalInputs</span></code>, <code class="docutils literal notranslate"><span class="pre">GetDigitalOutputs</span></code>, <code class="docutils literal notranslate"><span class="pre">SetDigitalOutputs</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_ai</span></code>, <code class="docutils literal notranslate"><span class="pre">get_ao</span></code>, <code class="docutils literal notranslate"><span class="pre">set_ao</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetAnalogInput</span></code>, <code class="docutils literal notranslate"><span class="pre">GetAnalogOutput</span></code>, <code class="docutils literal notranslate"><span class="pre">SetAnalogOutput</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_ais</span></code>, <code class="docutils literal notranslate"><span class="pre">get_aos</span></code>, <code class="docutils literal notranslate"><span class="pre">set_aos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetAnalogInputs</span></code>, <code class="docutils literal notranslate"><span class="pre">GetAnalogOutputs</span></code>, <code class="docutils literal notranslate"><span class="pre">SetAnalogOutputs</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_dio_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">set_dio_mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GetDioMode</span></code>, <code class="docutils literal notranslate"><span class="pre">SetDioMode</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="led">
+<h2>LED 和信号<a class="headerlink" href="#led" title="此标题的永久链接"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/led/set_led</span></code> （<code class="docutils literal notranslate"><span class="pre">SetLed</span></code>）接收模式、速度和颜色。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/signal/get_signals</span></code> （<code class="docutils literal notranslate"><span class="pre">GetSignals</span></code>）从指定索引开始读取一定数量的
+信号值。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/signal/set_signals</span></code> （<code class="docutils literal notranslate"><span class="pre">SetSignals</span></code>）从指定索引开始写入信号值。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>资源<a class="headerlink" href="#id4" title="此标题的永久链接"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">/lebai/resource/</span></code> 下的 <code class="docutils literal notranslate"><span class="pre">load_tcp_list</span></code>、<code class="docutils literal notranslate"><span class="pre">load_pose_list</span></code>、
+<code class="docutils literal notranslate"><span class="pre">load_frame_list</span></code> 和 <code class="docutils literal notranslate"><span class="pre">load_trajectory_list</span></code> 都使用 <code class="docutils literal notranslate"><span class="pre">LoadResourceList</span></code>。
+传入目录 <code class="docutils literal notranslate"><span class="pre">directory</span></code>，从响应的 <code class="docutils literal notranslate"><span class="pre">names</span></code> 数组读取名称。</p>
+</section>
+<section id="id5">
+<h2>内置夹爪<a class="headerlink" href="#id5" title="此标题的永久链接"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/init_claw</span></code> （<code class="docutils literal notranslate"><span class="pre">Command</span></code>）初始化夹爪。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/set_claw</span></code> （<code class="docutils literal notranslate"><span class="pre">SetClaw</span></code>）接收夹持力 <code class="docutils literal notranslate"><span class="pre">force</span></code> 和开合幅度
+<code class="docutils literal notranslate"><span class="pre">amplitude</span></code>。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/lebai/claw/get_claw</span></code> （<code class="docutils literal notranslate"><span class="pre">GetClaw</span></code>）返回 <code class="docutils literal notranslate"><span class="pre">ClawState</span></code> 类型的 <code class="docutils literal notranslate"><span class="pre">state</span></code>。</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>串口夹爪<a class="headerlink" href="#id6" title="此标题的永久链接"></a></h2>
+<p>串口夹爪节点在 <code class="docutils literal notranslate"><span class="pre">/lebai/gripper/</span></code> 下提供以下服务。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">set_position</span></code> （<code class="docutils literal notranslate"><span class="pre">SetGripperPosition</span></code>）设置位置。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_force</span></code> （<code class="docutils literal notranslate"><span class="pre">SetGripperForce</span></code>）设置夹持力。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_velocity</span></code> （<code class="docutils literal notranslate"><span class="pre">SetGripperVelocity</span></code>）接收速度 <code class="docutils literal notranslate"><span class="pre">velocity</span></code> 和持久化标志
+<code class="docutils literal notranslate"><span class="pre">persistent</span></code>。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do_calibration</span></code>、<code class="docutils literal notranslate"><span class="pre">turn_on_auto_calibration</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">turn_off_auto_calibration</span></code> 的类型均为 <code class="docutils literal notranslate"><span class="pre">Command</span></code>。</p></li>
+</ul>
+</section>
+<section id="id7">
+<h2>发现控制器<a class="headerlink" href="#id7" title="此标题的永久链接"></a></h2>
+<p>发现节点提供 <code class="docutils literal notranslate"><span class="pre">/lebai/discovery/resolve</span></code> （<code class="docutils literal notranslate"><span class="pre">ResolveControllers</span></code>）。
+请求为空，返回的 <code class="docutils literal notranslate"><span class="pre">controllers</span></code> 数组以 <code class="docutils literal notranslate"><span class="pre">ControllerInfo</span></code> 记录发现的控制器。</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="页脚">
+        <a href="topics.html" class="btn btn-neutral float-left" title="话题" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> 上一页</a>
+        <a href="../moveit.html" class="btn btn-neutral float-right" title="MoveIt" accesskey="n" rel="next">下一页 <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 。</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用的 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a> 开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
