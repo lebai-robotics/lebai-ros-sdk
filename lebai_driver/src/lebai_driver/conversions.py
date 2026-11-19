@@ -23,13 +23,18 @@ def cartesian_pose_from_sdk(data):
 
 
 def robot_state_from_sdk(robot):
-    return RobotState(
+    message = RobotState(
         connected=True,
         state=int(robot.get_robot_state()),
         estop_reason=int(robot.get_estop_reason()),
         is_disconnected=bool(robot.is_disconnected()),
         is_down=bool(robot.is_down()),
     )
+    # genpy checks int32 only at publication, after the status error handler.
+    for field in ('state', 'estop_reason'):
+        if not -2_147_483_648 <= getattr(message, field) <= 2_147_483_647:
+            raise ValueError(f"The '{field}' field must be an integer in [-2147483648, 2147483647]")
+    return message
 
 
 def robot_state_error(exc):

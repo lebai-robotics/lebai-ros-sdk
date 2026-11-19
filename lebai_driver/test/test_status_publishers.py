@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 from threading import Event
 from types import SimpleNamespace
 
@@ -205,6 +206,29 @@ def test_status_publishers_publish_fallback_messages_on_sdk_errors(status_rospy,
     assert messages['claw/joint_states'].name == ['gripper_r_joint1']
     assert messages['claw/joint_states'].position == []
     assert messages['model/joint_states'].position == [0.0] * 7
+
+
+@pytest.mark.parametrize('method, field, invalid, boundary', [
+    ('get_robot_state', 'state', 2_147_483_648, 2_147_483_647),
+    ('get_estop_reason', 'estop_reason', -2_147_483_649, -2_147_483_648),
+])
+def test_robot_status_recovers_from_out_of_range_sdk_code(
+        status_rospy, status_robot, method, field, invalid, boundary):
+    values = iter([invalid, boundary])
+    setattr(status_robot, method, lambda: next(values))
+    handles = _register(status_rospy, CountingConnection(status_robot))
+    publisher, timer = next(handle for handle in handles if handle[0].name == 'status/robot')
+
+    _tick(timer)
+    _tick(timer)
+
+    failed, recovered = publisher.messages
+    for message in publisher.messages:
+        message.serialize(BytesIO())
+    assert not failed.connected
+    assert failed.message == f"The '{field}' field must be an integer in [-2147483648, 2147483647]"
+    assert recovered.connected
+    assert getattr(recovered, field) == boundary
 
 
 @pytest.mark.parametrize(
