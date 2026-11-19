@@ -62,9 +62,13 @@ def test_build_script_creates_pages_artifact():
     assert (site / '_static/css/theme.css').is_file()
     switcher = site / '_static/version-switcher.js'
     assert switcher.is_file()
-    assert "new URL('../../', document.currentScript.src)" in switcher.read_text(encoding='utf-8')
-    assert "new URL('versions.json', siteBase)" in switcher.read_text(encoding='utf-8')
+    switcher_text = switcher.read_text(encoding='utf-8')
+    assert "new URL('../../', scriptUrl)" in switcher_text
+    assert "new URL('versions.json', siteBase)" in switcher_text
+    assert "document.addEventListener('DOMContentLoaded'" in switcher_text
+    assert "document.querySelector('.wy-nav-content')" in switcher_text
     index = (site / 'index.html').read_text(encoding='utf-8')
+    assert 'class="wy-nav-content"' in index
     assert 'Lebai ROS SDK for Noetic' in index
     assert '2.0.0' in index
     assert 'version-switcher.js' in index

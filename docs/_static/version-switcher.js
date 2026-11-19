@@ -1,38 +1,55 @@
-(async function createVersionSwitcher() {
-  const mount = document.createElement('div');
-  mount.style.margin = '1rem 0';
+(function initializeVersionSwitcher() {
+  const scriptUrl = document.currentScript.src;
 
-  const label = document.createElement('label');
-  label.textContent = 'Docs version: ';
-  label.setAttribute('for', 'docs-version-select');
+  async function createVersionSwitcher() {
+    const mount = document.createElement('div');
+    mount.id = 'docs-version-switcher';
+    mount.style.margin = '1rem 0';
 
-  const select = document.createElement('select');
-  select.id = 'docs-version-select';
+    const label = document.createElement('label');
+    label.textContent = 'Docs version: ';
+    label.setAttribute('for', 'docs-version-select');
 
-  const siteBase = new URL('../../', document.currentScript.src);
-  const versionsUrl = new URL('versions.json', siteBase);
-  const response = await fetch(versionsUrl);
-  const versions = await response.json();
-  const current = location.pathname
-    .replace(siteBase.pathname, '')
-    .split('/')
-    .filter(Boolean)[0];
+    const select = document.createElement('select');
+    select.id = 'docs-version-select';
 
-  for (const version of versions) {
-    const option = document.createElement('option');
-    option.textContent = version.label;
-    option.value = new URL(`${version.path}/`, siteBase).toString();
-    option.selected = version.path === current;
-    select.appendChild(option);
+    const siteBase = new URL('../../', scriptUrl);
+    const versionsUrl = new URL('versions.json', siteBase);
+    const response = await fetch(versionsUrl);
+    const versions = await response.json();
+    const current = location.pathname
+      .replace(siteBase.pathname, '')
+      .split('/')
+      .filter(Boolean)[0];
+
+    for (const version of versions) {
+      const option = document.createElement('option');
+      option.textContent = version.label;
+      option.value = new URL(`${version.path}/`, siteBase).toString();
+      option.selected = version.path === current;
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', () => {
+      location.href = select.value;
+    });
+
+    mount.appendChild(label);
+    mount.appendChild(select);
+
+    const content = document.querySelector('.wy-nav-content') || document.body;
+    content.prepend(mount);
   }
 
-  select.addEventListener('change', () => {
-    location.href = select.value;
-  });
+  function start() {
+    createVersionSwitcher().catch((error) => {
+      console.error('Unable to load documentation versions', error);
+    });
+  }
 
-  mount.appendChild(label);
-  mount.appendChild(select);
-
-  const main = document.querySelector('div.body') || document.body;
-  main.prepend(mount);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
 }());

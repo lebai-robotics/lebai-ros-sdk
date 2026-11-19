@@ -2,7 +2,9 @@
 
 import math
 from pathlib import Path
+import runpy
 import subprocess
+from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 
 import pytest
@@ -16,6 +18,7 @@ LAUNCH = PACKAGE / "launch"
 URDF = PACKAGE.parent / "lebai_lm3_support" / "urdf"
 ARM = ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
 FINGER = "gripper_r_joint1"
+MODEL_STATE_RELAY = PACKAGE / "scripts/model_joint_states.py"
 MODES = [
     (False, "lm3.xacro", "lebai_lm3_no_gripper.srdf",
      "/lebai/status/joint_states", "controllers_arm_only.yaml"),
@@ -134,6 +137,25 @@ def test_launch_selects_consistent_assets(has_gripper, model, semantic, topic, c
 def test_starting_driver_requires_an_explicit_controller_address():
     with pytest.raises(roslaunch.RLException, match="robot_ip"):
         launch_config()
+
+
+def test_model_joint_state_relay_requires_each_modeled_joint_once():
+    is_complete_model_state = runpy.run_path(str(MODEL_STATE_RELAY))[
+        "is_complete_model_state"
+    ]
+    expected = ARM + [FINGER]
+
+    def state(names):
+        return SimpleNamespace(
+            name=names,
+            position=[0.0] * 7,
+            velocity=[0.0] * 7,
+            effort=[0.0] * 7,
+        )
+
+    assert is_complete_model_state(state(list(reversed(expected))))
+    assert not is_complete_model_state(state(ARM + ["joint_6"]))
+    assert not is_complete_model_state(state(ARM + ["unknown_joint"]))
 
 
 def test_default_launch_starts_driver_forwards_connection_and_selects_gripper():
