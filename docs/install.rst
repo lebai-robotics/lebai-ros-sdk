@@ -37,8 +37,8 @@ Building this guide
 -------------------
 
 Install the documentation dependencies and build from the repository root.
-The build treats Sphinx warnings as errors and writes the site to
-``docs/build/html/``. Open ``docs/build/html/index.html`` in a browser.
+The build treats Sphinx warnings as errors and writes the site to ``site/``.
+Open ``site/index.html`` in a browser.
 
 .. code-block:: bash
 

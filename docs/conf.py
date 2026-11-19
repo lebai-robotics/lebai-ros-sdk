@@ -5,5 +5,11 @@ project = 'Lebai ROS SDK for Noetic'
 manifest = Path(__file__).resolve().parents[1] / 'lebai_driver' / 'package.xml'
 release = ElementTree.parse(str(manifest)).findtext('version')
 root_doc = 'index'
-exclude_patterns = ['build']
-html_theme = 'alabaster'
+exclude_patterns = ['build', 'superpowers']
+html_theme = 'sphinx_rtd_theme'
+html_theme_options = {
+    'display_version': True,
+    'titles_only': True,
+}
+html_static_path = ['_static']
+html_js_files = ['version-switcher.js']

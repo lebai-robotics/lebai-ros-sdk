@@ -15,4 +15,4 @@ python3 -m pip install --user -r docs/requirements.txt
 ./scripts/build-docs.sh
 ```
 
-Open `docs/build/html/index.html` after the build.
+Open `site/index.html` after the build.

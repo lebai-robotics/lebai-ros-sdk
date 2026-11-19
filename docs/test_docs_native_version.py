@@ -1,5 +1,6 @@
 from pathlib import Path
 import runpy
+import subprocess
 import xml.etree.ElementTree as ET
 
 import pytest
@@ -39,3 +40,31 @@ def test_breaking_driver_version_matches_release_documentation():
     assert runpy.run_path(str(DOCS / 'conf.py'))['release'] == version
     for page in (repo / 'README.md', DOCS / 'architecture.rst'):
         assert version in page.read_text()
+
+
+def test_build_script_creates_pages_artifact():
+    repo = DOCS.parent
+    site = repo / 'site'
+    site.mkdir(exist_ok=True)
+    obsolete = site / 'obsolete-noetic-0.1.html'
+    obsolete.write_text('legacy Noetic documentation', encoding='utf-8')
+
+    completed = subprocess.run(
+        [str(repo / 'scripts/build-docs.sh')],
+        cwd=str(repo),
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert not obsolete.exists()
+    assert (site / 'index.html').is_file()
+    assert (site / '_static/css/theme.css').is_file()
+    switcher = site / '_static/version-switcher.js'
+    assert switcher.is_file()
+    assert "new URL('../../', document.currentScript.src)" in switcher.read_text(encoding='utf-8')
+    assert "new URL('versions.json', siteBase)" in switcher.read_text(encoding='utf-8')
+    index = (site / 'index.html').read_text(encoding='utf-8')
+    assert 'Lebai ROS SDK for Noetic' in index
+    assert '2.0.0' in index
+    assert 'version-switcher.js' in index
