@@ -28,7 +28,9 @@ ROS2_QUALIFICATION = re.compile(r"^(\s*lebai_interfaces/)(?:msg|srv)/")
 def require_humble_baseline():
     assert HUMBLE_TREE.returncode == 0, (
         f"Humble baseline {HUMBLE_BASELINE} is unavailable. "
-        f"Run `git fetch origin {HUMBLE_BASELINE}`.\n{HUMBLE_TREE.stderr.strip()}"
+        "For a shallow checkout, run `git fetch --unshallow origin humble-dev`. "
+        "For a full checkout, run `git fetch origin humble-dev`.\n"
+        f"{HUMBLE_TREE.stderr.strip()}"
     )
     assert HUMBLE_FILES, f"Humble baseline {HUMBLE_BASELINE} contains no interfaces"
 
