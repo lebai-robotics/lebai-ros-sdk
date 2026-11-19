@@ -1,0 +1,4 @@
+uint32 index
+int32[] values
+---
+lebai_interfaces/Result result

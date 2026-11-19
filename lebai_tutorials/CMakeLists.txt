@@ -2,50 +2,32 @@ cmake_minimum_required(VERSION 3.0.2)
 project(lebai_tutorials)
 
 find_package(catkin REQUIRED COMPONENTS
-  lebai_msgs
+  actionlib
+  actionlib_msgs
+  control_msgs
+  lebai_interfaces
+  moveit_commander
   rospy
-  roscpp
+  sensor_msgs
 )
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES lebai_tutorials
-#  CATKIN_DEPENDS lebai_msgs rospy
-#  DEPENDS system_lib
+catkin_package()
+
+catkin_install_python(PROGRAMS
+  scripts/io_example.py
+  scripts/joint_state_subscriber.py
+  scripts/move_example.py
+  scripts/moveit_gripper_amplitude_example.py
+  scripts/moveit_manipulator_example.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+# Keep the importable helper next to the scripts in both Catkin spaces.
+configure_file(
+  scripts/lebai_tutorials_common.py
+  "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/lebai_tutorials_common.py"
+  COPYONLY
 )
-
-# move_example node
-add_executable(move_example
-  src/move_example
+install(FILES scripts/lebai_tutorials_common.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-target_link_libraries(move_example
-  ${catkin_LIBRARIES}
-)
-#set_target_properties(move_example
-#  PROPERTIES OUTPUT_NAME move_example
-#  PREFIX "")
-add_dependencies(move_example lebai_msgs_generate_messages_cpp)
-
-
-#############
-## Install ##
-#############
-
-install(TARGETS move_example
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS scripts/io_example.py scripts/move_example.py scripts/robot_state.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-  

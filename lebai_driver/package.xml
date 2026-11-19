@@ -2,25 +2,26 @@
 <package format="2">
   <name>lebai_driver</name>
   <license>lebai</license>
-  <version>0.0.2</version>
+  <version>2.0.0</version>
   <description>The lebai_driver package</description>
   <maintainer email="liufang_robot@outlook.com">Liu Fang</maintainer>
   <author email="liufang_robot@outlook.com">Liu Fang</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>lebai_msgs</build_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>industrial_robot_client</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>lebai_msgs</exec_depend>  
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>industrial_robot_client</exec_depend>
+  <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>lebai_interfaces</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <exec_depend>lebai_lm3_support</exec_depend>
+  <exec_depend>pylebai</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>rostest</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

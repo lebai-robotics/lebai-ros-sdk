@@ -1,0 +1,6 @@
+string device
+uint32 pin
+uint32 num
+---
+lebai_interfaces/Result result
+bool[] values

@@ -3,18 +3,20 @@ project(lebai_driver)
 
 
 find_package(catkin REQUIRED COMPONENTS
-   rospy
-   std_msgs
-   message_generation
+  actionlib
+  actionlib_msgs
+  control_msgs
+  lebai_interfaces
+  rospy
+  sensor_msgs
+  std_msgs
+  trajectory_msgs
 )
 
 catkin_python_setup()
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES beginner_tutorials
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
-#  DEPENDS system_lib
+  CATKIN_DEPENDS actionlib actionlib_msgs control_msgs lebai_interfaces rospy sensor_msgs std_msgs trajectory_msgs
 )
 
 ###########
@@ -43,10 +45,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  src/io_service_node.py
-  src/motion_service_node.py
-  src/robot_state_node.py
-  src/system_service_node.py
+  scripts/lebai_driver_node.py
+  scripts/lebai_discovery_node.py
+  scripts/lebai_serial_gripper_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -71,7 +72,13 @@ catkin_install_python(PROGRAMS
 #   PATTERN ".svn" EXCLUDE
 # )
 
-install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(FILES
+  launch/driver.launch
+  launch/discovery.launch
+  launch/serial_gripper.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -85,4 +92,7 @@ install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 #############
 ## Testing ##
 #############
-add_subdirectory(test)
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(test/driver_interfaces.test)
+endif()

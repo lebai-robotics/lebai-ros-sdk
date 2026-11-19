@@ -11,6 +11,9 @@
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>lebai_resources</run_depend>
 
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>xacro</test_depend>
+  <test_depend>urdf</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

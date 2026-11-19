@@ -1,0 +1,7 @@
+float64 acceleration
+lebai_interfaces/CartesianPose velocity
+float64 time
+lebai_interfaces/CartesianPose reference
+---
+lebai_interfaces/Result result
+uint32 motion_id

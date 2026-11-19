@@ -1,0 +1,13 @@
+<launch>
+  <include file="$(find lebai_driver)/launch/driver.launch">
+    <arg name="simulator" value="true"/>
+    <arg name="publish_robot_description" value="false"/>
+    <arg name="joint_state_publish_rate" value="0.001"/>
+    <arg name="robot_state_publish_rate" value="0.001"/>
+    <arg name="joint_motion_publish_rate" value="0.001"/>
+    <arg name="io_state_publish_rate" value="0.001"/>
+    <arg name="gripper_state_publish_rate" value="0.001"/>
+  </include>
+  <!-- Allow 20 seconds for graph registration and five seconds for requested process exit. -->
+  <test pkg="lebai_driver" type="test_driver_interfaces.py" test-name="driver_interfaces" time-limit="30"/>
+</launch>

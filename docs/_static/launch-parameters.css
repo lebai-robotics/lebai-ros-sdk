@@ -1,0 +1,16 @@
+.rst-content table.launch-parameters {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.rst-content table.launch-parameters th,
+.rst-content table.launch-parameters td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.rst-content table.launch-parameters code,
+.rst-content table.launch-parameters code .pre {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

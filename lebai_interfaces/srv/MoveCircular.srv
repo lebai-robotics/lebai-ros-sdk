@@ -1,0 +1,7 @@
+lebai_interfaces/MotionTarget via
+lebai_interfaces/MotionTarget target
+float64 rad
+lebai_interfaces/MotionParams params
+---
+lebai_interfaces/Result result
+uint32 motion_id

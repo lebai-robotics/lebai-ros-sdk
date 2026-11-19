@@ -1,7 +1,13 @@
 .vscode
-\devel/
+devel/
 logs/
 build/
+install/
+site/
+*.egg-info/
+*.whl
+__pycache__/
+.pytest_cache/
 bin/
 msg_gen/
 srv_gen/
@@ -24,6 +30,7 @@ devel_isolated/
 # Ignore generated docs
 *.dox
 *.wikidoc
+/docs/superpowers/
 
 # eclipse stuff
 .project
