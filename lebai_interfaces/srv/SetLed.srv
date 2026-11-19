@@ -1,0 +1,5 @@
+uint32 mode
+uint32 speed
+uint8[] color
+---
+lebai_interfaces/Result result

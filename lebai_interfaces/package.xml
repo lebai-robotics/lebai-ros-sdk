@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>lebai_interfaces</name>
+  <version>0.0.1</version>
+  <description>Lebai robot interface message and service definitions</description>
+  <maintainer email="liufang_robot@outlook.com">ros</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <depend>std_msgs</depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <test_depend>git</test_depend>
+  <test_depend>python3-pytest</test_depend>
+</package>

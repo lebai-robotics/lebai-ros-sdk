@@ -1,0 +1,6 @@
+float64[] positions
+float64[] velocities
+float64[] accelerations
+float64 duration
+---
+lebai_interfaces/Result result
