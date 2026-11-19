@@ -92,8 +92,6 @@ install(FILES
 #############
 ## Testing ##
 #############
-add_subdirectory(test)
-
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   add_rostest(test/driver_interfaces.test)

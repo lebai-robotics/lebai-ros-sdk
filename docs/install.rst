@@ -7,11 +7,13 @@ See :doc:`architecture` when updating existing clients.
 
 With ROS Noetic installed, install the Python SDK into the Python 3.8
 environment that will run the ROS nodes. Do this before building the Catkin
-workspace.
+workspace. Ubuntu 20.04 ships pip 20.0.2. Upgrade to pip 25.0.1, which
+runs on Python 3.8 and recognizes the SDK's Linux wheel tags.
 
 .. code-block:: bash
 
    sudo apt install python3-pip
+   python3 -m pip install --user 'pip==25.0.1'
    python3 -m pip install --user 'pylebai>=2.0.8,<3'
 
 Place the checkout of this release in ``~/catkin_ws/src/lebai-ros-sdk``.

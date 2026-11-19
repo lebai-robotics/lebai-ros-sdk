@@ -1,8 +1,0 @@
-<launch>
-  <param name="robot_description" command="$(find xacro)/xacro '$(find lebai_lm3_support)/urdf/two_lm3.xacro'" />
-  <rosparam command="load" file="$(find lebai_lm3_support)/config/joint_names_lm3.yaml" />
-  <test pkg="lebai_driver" test-name="test_param_utils" type="test_param_utils.py">
-  </test>
-
-
-</launch>

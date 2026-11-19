@@ -1,0 +1,86 @@
+name: ROS 1 Noetic
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  noetic:
+    runs-on: ubuntu-24.04
+    container: ros:noetic-ros-base-focal
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install build and test tools
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential git liburdfdom-tools python3-pip python3-pytest python3-rosdep \
+            ros-noetic-catkin ros-noetic-moveit ros-noetic-rostest ros-noetic-urdf ros-noetic-xacro
+
+      - uses: actions/checkout@v4
+        with:
+          path: src/lebai-ros-sdk
+          fetch-depth: 0
+
+      - name: Verify immutable Humble interface baseline
+        working-directory: src/lebai-ros-sdk
+        run: |
+          git fetch origin humble-dev:refs/remotes/origin/humble-dev
+          git cat-file -e '15860fdfa3cbef29892a3d139b813a840903a926^{commit}'
+
+      - name: Verify Focal wheel and install dependencies
+        run: |
+          source /opt/ros/noetic/setup.bash
+          python3 -m pip install pip==25.0.1
+          python3 -m pip download --only-binary=:all: --no-deps \
+            --platform manylinux_2_27_x86_64 --implementation cp \
+            --python-version 38 --abi cp38 pylebai==2.0.8 --dest /tmp/pylebai-cp38-wheel
+          python3 -m pip install pylebai==2.0.8
+          python3 -c "from pylebai import Robot; from importlib.metadata import version; print(version('pylebai'), Robot)"
+          python3 -m pip install -r src/lebai-ros-sdk/docs/requirements.txt
+          rosdep update --rosdistro noetic --include-eol-distros
+          rosdep install --from-paths src --ignore-src -r -y --rosdistro noetic --skip-keys pylebai
+
+      - name: Build Catkin workspace
+        run: |
+          source /opt/ros/noetic/setup.bash
+          catkin_make
+
+      - name: Run Python suites
+        run: |
+          source devel/setup.bash
+          cd src/lebai-ros-sdk
+          python3 -m pytest -q -m 'not integration' \
+            lebai_interfaces/test lebai_driver/test lebai_lm3_support/test \
+            lebai_lm3_moveit_config/test/test_moveit_modes.py lebai_tutorials/test \
+            docs/test_docs_native_version.py test
+
+      - name: Exercise ROS graph and MoveIt execution
+        run: |
+          source devel/setup.bash
+          rostest lebai_driver driver_interfaces.test
+          rostest lebai_lm3_moveit_config lm3_arm_only.test
+          rostest lebai_lm3_moveit_config lm3_with_gripper.test
+          catkin_make run_tests
+          catkin_test_results --verbose
+
+      - name: Check Python sources, dependencies, and documentation
+        run: |
+          source devel/setup.bash
+          cd src/lebai-ros-sdk
+          python3 -m compileall -q lebai_driver/src lebai_driver/scripts lebai_tutorials/scripts
+          python3 -m pip check
+          ./scripts/build-docs.sh
+
+      - name: Exercise configured simulator
+        if: vars.LEBAI_TEST_ROBOT_IP != ''
+        env:
+          LEBAI_TEST_ROBOT_IP: ${{ vars.LEBAI_TEST_ROBOT_IP }}
+        run: |
+          source devel/setup.bash
+          python3 -m pytest -q -m integration src/lebai-ros-sdk/lebai_driver/test/test_simulator_smoke.py

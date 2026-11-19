@@ -1,5 +1,0 @@
-if (CATKIN_ENABLE_TESTING)
-find_package(rostest REQUIRED)
-  add_rostest(test_param_utils.launch)
-  add_rostest(test_lebai_driver.launch)
-endif()
