@@ -1,0 +1,2 @@
+# Sphinx 7.1 supports Python 3.8.
+Sphinx>=7.1,<7.2
