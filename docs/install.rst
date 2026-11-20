@@ -60,14 +60,3 @@ pip 25.0.1，该版本支持 Python 3.8，并能识别 SDK 的 Linux wheel 标�
    rosmsg show lebai_interfaces/RobotState
 
 接下来参阅 :doc:`quickstart`。
-
-构建本文档
-----------
-
-在仓库根目录安装文档依赖并构建。构建遇到 Sphinx 警告时会报错，成功后将页面
-输出到 ``site/``。在浏览器中打开 ``site/index.html`` 查看。
-
-.. code-block:: bash
-
-   python3 -m pip install --user -r docs/requirements.txt
-   ./scripts/build-docs.sh
